@@ -4,9 +4,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+/**
+ * JpaUtil - Singleton utility to manage the EntityManagerFactory and provide EntityManagers.
+ * Modeled after the Example project's manual database management.
+ */
 public final class JpaUtil {
     private static final EntityManagerFactory EMF =
-            Persistence.createEntityManagerFactory("StudentManagement");
+            Persistence.createEntityManagerFactory("OnlineUtePU");
 
     private JpaUtil() {
     }

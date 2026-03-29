@@ -11,14 +11,21 @@ public class Class {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "class_name", nullable = false)
+    private String className;
+
     @OneToMany(mappedBy = "classEntity", fetch = FetchType.LAZY)
     private List<Student> students = new ArrayList<>();
 
     public Class() {}
 
-    public Class(Long id) {
+    public Class(Long id, String className) {
         this.id = id;
+        this.className = className;
     }
+
+    public String getClassName() { return className; }
+    public void setClassName(String className) { this.className = className; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

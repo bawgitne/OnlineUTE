@@ -6,15 +6,27 @@
                https://jakarta.ee/xml/ns/persistence
                https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
 
-    <persistence-unit name="StudentManagement" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="OnlineUtePU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-
-
+        
+        <class>com.bangcompany.onlineute.Model.Entity.Account</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Admin</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Student</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Lecturer</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Class</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Course</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Term</class>
+        <class>com.bangcompany.onlineute.Model.Entity.StudyProgram</class>
+        <class>com.bangcompany.onlineute.Model.Entity.CourseSection</class>
+        <class>com.bangcompany.onlineute.Model.Entity.CourseRegistration</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Schedule</class>
+        <class>com.bangcompany.onlineute.Model.Entity.ExamSchedule</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Mark</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="jakarta.persistence.jdbc.url"
-                      value="jdbc:mysql://localhost:3306/student_management?useSSL=false&amp;serverTimezone=Asia/Ho_Chi_Minh&amp;allowPublicKeyRetrieval=true"/>
+                      value="jdbc:mysql://localhost:3306/online_ute?useSSL=false&amp;serverTimezone=Asia/Ho_Chi_Minh&amp;allowPublicKeyRetrieval=true"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
             <property name="jakarta.persistence.jdbc.password" value="1234"/>
 

@@ -1,6 +1,7 @@
 package com.bangcompany.onlineute.Model.Entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -10,34 +11,35 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "student_code", unique = true)
-    private Integer studentCode;
+    @Column(name = "code", unique = true, nullable = false)
+    private String code;
 
-    @Column(name = "fullname")
+    @Column(name = "fullname", nullable = false)
     private String fullName;
 
     @Column(name = "birth_of_date")
-    private String birthOfDate;
+    private LocalDate birthOfDate;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id")
+    @JoinColumn(name = "class_id", nullable = false)
     private Class classEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "study_program_id")
+    @JoinColumn(name = "study_program_id", nullable = false)
     private StudyProgram studyProgram;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "academic_term_id")
+    @JoinColumn(name = "academic_term_id", nullable = false)
     private Term term;
 
-    @OneToOne(mappedBy = "student")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
     @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
@@ -45,23 +47,24 @@ public class Student {
 
     public Student() {}
 
-    public Student(Long id, Integer studentCode, String fullName, String birthOfDate, String email, String avatarUrl) {
+    public Student(Long id, String code, String fullName, LocalDate birthOfDate, String email, String avatarUrl, Account account) {
         this.id = id;
-        this.studentCode = studentCode;
+        this.code = code;
         this.fullName = fullName;
         this.birthOfDate = birthOfDate;
         this.email = email;
         this.avatarUrl = avatarUrl;
+        this.account = account;
     }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public Integer getStudentCode() { return studentCode; }
-    public void setStudentCode(Integer studentCode) { this.studentCode = studentCode; }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
-    public String getBirthOfDate() { return birthOfDate; }
-    public void setBirthOfDate(String birthOfDate) { this.birthOfDate = birthOfDate; }
+    public LocalDate getBirthOfDate() { return birthOfDate; }
+    public void setBirthOfDate(LocalDate birthOfDate) { this.birthOfDate = birthOfDate; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public String getAvatarUrl() { return avatarUrl; }
@@ -77,3 +80,4 @@ public class Student {
     public List<CourseRegistration> getCourseRegistrations() { return courseRegistrations; }
     public void setCourseRegistrations(List<CourseRegistration> courseRegistrations) { this.courseRegistrations = courseRegistrations; }
 }
+
