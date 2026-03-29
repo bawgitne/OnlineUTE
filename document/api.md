@@ -1,72 +1,293 @@
-# Controller API Documentation
+# OnlineUTE - Tài liệu luồng API
 
-Tai lieu nay tong hop cac API public hien co trong cac controller cua du an.
+Tài liệu này mô tả luồng gọi hàm theo đúng mã nguồn hiện tại:
 
-## 1. AuthController
-File: `src/main/java/com/bangcompany/onlineute/Controller/AuthController.java`
+`Controller -> Service -> DAO`
 
-### 1.1 Login
-- Signature: `Optional<Account> Login(String username, String password)`
-- Mo ta: Dang nhap bang username va password.
-- Dau vao:
-  - `username`: ten dang nhap
-  - `password`: mat khau
-- Dau ra:
-  - `Optional<Account>`: co gia tri neu dang nhap thanh cong, rong neu that bai.
+Mục tiêu là giúp người đọc nắm nhanh một chức năng đi qua những lớp nào, gọi hàm nào.
 
-### 1.2 Logout
-- Signature: `void Logout()`
-- Mo ta: Dang xuat tai khoan hien tai (clear session).
-- Dau vao: khong co
-- Dau ra: khong co
+## 1. Phạm vi
 
-### 1.3 RegisterStudent
-- Signature: `Account RegisterStudent(Account account, Student student)`
-- Mo ta: Dang ky tai khoan sinh vien.
-- Dau vao:
-  - `account`: thong tin tai khoan
-  - `student`: thong tin ho so sinh vien
-- Dau ra:
-  - `Account`: tai khoan vua dang ky
-  - `null`: neu xay ra loi trong qua trinh dang ky
+- Đây là API ở tầng `Controller` trong ứng dụng desktop Swing, không phải REST endpoint HTTP.
+- Tên hàm được giữ nguyên theo source hiện tại.
 
-### 1.4 RegisterLecturer
-- Signature: `Account RegisterLecturer(Account account, Lecturer lecturer)`
-- Mo ta: Dang ky tai khoan giang vien.
-- Dau vao:
-  - `account`: thong tin tai khoan
-  - `lecturer`: thong tin ho so giang vien
-- Dau ra:
-  - `Account`: tai khoan vua dang ky
-  - `null`: neu xay ra loi trong qua trinh dang ky
+## 2. Wiring thực tế trong AppContext
 
-### 1.5 RegisterAdmin
-- Signature: `Account RegisterAdmin(Account account, Admin admin)`
-- Mo ta: Dang ky tai khoan quan tri.
-- Dau vao:
-  - `account`: thong tin tai khoan
-  - `admin`: thong tin ho so quan tri
-- Dau ra:
-  - `Account`: tai khoan vua dang ky
-  - `null`: neu xay ra loi trong qua trinh dang ky
+Đã được khởi tạo trong `AppContext.init()`:
 
-## 2. StudentController
-File: `src/main/java/com/bangcompany/onlineute/Controller/StudentController.java`
+- `AuthController -> AuthServiceImpl -> AccountDAO, StudentDAO, LecturerDAO, AdminDAO`
+- `TermController -> TermServiceImpl -> TermDAO`
+- `StudentController -> StudentServiceImpl -> StudentDAO`
+- `CourseSectionController -> CourseSectionServiceImpl -> CourseSectionDAO`
+- `CourseRegistrationController -> CourseRegistrationServiceImpl -> CourseRegistrationDAO`
+- `MarkController -> MarkServiceImpl -> MarkDAO`
+- `NotificationController -> AnnouncementServiceImpl, CourseSectionServiceImpl -> AnnouncementDAO, CourseSectionDAO`
+- `ScheduleServiceImpl -> ScheduleDAO` (hiện tại View gọi trực tiếp qua `AppContext.getScheduleService()`)
 
-### 2.1 createStudent
-- Signature: `void createStudent(Student student, Account account)`
-- Mo ta: Tao sinh vien moi va lien ket voi account.
-- Dau vao:
-  - `student`: thong tin sinh vien
-  - `account`: thong tin tai khoan
-- Dau ra: khong co
+Chưa thấy được wire vào `AppContext`:
 
-## 3. NotificationController
-File: `src/main/java/com/bangcompany/onlineute/Controller/NotificationController.java`
+- `CourseController`
+- `CourseServiceImpl`
+- `CourseDAO` trong luồng chính
 
-Hien tai chua dinh nghia API public nao.
+## 3. Module xác thực (Auth)
 
-## 4. Ghi chu
-- Day la API o tang controller trong ung dung desktop (Swing), khong phai REST endpoint HTTP.
-- Method naming hien tai dang dung PascalCase va camelCase xen ke (`Login`, `Logout`, `createStudent`).
-- Co the chuan hoa dat ten method ve camelCase dong nhat trong cac controller.
+Files:
+
+- `Controller`: `src/main/java/com/bangcompany/onlineute/Controller/AuthController.java`
+- `Service`: `src/main/java/com/bangcompany/onlineute/Service/AuthService.java`
+- `ServiceImpl`: `src/main/java/com/bangcompany/onlineute/Service/Impl/AuthServiceImpl.java`
+- `DAO`: `AccountDAO`, `StudentDAO`, `LecturerDAO`, `AdminDAO`
+
+Luồng theo từng hàm:
+
+- `AuthController.Login(username, password)`
+  - Gọi `AuthService.login(username, password)`
+  - Service gọi `AccountDAO.findByUsername(username)`
+  - Nếu đúng mật khẩu, service nạp profile bằng:
+    - `StudentDAO.findByAccountId(...)` hoặc
+    - `LecturerDAO.findByAccountId(...)` hoặc
+    - `AdminDAO.findByAccountId(...)`
+  - Kết quả: trả `Optional<Account>` và cập nhật `SessionManager`
+
+- `AuthController.Logout()`
+  - Gọi `AuthService.logout()`
+  - Không gọi DAO
+  - Kết quả: xóa session hiện tại
+
+- `AuthController.RegisterStudent(account, student)`
+  - Gọi `AuthService.registerStudent(...)`
+  - Service liên kết account vào student
+  - Gọi `StudentDAO.save(student)`
+
+- `AuthController.RegisterLecturer(account, lecturer)`
+  - Gọi `AuthService.registerLecturer(...)`
+  - Service liên kết account vào lecturer
+  - Gọi `LecturerDAO.save(lecturer)`
+
+- `AuthController.RegisterAdmin(account, admin)`
+  - Gọi `AuthService.registerAdmin(...)`
+  - Service liên kết account vào admin
+  - Gọi `AdminDAO.save(admin)`
+
+## 4. Module thông báo (Notification/Announcement)
+
+Files:
+
+- `Controller`: `src/main/java/com/bangcompany/onlineute/Controller/NotificationController.java`
+- `Service`: `src/main/java/com/bangcompany/onlineute/Service/AnnouncementService.java`
+- `ServiceImpl`: `src/main/java/com/bangcompany/onlineute/Service/Impl/AnnouncementServiceImpl.java`
+- `DAO`: `src/main/java/com/bangcompany/onlineute/DAO/AnnouncementDAO.java`
+- `DAOImpl`: `src/main/java/com/bangcompany/onlineute/DAO/Impl/AnnouncementDAOImpl.java`
+
+Luồng theo từng hàm:
+
+- `NotificationController.createAnnouncement(title, content, targetType, courseSectionId, senderName)`
+  - Gọi `AnnouncementService.createAnnouncement(...)`
+  - Service tạo entity `Announcement`
+  - Gọi `AnnouncementDAO.create(announcement)`
+
+- `NotificationController.getAnnouncementsForCurrentUser()`
+  - Gọi `AnnouncementService.getAnnouncementsForCurrentUser()`
+  - Service phân nhánh theo role:
+    - `ADMIN`: gọi `AnnouncementDAO.findAll()`
+    - `LECTURER`: gọi `AnnouncementDAO.findByTargetType("ALL_LECTURERS")` và `findByTargetType("ALL")`
+    - `STUDENT`: gọi `AnnouncementDAO.findAnnouncementsForStudent(studentId)`
+
+- `NotificationController.getCourseSectionsByLecturerId(lecturerId)`
+  - Gọi `CourseSectionService.getAllSections()`
+  - Service gọi `CourseSectionDAO.findAll()`
+  - Controller lọc danh sách theo `lecturerId`
+
+Chi tiết quan trọng cho sinh viên:
+
+- `AnnouncementDAOImpl.findAnnouncementsForStudent(studentId)` lấy:
+  - Thông báo `ALL`
+  - Thông báo `ALL_STUDENTS`
+  - Thông báo `COURSE_SECTION` nếu `courseSectionId` nằm trong các lớp sinh viên đã đăng ký
+
+## 5. Module học kỳ (Term)
+
+Files:
+
+- `Controller`: `src/main/java/com/bangcompany/onlineute/Controller/TermController.java`
+- `Service`: `src/main/java/com/bangcompany/onlineute/Service/TermService.java`
+- `ServiceImpl`: `src/main/java/com/bangcompany/onlineute/Service/Impl/TermServiceImpl.java`
+- `DAO`: `src/main/java/com/bangcompany/onlineute/DAO/TermDAO.java`
+- `DAOImpl`: `src/main/java/com/bangcompany/onlineute/DAO/Impl/TermDAOImpl.java`
+
+Luồng theo từng hàm:
+
+- `TermController.getAllTerms()`
+  - `TermService.getAllTerms()`
+  - `TermDAO.findAll()`
+
+- `TermController.getTermById(id)`
+  - `TermService.getTermById(id)`
+  - `TermDAO.findById(id)`
+
+- `TermController.getCurrentTerm()`
+  - `TermService.getCurrentTerm()`
+  - `TermDAO.findCurrentTerm()`
+
+- `TermController.createTerm(term)`
+  - `TermService.createTerm(term)`
+  - `TermDAO.save(term)`
+
+- `TermController.updateTerm(term)`
+  - `TermService.updateTerm(term)`
+  - `TermDAO.update(term)`
+
+- `TermController.deleteTerm(term)`
+  - `TermService.deleteTerm(term)`
+  - `TermDAO.delete(term)`
+
+## 6. Module lớp học phần (Course Section)
+
+Files:
+
+- `Controller`: `src/main/java/com/bangcompany/onlineute/Controller/CourseSectionController.java`
+- `Service`: `src/main/java/com/bangcompany/onlineute/Service/CourseSectionService.java`
+- `ServiceImpl`: `src/main/java/com/bangcompany/onlineute/Service/Impl/CourseSectionServiceImpl.java`
+- `DAO`: `src/main/java/com/bangcompany/onlineute/DAO/CourseSectionDAO.java`
+- `DAOImpl`: `src/main/java/com/bangcompany/onlineute/DAO/Impl/CourseSectionDAOImpl.java`
+
+Luồng theo từng hàm:
+
+- `CourseSectionController.getSectionsByTerm(termId)`
+  - `CourseSectionService.getSectionsByTerm(termId)`
+  - `CourseSectionDAO.findByTermId(termId)`
+
+- `CourseSectionController.getAllSections()`
+  - `CourseSectionService.getAllSections()`
+  - `CourseSectionDAO.findAll()`
+
+- `CourseSectionController.getSectionById(id)`
+  - `CourseSectionService.getSectionById(id)`
+  - `CourseSectionDAO.findById(id)`
+
+- `CourseSectionController.createSection(section)`
+  - `CourseSectionService.createSection(section)`
+  - `CourseSectionDAO.save(section)`
+
+## 7. Module đăng ký học phần (Course Registration)
+
+Files:
+
+- `Controller`: `src/main/java/com/bangcompany/onlineute/Controller/CourseRegistrationController.java`
+- `Service`: `src/main/java/com/bangcompany/onlineute/Service/CourseRegistrationService.java`
+- `ServiceImpl`: `src/main/java/com/bangcompany/onlineute/Service/Impl/CourseRegistrationServiceImpl.java`
+- `DAO`: `src/main/java/com/bangcompany/onlineute/DAO/CourseRegistrationDAO.java`
+- `DAOImpl`: `src/main/java/com/bangcompany/onlineute/DAO/Impl/CourseRegistrationDAOImpl.java`
+
+Luồng theo từng hàm:
+
+- `CourseRegistrationController.register(registration)`
+  - `CourseRegistrationService.registerToSection(registration)`
+  - `CourseRegistrationDAO.save(registration)`
+
+- `CourseRegistrationController.cancel(registration)`
+  - `CourseRegistrationService.cancelRegistration(registration)`
+  - `CourseRegistrationDAO.delete(registration)`
+
+- `CourseRegistrationController.getStudentRegistrations(studentId)`
+  - `CourseRegistrationService.getRegistrationsByStudent(studentId)`
+  - `CourseRegistrationDAO.findByStudentId(studentId)`
+
+- `CourseRegistrationController.isStudentInCourse(studentId, sectionId)`
+  - `CourseRegistrationService.isStudentRegistered(studentId, sectionId)`
+  - `CourseRegistrationDAO.isRegistered(studentId, sectionId)`
+
+## 8. Module điểm (Mark)
+
+Files:
+
+- `Controller`: `src/main/java/com/bangcompany/onlineute/Controller/MarkController.java`
+- `Service`: `src/main/java/com/bangcompany/onlineute/Service/MarkService.java`
+- `ServiceImpl`: `src/main/java/com/bangcompany/onlineute/Service/Impl/MarkServiceImpl.java`
+- `DAO`: `src/main/java/com/bangcompany/onlineute/DAO/MarkDAO.java`
+- `DAOImpl`: `src/main/java/com/bangcompany/onlineute/DAO/Impl/MarkDAOImpl.java`
+
+Luồng theo từng hàm:
+
+- `MarkController.updateMark(mark)`
+  - `MarkService.saveMark(mark)`
+  - Service tự tính `finalScore` và `gradeChar`
+  - `MarkDAO.save(mark)`
+
+- `MarkController.getMarkByRegistration(registrationId)`
+  - `MarkService.getMarkByRegistration(registrationId)`
+  - `MarkDAO.findByRegistrationId(registrationId)`
+
+- `MarkController.getMarkById(id)`
+  - `MarkService.getMarkById(id)`
+  - `MarkDAO.findById(id)`
+
+## 9. Module sinh viên (Student)
+
+Files:
+
+- `Controller`: `src/main/java/com/bangcompany/onlineute/Controller/StudentController.java`
+- `Service`: `src/main/java/com/bangcompany/onlineute/Service/StudentService.java`
+- `ServiceImpl`: `src/main/java/com/bangcompany/onlineute/Service/Impl/StudentServiceImpl.java`
+- `DAO`: `src/main/java/com/bangcompany/onlineute/DAO/StudentDAO.java`
+- `DAOImpl`: `src/main/java/com/bangcompany/onlineute/DAO/Impl/StudentDAOImpl.java`
+
+Luồng theo từng hàm:
+
+- `StudentController.createStudent(student, account)`
+  - `StudentService.createStudent(student, account)`
+  - Service gắn `student.setAccount(account)`
+  - `StudentDAO.save(student)`
+
+## 10. Module thời khóa biểu (Schedule) - hiện chưa qua Controller
+
+Files:
+
+- `Service`: `src/main/java/com/bangcompany/onlineute/Service/ScheduleService.java`
+- `ServiceImpl`: `src/main/java/com/bangcompany/onlineute/Service/Impl/ScheduleServiceImpl.java`
+- `DAO`: `src/main/java/com/bangcompany/onlineute/DAO/ScheduleDAO.java`
+- `DAOImpl`: `src/main/java/com/bangcompany/onlineute/DAO/Impl/ScheduleDAOImpl.java`
+
+Luồng hiện tại trong View:
+
+- `SchedulePage` gọi `AppContext.getScheduleService().getStudentSchedule(studentId)`
+- Service gọi `ScheduleDAO.findByStudentId(studentId)`
+
+Ghi chú:
+
+- DAO dùng `JOIN FETCH` để lấy luôn `CourseSection`, `Course`, `Lecturer`, tránh lỗi lazy loading khi render UI.
+
+## 11. Module môn học (Course) - có code nhưng chưa wire AppContext
+
+Files:
+
+- `Controller`: `src/main/java/com/bangcompany/onlineute/Controller/CourseController.java`
+- `Service`: `src/main/java/com/bangcompany/onlineute/Service/CourseService.java`
+- `ServiceImpl`: `src/main/java/com/bangcompany/onlineute/Service/Impl/CourseServiceImpl.java`
+- `DAO`: `src/main/java/com/bangcompany/onlineute/DAO/CourseDAO.java`
+- `DAOImpl`: `src/main/java/com/bangcompany/onlineute/DAO/Impl/CourseDAOImpl.java`
+
+Luồng nếu được wire:
+
+- `CourseController.createCourse(course)`
+  - `CourseService.createCourse(course)`
+  - `CourseDAO.save(course)`
+
+- `CourseController.updateCourse(course)`
+  - `CourseService.updateCourse(course)`
+  - `CourseDAO.update(course)`
+
+- `CourseController.deleteCourse(course)`
+  - `CourseService.deleteCourse(course)`
+  - `CourseDAO.delete(course)`
+
+- `CourseController.findById(id)`
+  - `CourseService.findById(id)`
+  - `CourseDAO.findById(id)`
+
+## 12. Ghi chú kiến trúc
+
+- Vẫn còn chỗ View gọi service trực tiếp (ví dụ `SchedulePage`). Nếu muốn đồng nhất kiến trúc, nên thêm `ScheduleController`.
+- `AuthController` đang bắt exception và trả `null` cho các hàm register; có thể chuyển sang trả `Optional` hoặc ném custom exception để dễ debug hơn.
+- Tên hàm controller hiện chưa đồng nhất kiểu đặt tên (`Login`, `Logout`, `createStudent`).
