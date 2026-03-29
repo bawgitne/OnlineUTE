@@ -11,10 +11,11 @@ public enum MenuItem {
     
     // LECTURER  
     MY_CLASSES("Lớp học của tôi", "LECTURER", "class.png"),
-    INPUT_GRADES("Nhập điểm", "LECTURER", "grade.png"),
+    INPUT_GRADES    ("Quản lý sinh viên", "LECTURER", "grade.png"),
     
     // STUDENT
     MY_GRADES("Xem điểm", "STUDENT", "grade.png"),
+    ATTENDANCE("Chuyên cần", "STUDENT", "lich.png"),
     MY_SCHEDULE("Thời khóa biểu", "STUDENT", "lich.png"),
     
     // ALL roles

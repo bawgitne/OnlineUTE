@@ -23,6 +23,7 @@ public class PageFactory {
                 case COMPOSE_ANNOUNCEMENT -> new CreateAnnouncementPage();
                 case PROFILE              -> new ProfilePage();
                 case MY_SCHEDULE          -> new SchedulePage();
+                case INPUT_GRADES         -> new InputGradesPage();
                 // Add more cases mapping MenuItem to specific Page classes
                 default                   -> createPlaceholder(item.getLabel());
             };

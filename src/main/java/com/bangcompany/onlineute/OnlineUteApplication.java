@@ -2,8 +2,7 @@ package com.bangcompany.onlineute;
 
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.JpaUtil;
-import com.bangcompany.onlineute.View.WindowManager;
-import com.bangcompany.onlineute.View.Screens.LoginFrame;
+import com.bangcompany.onlineute.view.navigation.MainNavigator;
 import javax.swing.*;
 
 /**
@@ -33,8 +32,8 @@ public class OnlineUteApplication {
         // 3. Launch Interface using WindowManager (Centralized)
         SwingUtilities.invokeLater(() -> {
             try {
-                // Show the Login screen centrally
-                WindowManager.show(new LoginFrame());
+                // Start from the new view architecture entrypoint
+                MainNavigator.showLogin();
                 
             } catch (Exception ex) {
                 ex.printStackTrace();

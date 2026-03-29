@@ -64,7 +64,7 @@ public class CourseRegistrationDAOImpl implements CourseRegistrationDAO {
     public List<CourseRegistration> findByStudentId(Long studentId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
-            return em.createQuery("SELECT cr FROM CourseRegistration cr WHERE cr.student.id = :studentId", CourseRegistration.class)
+            return em.createQuery("SELECT cr FROM CourseRegistration cr JOIN FETCH cr.courseSection cs JOIN FETCH cs.course LEFT JOIN FETCH cr.mark WHERE cr.student.id = :studentId", CourseRegistration.class)
                     .setParameter("studentId", studentId)
                     .getResultList();
         } finally {
@@ -76,7 +76,7 @@ public class CourseRegistrationDAOImpl implements CourseRegistrationDAO {
     public List<CourseRegistration> findByCourseSectionId(Long sectionId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
-            return em.createQuery("SELECT cr FROM CourseRegistration cr WHERE cr.courseSection.id = :sectionId", CourseRegistration.class)
+            return em.createQuery("SELECT cr FROM CourseRegistration cr JOIN FETCH cr.student LEFT JOIN FETCH cr.mark WHERE cr.courseSection.id = :sectionId", CourseRegistration.class)
                     .setParameter("sectionId", sectionId)
                     .getResultList();
         } finally {

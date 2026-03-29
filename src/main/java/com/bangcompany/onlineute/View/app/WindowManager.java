@@ -1,22 +1,16 @@
-package com.bangcompany.onlineute.View;
+package com.bangcompany.onlineute.view.app;
 
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * WindowManager - The singleton window for the whole application.
- * Generalized to show any JPanel as the main screen.
- */
 public final class WindowManager extends JFrame {
     private static WindowManager instance;
     private static JPanel container;
 
-
-
     private WindowManager() {
-        setTitle("U Tê E");
+        setTitle("OnlineUTE");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1200,800);
+        setSize(1200, 800);
         setResizable(true);
         setLocationRelativeTo(null);
 
@@ -30,22 +24,15 @@ public final class WindowManager extends JFrame {
         }
     }
 
-    public static void show(JPanel panel) {
+    public static void showScreen(JPanel panel) {
         init();
         container.removeAll();
         container.add(panel, BorderLayout.CENTER);
         container.revalidate();
         container.repaint();
-        
+
         if (!instance.isVisible()) {
             instance.setVisible(true);
         }
-    }
-
-    public static void exit() {
-        if (instance != null) {
-            instance.dispose();
-        }
-        System.exit(0);
     }
 }

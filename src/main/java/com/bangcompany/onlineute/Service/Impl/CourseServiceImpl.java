@@ -3,6 +3,7 @@ package com.bangcompany.onlineute.Service.Impl;
 import com.bangcompany.onlineute.DAO.CourseDAO;
 import com.bangcompany.onlineute.Model.Entity.Course;
 import com.bangcompany.onlineute.Service.CourseService;
+import java.util.List;
 
 public class CourseServiceImpl implements CourseService {
     private final CourseDAO courseDAO;
@@ -28,5 +29,10 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Course findById(Long id) {
         return courseDAO.findById(id);
+    }
+
+    @Override
+    public List<Course> getAllCourses() {
+        return courseDAO.findAll();
     }
 }

@@ -26,14 +26,18 @@ public class Mark {
     @Column(name = "grade_char")
     private String gradeChar;
 
+    @Column(name = "attendance", length = 30)
+    private String attendance;
+
     public Mark() {}
 
-    public Mark(Long id, BigDecimal processScore, BigDecimal testScore, BigDecimal finalScore, String gradeChar) {
+    public Mark(Long id, BigDecimal processScore, BigDecimal testScore, BigDecimal finalScore, String gradeChar, String attendance) {
         this.id = id;
         this.processScore = processScore;
         this.testScore = testScore;
         this.finalScore = finalScore;
         this.gradeChar = gradeChar;
+        this.attendance = attendance;
     }
 
     public Long getId() { return id; }
@@ -48,4 +52,6 @@ public class Mark {
     public void setFinalScore(BigDecimal finalScore) { this.finalScore = finalScore; }
     public String getGradeChar() { return gradeChar; }
     public void setGradeChar(String gradeChar) { this.gradeChar = gradeChar; }
+    public String getAttendance() { return attendance; }
+    public void setAttendance(String attendance) { this.attendance = attendance; }
 }

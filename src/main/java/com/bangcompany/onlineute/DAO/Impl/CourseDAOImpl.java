@@ -5,6 +5,7 @@ import com.bangcompany.onlineute.DAO.CourseDAO;
 import com.bangcompany.onlineute.Model.Entity.Course;
 import jakarta.persistence.EntityManager;
 
+import java.util.List;
 import java.util.Optional;
 
 public class CourseDAOImpl implements CourseDAO {
@@ -59,8 +60,14 @@ public class CourseDAOImpl implements CourseDAO {
         }
     }
 
-
-
-
-
+    @Override
+    public List<Course> findAll() {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            return em.createQuery("SELECT c FROM Course c ORDER BY c.courseCode", Course.class)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
 }
