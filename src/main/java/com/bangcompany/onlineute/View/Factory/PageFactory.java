@@ -10,17 +10,25 @@ import javax.swing.*;
 public class PageFactory {
     public static JPanel create(String pageKey) {
         // Find if it's a valid MenuItem name
+        MenuItem item;
         try {
-            MenuItem item = MenuItem.valueOf(pageKey);
-            return switch (item) {
-                case ANNOUNCEMENT    -> new AnnouncementPage();
-                case PROFILE         -> new ProfilePage();
-                case MY_SCHEDULE     -> new SchedulePage();
-                // Add more cases mapping MenuItem to specific Page classes
-                default             -> createPlaceholder(item.getLabel());
-            };
+            item = MenuItem.valueOf(pageKey);
         } catch (IllegalArgumentException e) {
             return createPlaceholder("Trang không tồn tại: " + pageKey);
+        }
+
+        try {
+            return switch (item) {
+                case ANNOUNCEMENT         -> new AnnouncementPage();
+                case COMPOSE_ANNOUNCEMENT -> new CreateAnnouncementPage();
+                case PROFILE              -> new ProfilePage();
+                case MY_SCHEDULE          -> new SchedulePage();
+                // Add more cases mapping MenuItem to specific Page classes
+                default                   -> createPlaceholder(item.getLabel());
+            };
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createPlaceholder("Lỗi tải trang: " + e.getMessage());
         }
     }
 

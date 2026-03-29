@@ -1,35 +1,54 @@
 package com.bangcompany.onlineute.View;
 
-import com.bangcompany.onlineute.View.Screens.DashboardFrame;
-import com.bangcompany.onlineute.View.Screens.LoginFrame;
 import javax.swing.*;
+import java.awt.*;
 
-public final class WindowManager {
-    private static JFrame currentFrame;
+/**
+ * WindowManager - The singleton window for the whole application.
+ * Generalized to show any JPanel as the main screen.
+ */
+public final class WindowManager extends JFrame {
+    private static WindowManager instance;
+    private static JPanel container;
 
-    private WindowManager() {}
 
-    public static void showLogin() {
-        switchFrame(new LoginFrame());
+
+    private WindowManager() {
+        setTitle("U Tê E");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1200,800);
+        setResizable(true);
+        setLocationRelativeTo(null);
+
+        container = new JPanel(new BorderLayout());
+        add(container);
     }
 
-    public static void showDashboard() {
-        switchFrame(new DashboardFrame());
+    private static void init() {
+        if (instance == null) {
+            instance = new WindowManager();
+        }
     }
 
-    private static void switchFrame(JFrame nextFrame) {
-        SwingUtilities.invokeLater(() -> {
-            if (currentFrame != null) {
-                currentFrame.dispose();
-            }
-            currentFrame = nextFrame;
-            currentFrame.setVisible(true);
-        });
+    /**
+     * Generalized method to switch the main content panel.
+     * @param panel The JPanel to display.
+     */
+    public static void show(JPanel panel) {
+        init();
+        container.removeAll();
+        container.add(panel, BorderLayout.CENTER);
+        container.revalidate();
+        container.repaint();
+        
+        if (!instance.isVisible()) {
+            instance.setVisible(true);
+        }
     }
 
     public static void exit() {
-        if (currentFrame != null) {
-            currentFrame.dispose();
+        if (instance != null) {
+            instance.dispose();
         }
         System.exit(0);
     }

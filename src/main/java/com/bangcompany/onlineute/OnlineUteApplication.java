@@ -3,6 +3,7 @@ package com.bangcompany.onlineute;
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.JpaUtil;
 import com.bangcompany.onlineute.View.WindowManager;
+import com.bangcompany.onlineute.View.Screens.LoginFrame;
 import javax.swing.*;
 
 /**
@@ -32,10 +33,8 @@ public class OnlineUteApplication {
         // 3. Launch Interface using WindowManager (Centralized)
         SwingUtilities.invokeLater(() -> {
             try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                
-                // Switch to Login screen (Registry manages the frame)
-                WindowManager.showLogin();
+                // Show the Login screen centrally
+                WindowManager.show(new LoginFrame());
                 
             } catch (Exception ex) {
                 ex.printStackTrace();

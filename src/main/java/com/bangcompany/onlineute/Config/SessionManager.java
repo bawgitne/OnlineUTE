@@ -75,4 +75,18 @@ public final class SessionManager {
         if (currentAccount != null) return "ACC-" + currentAccount.getId();
         return "N/A";
     }
+
+    public static String getRole() {
+        if (currentAccount != null && currentAccount.getRole() != null) {
+            return currentAccount.getRole().name();
+        }
+        return null;
+    }
+
+    public static String getRoleDisplayName() {
+        if (currentAccount != null && currentAccount.getRole() != null) {
+            return currentAccount.getRole().toString();
+        }
+        return "Người dùng";
+    }
 }

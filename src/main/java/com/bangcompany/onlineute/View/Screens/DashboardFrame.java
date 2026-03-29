@@ -3,72 +3,80 @@ package com.bangcompany.onlineute.View.Screens;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.Account;
 import com.bangcompany.onlineute.Model.EnumType.MenuItem;
-import com.bangcompany.onlineute.View.Containers.LeftBar;
+import com.bangcompany.onlineute.View.Containers.Sidebar;
 import com.bangcompany.onlineute.View.Containers.MainView;
 import com.bangcompany.onlineute.View.Containers.TopHeader;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * DashboardFrame - Minimal header, no breadcrumb.
+ * DashboardFrame - Smart Container.
+ * Handles business logic: role filtering, data preparation, navigation.
+ * Passes pre-processed data down to dumb components (Sidebar, MainView, TopHeader).
  */
-public class DashboardFrame extends JFrame {
+public class DashboardFrame extends JPanel {
     private MainView mainView;
     private TopHeader topHeader;
-    private LeftBar leftBar;
+    private Sidebar sidebar;
 
     public DashboardFrame() {
-        setTitle("Hệ thống thông tin sinh viên - HCMUTE");
-        setSize(1200, 800);
-        setLocationRelativeTo(null);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Get Dynamic Data from Session
+        // --- Smart Logic: Prepare data from Session ---
         String name = SessionManager.getProfileFullName();
         String code = SessionManager.getProfileCode();
-        Account currentAcc = SessionManager.getCurrentAccount();
 
-        // 1. Initialize Components
+        // Business logic: determine role display name
+        String roleDisplay = SessionManager.getRoleDisplayName();
+
+        // Business logic: filter menu items by role
+        List<MenuItem> accessibleItems = getAccessibleMenuItems();
+
+        // --- Assemble dumb components with pre-processed data ---
         mainView = new MainView();
         topHeader = new TopHeader("TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT TP.HCM");
 
-        // 2. Sidebar with Logic (Sync with your previous edit removing 'status')
-        leftBar = new LeftBar(
-            name, 
-            code, 
-            (currentAcc != null) ? currentAcc.getRole() : null, 
-            pageKey -> mainView.showPage(pageKey) // No breadcrumb update
+        sidebar = new Sidebar(
+            name,
+            code,
+            roleDisplay,
+            accessibleItems,
+            pageKey -> mainView.showPage(pageKey)
         );
 
-        add(leftBar, BorderLayout.WEST);
+        add(sidebar, BorderLayout.WEST);
 
-        // 3. Main Area
         JPanel mainArea = new JPanel(new BorderLayout());
         mainArea.add(topHeader, BorderLayout.NORTH);
         mainArea.add(mainView, BorderLayout.CENTER);
-
         add(mainArea, BorderLayout.CENTER);
 
-        // 4. Set Default Page
+        // Default page
         showDefaultPage();
+    }
+
+    /**
+     * Business logic: Filter MenuItem enum by the current user's role.
+     */
+    private List<MenuItem> getAccessibleMenuItems() {
+        String roleName = SessionManager.getRole();
+        if (roleName == null) roleName = "NONE";
+
+        List<MenuItem> items = new ArrayList<>();
+        for (MenuItem item : MenuItem.values()) {
+            if (item.isAccessibleBy(roleName)) {
+                items.add(item);
+            }
+        }
+        return items;
     }
 
     private void showDefaultPage() {
         String defaultPageKey = MenuItem.ANNOUNCEMENT.name();
         mainView.showPage(defaultPageKey);
-        leftBar.setActiveTab(defaultPageKey);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new DashboardFrame().setVisible(true);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
+        sidebar.setActiveTab(defaultPageKey);
     }
 }

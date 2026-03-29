@@ -28,6 +28,7 @@ public final class AppContext {
     public static CourseSectionDAO courseSectionDAO;
     public static CourseRegistrationDAO courseRegistrationDAO;
     public static MarkDAO markDAO;
+    public static AnnouncementDAO announcementDAO;
 
     // Services
     public static AuthService authService;
@@ -37,6 +38,7 @@ public final class AppContext {
     public static CourseSectionService courseSectionService;
     public static CourseRegistrationService courseRegistrationService;
     public static MarkService markService;
+    public static AnnouncementService announcementService;
 
     // Controllers
     public static AuthController authController;
@@ -45,6 +47,7 @@ public final class AppContext {
     public static CourseSectionController courseSectionController;
     public static CourseRegistrationController courseRegistrationController;
     public static MarkController markController;
+    public static NotificationController notificationController;
 
     private AppContext() {}
 
@@ -61,6 +64,7 @@ public final class AppContext {
         courseSectionDAO = new CourseSectionDAOImpl();
         courseRegistrationDAO = new CourseRegistrationDAOImpl();
         markDAO = new MarkDAOImpl();
+        announcementDAO = new AnnouncementDAOImpl();
 
         // 2. Instantiate Services (Injecting DAOs)
         authService = new AuthServiceImpl(accountDAO, studentDAO, lecturerDAO, adminDAO);
@@ -70,6 +74,7 @@ public final class AppContext {
         courseSectionService = new CourseSectionServiceImpl(courseSectionDAO);
         courseRegistrationService = new CourseRegistrationServiceImpl(courseRegistrationDAO);
         markService = new MarkServiceImpl(markDAO);
+        announcementService = new AnnouncementServiceImpl(announcementDAO);
 
         // 3. Instantiate Controllers (Injecting Services)
         authController = new AuthController(authService);
@@ -78,6 +83,7 @@ public final class AppContext {
         courseSectionController = new CourseSectionController(courseSectionService);
         courseRegistrationController = new CourseRegistrationController(courseRegistrationService);
         markController = new MarkController(markService);
+        notificationController = new NotificationController(announcementService, courseSectionService);
 
         System.out.println("Bean initialization completed successfully.");
     }
@@ -87,4 +93,6 @@ public final class AppContext {
     public static CourseSectionService getCourseSectionService() { return courseSectionService; }
     public static CourseRegistrationService getCourseRegistrationService() { return courseRegistrationService; }
     public static MarkService getMarkService() { return markService; }
+    public static AnnouncementService getAnnouncementService() { return announcementService; }
+    public static NotificationController getNotificationController() { return notificationController; }
 }

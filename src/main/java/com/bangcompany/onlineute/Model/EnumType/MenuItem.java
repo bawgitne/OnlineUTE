@@ -20,7 +20,10 @@ public enum MenuItem {
     // ALL roles
     PROFILE("Hồ sơ cá nhân", "ALL", "thongTinCaNhan.png"),
     CHANGE_PASSWORD("Đổi mật khẩu", "ALL", "password.png"),
-    ANNOUNCEMENT("Thông báo", "ALL", "thongTinCaNhan.png");
+    ANNOUNCEMENT("Thông báo", "ALL", "thongTinCaNhan.png"),
+    
+    // MIXED
+    COMPOSE_ANNOUNCEMENT("Gửi thông báo", "ADMIN_AND_LECTURER", "account.png");
 
     private final String label;
     private final String requiredRole;
@@ -36,7 +39,8 @@ public enum MenuItem {
     public String getIcon() { return icon; }
 
     public boolean isAccessibleBy(String role) {
-        return this.requiredRole.equals("ALL") || 
-               this.requiredRole.equals(role);
+        if (this.requiredRole.equals("ALL")) return true;
+        if (this.requiredRole.equals("ADMIN_AND_LECTURER") && (role.equals("ADMIN") || role.equals("LECTURER"))) return true;
+        return this.requiredRole.equals(role);
     }
 }

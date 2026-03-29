@@ -22,6 +22,7 @@
         <class>com.bangcompany.onlineute.Model.Entity.Schedule</class>
         <class>com.bangcompany.onlineute.Model.Entity.ExamSchedule</class>
         <class>com.bangcompany.onlineute.Model.Entity.Mark</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Announcement</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
@@ -31,7 +32,7 @@
             <property name="jakarta.persistence.jdbc.password" value="1234"/>
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
         </properties>

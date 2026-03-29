@@ -76,7 +76,7 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
     public List<CourseSection> findAll() {
         EntityManager em = JpaUtil.getEntityManager();
         try {
-            return em.createQuery("SELECT cs FROM CourseSection cs", CourseSection.class).getResultList();
+            return em.createQuery("SELECT cs FROM CourseSection cs JOIN FETCH cs.course LEFT JOIN FETCH cs.lecturer", CourseSection.class).getResultList();
         } finally {
             em.close();
         }

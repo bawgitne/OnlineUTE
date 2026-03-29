@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- * SchedulePage - Beautiful modern class schedule view based on HCMUTE Portal.
- */
+
 public class SchedulePage extends JPanel implements Refreshable {
     private JPanel gridPanel;
     private final Color primaryColor = new Color(0, 85, 141);
@@ -68,19 +66,6 @@ public class SchedulePage extends JPanel implements Refreshable {
         titleBox.add(titleLabel);
 
         header.add(titleBox, BorderLayout.WEST);
-        
-        // Tab bar simulation
-        JPanel tabs = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-        tabs.setOpaque(false);
-        String[] tabLabels = {"THỜI KHÓA BIỂU THEO PHÒNG", "THỜI KHÓA BIỂU SV/HV/NCS", "TKB TUẦN", "TKB THỨ - TIẾT"};
-        for (int i = 0; i < tabLabels.length; i++) {
-            JLabel tab = new JLabel(tabLabels[i]);
-            tab.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-            tab.setForeground(i == 1 ? primaryColor : Color.GRAY);
-            if (i == 1) tab.setBorder(new MatteBorder(0, 0, 2, 0, primaryColor));
-            tabs.add(tab);
-        }
-        header.add(tabs, BorderLayout.SOUTH);
 
         return header;
     }
@@ -89,18 +74,17 @@ public class SchedulePage extends JPanel implements Refreshable {
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
         filterPanel.setOpaque(false);
 
-        // Dummy filters
-        filterPanel.add(new JLabel("Năm học:"));
-        filterPanel.add(new JComboBox<>(new String[]{"2024-2025", "2023-2024"}));
-
-        filterPanel.add(new JLabel("Học kỳ:"));
-        filterPanel.add(new JComboBox<>(new String[]{"Học kỳ 1", "Học kỳ 2"}));
-
-        filterPanel.add(new JLabel("Tuần:"));
-        filterPanel.add(new JComboBox<>(new String[]{"24/03/2026 - 29/03/2026"}));
+        JLabel currentScheduleLabel = new JLabel("Lịch học Học kỳ hiện tại");
+        currentScheduleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        currentScheduleLabel.setForeground(new Color(0, 85, 141));
+        
+        filterPanel.add(currentScheduleLabel);
+        
+        // Push the print button to the right if we had a BorderLayout or just keep flow
+        filterPanel.add(Box.createRigidArea(new Dimension(20, 0)));
 
         PrimaryButton btnPrint = new PrimaryButton("In thời khóa biểu");
-        btnPrint.setPreferredSize(new Dimension(150, 30));
+        btnPrint.setPreferredSize(new Dimension(150, 45));
         filterPanel.add(btnPrint);
 
         return filterPanel;

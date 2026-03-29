@@ -4,9 +4,17 @@ import com.bangcompany.onlineute.View.Containers.AnnouncementTable;
 import javax.swing.*;
 import java.awt.*;
 
-public class AnnouncementPage extends JPanel {
+public class AnnouncementPage extends JPanel implements Refreshable {
+    private final AnnouncementTable announcementTable;
+
     public AnnouncementPage() {
         setLayout(new BorderLayout());
-        add(new AnnouncementTable(), BorderLayout.CENTER);
+        announcementTable = new AnnouncementTable();
+        add(announcementTable, BorderLayout.CENTER);
+    }
+
+    @Override
+    public void onEnter() {
+        announcementTable.refreshData();
     }
 }
