@@ -23,11 +23,15 @@ public class SchedulePage extends JPanel implements Refreshable {
     private final String[] periods = {"Sáng", "Chiều", "Tối"};
 
     public SchedulePage() {
-        setLayout(new BorderLayout());
-        setBackground(Color.WHITE);
-        
+        setLayout(new BorderLayout(0, 20));
+        setBackground(new Color(245, 245, 245));
+        setBorder(new EmptyBorder(20, 20, 20, 20));
+
         // 1. Title Header
-        add(createTitleHeader(), BorderLayout.NORTH);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setOpaque(false);
+        topPanel.add(new com.bangcompany.onlineute.View.Components.PageTitleLabel("THỜI KHÓA BIỂU"), BorderLayout.NORTH);
+        add(topPanel, BorderLayout.NORTH);
 
         // 2. Main Content Wrapper
         JPanel contentWrapper = new JPanel(new BorderLayout());
@@ -50,24 +54,6 @@ public class SchedulePage extends JPanel implements Refreshable {
         add(contentWrapper, BorderLayout.CENTER);
         
         onEnter(); // Load data
-    }
-
-    private JPanel createTitleHeader() {
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(new Color(240, 240, 240));
-        header.setBorder(new MatteBorder(0, 0, 1, 0, new Color(210, 210, 210)));
-
-        JPanel titleBox = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 8));
-        titleBox.setBackground(primaryColor);
-        
-        JLabel titleLabel = new JLabel("THỜI KHÓA BIỂU");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        titleLabel.setForeground(Color.WHITE);
-        titleBox.add(titleLabel);
-
-        header.add(titleBox, BorderLayout.WEST);
-
-        return header;
     }
 
     private JPanel createFilterPanel() {

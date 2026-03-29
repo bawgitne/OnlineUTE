@@ -6,6 +6,7 @@ package com.bangcompany.onlineute.Model.EnumType;
 public enum MenuItem {
     // ADMIN
     MANAGE_ACCOUNTS("Quản lý tài khoản", "ADMIN", "account.png"),
+    CREATE_ACCOUNTS("Cấp tài khoản mới", "ADMIN", "account.png"),
     MANAGE_STUDENTS("Quản lý sinh viên", "ADMIN", "student.png"),
     MANAGE_LECTURERS("Quản lý giảng viên", "ADMIN", "lecturer.png"),
     

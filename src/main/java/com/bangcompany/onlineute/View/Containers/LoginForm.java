@@ -66,33 +66,11 @@ public class LoginForm extends JPanel {
         });
         
         add(btnLogin);
-        add(Box.createRigidArea(new Dimension(0, 15))); 
-        // Separator
-        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-        separator.setForeground(new Color(230, 230, 230));
-        separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        separator.setAlignmentX(Component.LEFT_ALIGNMENT);
-        add(separator);
-        add(Box.createRigidArea(new Dimension(0, 15)));
-        
         JLabel forgotPassLabel = new JLabel("Quên mật khẩu");
         forgotPassLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         forgotPassLabel.setForeground(Color.GRAY);
         forgotPassLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         forgotPassLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        // Hover effect for link
-        forgotPassLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                forgotPassLabel.setForeground(new Color(0, 84, 140)); // Turn blue on hover
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                forgotPassLabel.setForeground(Color.GRAY);
-            }
-        });
-        
         add(forgotPassLabel);
     }
 }

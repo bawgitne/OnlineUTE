@@ -1,16 +1,20 @@
 package com.bangcompany.onlineute.View.Pages;
 
 import com.bangcompany.onlineute.View.Containers.AnnouncementTable;
+import com.bangcompany.onlineute.View.shared.components.PageScaffold;
+
 import javax.swing.*;
-import java.awt.*;
 
 public class AnnouncementPage extends JPanel implements Refreshable {
     private final AnnouncementTable announcementTable;
 
     public AnnouncementPage() {
-        setLayout(new BorderLayout());
+        setLayout(new java.awt.BorderLayout());
         announcementTable = new AnnouncementTable();
-        add(announcementTable, BorderLayout.CENTER);
+
+        PageScaffold scaffold = new PageScaffold("Thong Bao");
+        scaffold.setBody(announcementTable);
+        add(scaffold, java.awt.BorderLayout.CENTER);
     }
 
     @Override

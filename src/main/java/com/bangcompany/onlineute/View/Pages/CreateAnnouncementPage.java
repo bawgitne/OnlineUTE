@@ -15,7 +15,7 @@ import java.util.List;
 public class CreateAnnouncementPage extends JPanel implements Refreshable {
     private JPanel mainPanel;
     private InputGroup titleInput;
-    private JTextArea contentInput;
+    private com.bangcompany.onlineute.View.Components.TextAreaGroup contentInput;
     private SelectGroup<String> adminTargetSelect;
     private SelectGroup<CourseSectionItem> lecturerClassSelect;
 
@@ -37,11 +37,11 @@ public class CreateAnnouncementPage extends JPanel implements Refreshable {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        JLabel headerLabel = new JLabel(" SOAN THONG BAO MOI ", SwingConstants.CENTER);
-        headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        headerLabel.setForeground(new Color(0, 85, 141));
-        headerLabel.setBorder(new EmptyBorder(20, 0, 20, 0));
-        add(headerLabel, BorderLayout.NORTH);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBorder(new EmptyBorder(20, 50, 0, 50));
+        topPanel.setOpaque(false);
+        topPanel.add(new com.bangcompany.onlineute.View.Components.PageTitleLabel("SOẠN THÔNG BÁO MỚI"), BorderLayout.NORTH);
+        add(topPanel, BorderLayout.NORTH);
 
         mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(Color.WHITE);
@@ -79,37 +79,21 @@ public class CreateAnnouncementPage extends JPanel implements Refreshable {
                         .map(CourseSectionItem::new)
                         .toList();
             }
-            lecturerClassSelect = new SelectGroup<>("Chon lop hoc phan", myClasses);
+            lecturerClassSelect = new SelectGroup<>("Chọn lớp học phần", myClasses);
             mainPanel.add(lecturerClassSelect, gbc);
         }
 
         gbc.gridy++;
-        titleInput = new InputGroup("Tieu de thong bao", false);
+        titleInput = new InputGroup("Tiêu đề", false);
         mainPanel.add(titleInput, gbc);
-
-        gbc.gridy++;
-        JLabel contentLabel = new JLabel("Noi dung:");
-        contentLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        contentLabel.setForeground(new Color(40, 60, 80));
-        contentLabel.setBorder(new EmptyBorder(0, 5, 5, 0));
-        mainPanel.add(contentLabel, gbc);
 
         gbc.gridy++;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 0, 20, 0);
 
-        contentInput = new JTextArea();
-        contentInput.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        contentInput.setLineWrap(true);
-        contentInput.setWrapStyleWord(true);
-        contentInput.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(160, 180, 200), 1),
-                new EmptyBorder(10, 10, 10, 10)
-        ));
-
-        JScrollPane textScroll = new JScrollPane(contentInput);
-        textScroll.setPreferredSize(new Dimension(500, 250));
-        mainPanel.add(textScroll, gbc);
+        contentInput = new com.bangcompany.onlineute.View.Components.TextAreaGroup("Nội dung thông báo", 250);
+        mainPanel.add(contentInput, gbc);
 
         gbc.gridy++;
         gbc.weighty = 0;
@@ -117,7 +101,7 @@ public class CreateAnnouncementPage extends JPanel implements Refreshable {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(20, 0, 0, 0);
 
-        PrimaryButton btnSend = new PrimaryButton("Gui thong bao");
+        PrimaryButton btnSend = new PrimaryButton("Gửi thông báo");
         btnSend.setPreferredSize(new Dimension(200, 45));
         btnSend.addActionListener(e -> submitAnnouncement(role));
         mainPanel.add(btnSend, gbc);
@@ -128,7 +112,7 @@ public class CreateAnnouncementPage extends JPanel implements Refreshable {
 
     private void submitAnnouncement(String role) {
         String title = titleInput.getValue().trim();
-        String content = contentInput.getText().trim();
+        String content = contentInput.getValue().trim();
 
         if (title.isEmpty() || content.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui long nhap day du tieu de va noi dung!", "Loi", JOptionPane.ERROR_MESSAGE);
@@ -168,7 +152,7 @@ public class CreateAnnouncementPage extends JPanel implements Refreshable {
 
             JOptionPane.showMessageDialog(this, "Gui thong bao thanh cong!", "Hoan tat", JOptionPane.INFORMATION_MESSAGE);
             titleInput.setValue("");
-            contentInput.setText("");
+            contentInput.setValue("");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Loi khi gui: " + ex.getMessage(), "Loi", JOptionPane.ERROR_MESSAGE);
         }

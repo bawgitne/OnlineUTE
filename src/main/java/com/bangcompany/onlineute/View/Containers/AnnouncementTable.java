@@ -2,6 +2,7 @@ package com.bangcompany.onlineute.View.Containers;
 
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.Announcement;
+import com.bangcompany.onlineute.View.shared.components.TableStyles;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -17,36 +18,16 @@ public class AnnouncementTable extends JPanel {
     private final DefaultTableModel model;
 
     public AnnouncementTable() {
-        setLayout(new BorderLayout(0, 20));
+        setLayout(new BorderLayout());
         setBackground(Color.WHITE);
-        setBorder(new EmptyBorder(30, 40, 30, 40));
-
-        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        titlePanel.setOpaque(false);
-
-        JLabel titleLabel = new JLabel(" THONG BAO ");
-        titleLabel.setOpaque(true);
-        titleLabel.setBackground(new Color(0, 84, 140));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        titleLabel.setBorder(new EmptyBorder(8, 20, 8, 20));
-        titlePanel.add(titleLabel);
-
-        JLabel newsLabel = new JLabel(" TIN TUC ");
-        newsLabel.setForeground(new Color(0, 84, 140));
-        newsLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        newsLabel.setBorder(new EmptyBorder(8, 20, 8, 20));
-        titlePanel.add(newsLabel);
-
-        add(titlePanel, BorderLayout.NORTH);
+        setBorder(new EmptyBorder(0, 0, 0, 0));
 
         model = new DefaultTableModel(COLUMN_NAMES, 0);
         loadAnnouncements();
 
         JTable table = new JTable(model);
+        TableStyles.applyBlueHeader(table);
         table.setRowHeight(40);
-        table.getTableHeader().setBackground(new Color(0, 84, 140));
-        table.getTableHeader().setForeground(Color.WHITE);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));

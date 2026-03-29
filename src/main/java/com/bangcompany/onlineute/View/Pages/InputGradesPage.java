@@ -23,14 +23,14 @@ public class InputGradesPage extends JPanel implements Refreshable {
     private JPanel noDataPanel;
 
     public InputGradesPage() {
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(0, 20));
         setBackground(Color.WHITE);
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel headerLabel = new JLabel(" QUẢN LÝ SINH VIÊN - ĐIỂM DANH & NHẬP ĐIỂM ", SwingConstants.CENTER);
-        headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        headerLabel.setForeground(new Color(0, 85, 141));
-        headerLabel.setBorder(new EmptyBorder(20, 0, 20, 0));
-        add(headerLabel, BorderLayout.NORTH);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setOpaque(false);
+        topPanel.add(new com.bangcompany.onlineute.View.Components.PageTitleLabel("QUẢN LÝ SINH VIÊN - ĐIỂM DANH & NHẬP ĐIỂM"), BorderLayout.NORTH);
+        add(topPanel, BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
