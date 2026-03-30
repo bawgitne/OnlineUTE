@@ -1,6 +1,7 @@
 package com.bangcompany.onlineute.Model.Entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "schedule")
@@ -28,6 +29,9 @@ public class Schedule {
     @Column(name = "week_number", nullable = false)
     private Integer weekNumber;
 
+    @Column(name = "study_date", nullable = false)
+    private LocalDate studyDate;
+
     public Schedule() {}
 
     public Schedule(Long id, Integer dayOfWeek, Integer startSlot, Integer endSlot, String room, Integer weekNumber) {
@@ -53,4 +57,6 @@ public class Schedule {
     public void setRoom(String room) { this.room = room; }
     public Integer getWeekNumber() { return weekNumber; }
     public void setWeekNumber(Integer weekNumber) { this.weekNumber = weekNumber; }
+    public LocalDate getStudyDate() { return studyDate; }
+    public void setStudyDate(LocalDate studyDate) { this.studyDate = studyDate; }
 }

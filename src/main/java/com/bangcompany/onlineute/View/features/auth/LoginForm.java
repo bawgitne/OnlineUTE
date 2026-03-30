@@ -42,7 +42,7 @@ public class LoginForm extends JPanel {
         add(Box.createRigidArea(new Dimension(0, 25)));
 
         usernameGroup = new InputGroup("Tên đăng nhập", false);
-        passwordGroup = new InputGroup("Mat khau", true);
+        passwordGroup = new InputGroup("Mật khẩu", true);
         usernameGroup.setAlignmentX(Component.LEFT_ALIGNMENT);
         passwordGroup.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -51,7 +51,7 @@ public class LoginForm extends JPanel {
         add(passwordGroup);
         add(Box.createRigidArea(new Dimension(0, 15)));
 
-        PrimaryButton btnLogin = new PrimaryButton("Dang nhap");
+        PrimaryButton btnLogin = new PrimaryButton("Đăng nhập");
         btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         btnLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnLogin.addActionListener(e -> {
@@ -69,7 +69,7 @@ public class LoginForm extends JPanel {
         add(separator);
         add(Box.createRigidArea(new Dimension(0, 15)));
 
-        JLabel forgotPassLabel = new JLabel("Quen mat khau");
+        JLabel forgotPassLabel = new JLabel("Quên mật khẩu");
         forgotPassLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         forgotPassLabel.setForeground(Color.GRAY);
         forgotPassLabel.setAlignmentX(Component.LEFT_ALIGNMENT);

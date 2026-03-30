@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class AnnouncementTable extends JPanel {
-    private static final String[] COLUMN_NAMES = {"Tieu de", "Nguoi gui", "Thoi gian gui"};
+    private static final String[] COLUMN_NAMES = {"Tiêu đề", "Người gửi", "Thời gian gửi"};
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private final DefaultTableModel model;
@@ -42,7 +42,7 @@ public class AnnouncementTable extends JPanel {
         model.setRowCount(0);
 
         if (AppContext.getNotificationController() == null) {
-            model.addRow(new Object[]{"Khong co thong bao moi", "", ""});
+            model.addRow(new Object[]{"Không có thông báo mới", "", ""});
             return;
         }
 
@@ -56,7 +56,7 @@ public class AnnouncementTable extends JPanel {
         }
 
         if (model.getRowCount() == 0) {
-            model.addRow(new Object[]{"Khong co thong bao moi", "", ""});
+            model.addRow(new Object[]{"Không có thông báo mới", "", ""});
         }
     }
 }

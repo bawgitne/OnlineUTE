@@ -1,5 +1,6 @@
 package com.bangcompany.onlineute.Service.Impl;
 
+import com.bangcompany.onlineute.Config.PasswordUtil;
 import com.bangcompany.onlineute.DAO.AdminDAO;
 import com.bangcompany.onlineute.DAO.LecturerDAO;
 import com.bangcompany.onlineute.DAO.StudentDAO;
@@ -8,6 +9,9 @@ import com.bangcompany.onlineute.Model.Entity.Admin;
 import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import com.bangcompany.onlineute.Model.Entity.Student;
 import com.bangcompany.onlineute.Service.AccountService;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
 public class AccountServiceImpl implements AccountService {
     private final StudentDAO studentDAO;
@@ -22,6 +26,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account createStudentAccount(Account account, Student student) {
+        byte[] salt = PasswordUtil.generateSalt();
+        account.setSalt(salt);
+        account.setPasswordHash(PasswordUtil.hashPassword(account.getPasswordHash(),salt));
         student.setAccount(account);
         return studentDAO.save(student).getAccount();
     }

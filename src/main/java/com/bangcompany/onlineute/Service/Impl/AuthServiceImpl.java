@@ -1,5 +1,6 @@
 package com.bangcompany.onlineute.Service.Impl;
 
+import com.bangcompany.onlineute.Config.PasswordUtil;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.DAO.AccountDAO;
 import com.bangcompany.onlineute.DAO.AdminDAO;
@@ -30,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
         if (accountOpt.isEmpty()) {
             return Optional.empty();
         }
-
+        password = PasswordUtil.hashPassword(password, accountOpt.get().getSalt());
         Account account = accountOpt.get();
         if (!password.equals(account.getPasswordHash())) {
             return Optional.empty();

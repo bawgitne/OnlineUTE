@@ -39,15 +39,15 @@ public class CreateAccountPage extends JPanel implements Refreshable {
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
-        topPanel.add(new PageTitleLabel("TAO MOI TAI KHOAN"), BorderLayout.NORTH);
+        topPanel.add(new PageTitleLabel("TẠO MỚI TÀI KHOẢN"), BorderLayout.NORTH);
         add(topPanel, BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
         tabbedPane.setFocusable(false);
         tabbedPane.setBackground(Color.WHITE);
-        tabbedPane.addTab("Tao tung tai khoan", createManualTab());
-        tabbedPane.addTab("Nhap danh sach", createBulkTab());
+        tabbedPane.addTab("Tạo từng tài khoản", createManualTab());
+        tabbedPane.addTab("Nhập danh sách", createBulkTab());
         add(tabbedPane, BorderLayout.CENTER);
     }
 
@@ -63,35 +63,35 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 0, 15, 0);
 
-        roleSelect = new SelectGroup<>("Vai tro", java.util.List.of("Sinh vien", "Giang vien"));
+        roleSelect = new SelectGroup<>("Vai trò", java.util.List.of("Sinh viên", "Giảng viên"));
         panel.add(roleSelect, gbc);
 
         gbc.gridy++;
-        codeInput = new InputGroup("Ma", false);
+        codeInput = new InputGroup("Mã", false);
         panel.add(codeInput, gbc);
 
         gbc.gridy++;
-        nameInput = new InputGroup("Ho va ten", false);
+        nameInput = new InputGroup("Họ và tên", false);
         panel.add(nameInput, gbc);
 
         gbc.gridy++;
-        emailInput = new InputGroup("Email (cho sinh vien)", false);
+        emailInput = new InputGroup("Email (cho sinh viên)", false);
         panel.add(emailInput, gbc);
 
         gbc.gridy++;
-        dobInput = new InputGroup("Ngay sinh YYYY-MM-DD", false);
+        dobInput = new InputGroup("Ngày sinh YYYY-MM-DD", false);
         panel.add(dobInput, gbc);
 
         gbc.gridy++;
-        classSelect = new SelectGroup<>("Lop", AppContext.getClassService().getAllClasses());
+        classSelect = new SelectGroup<>("Lớp", AppContext.getClassService().getAllClasses());
         panel.add(classSelect, gbc);
 
         gbc.gridy++;
-        studyProgramSelect = new SelectGroup<>("Chuong trinh dao tao", AppContext.getStudyProgramService().getAllStudyPrograms());
+        studyProgramSelect = new SelectGroup<>("Chương trình đào tạo", AppContext.getStudyProgramService().getAllStudyPrograms());
         panel.add(studyProgramSelect, gbc);
 
         gbc.gridy++;
-        termSelect = new SelectGroup<>("Hoc ky", AppContext.getTermService().getAllTerms());
+        termSelect = new SelectGroup<>("Học kỳ", AppContext.getTermService().getAllTerms());
         panel.add(termSelect, gbc);
 
         gbc.gridy++;
@@ -99,7 +99,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(20, 0, 0, 0);
 
-        PrimaryButton btnCreate = new PrimaryButton("Khoi tao tai khoan");
+        PrimaryButton btnCreate = new PrimaryButton("Khởi tạo tài khoản");
         btnCreate.setPreferredSize(new Dimension(170, 45));
         btnCreate.addActionListener(e -> createSingleAccount());
         panel.add(btnCreate, gbc);
@@ -121,7 +121,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 0, 20, 0);
 
-        JLabel helpLabel = new JLabel("<html>Dan du lieu tu Excel vao day.<br>Backend tao hang loat chua duoc noi.</html>");
+        JLabel helpLabel = new JLabel("<html>Dán dữ liệu từ Excel vào đây.<br>Backend tạo hàng loạt chưa được nối.</html>");
         helpLabel.setFont(new Font("Segoe UI", Font.ITALIC, 13));
         helpLabel.setForeground(Color.GRAY);
         panel.add(helpLabel, gbc);
@@ -129,7 +129,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.gridy++;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        bulkDataInput = new TextAreaGroup("Du lieu bulk", 350);
+        bulkDataInput = new TextAreaGroup("Dữ liệu bulk", 350);
         panel.add(bulkDataInput, gbc);
 
         gbc.gridy++;
@@ -138,16 +138,16 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(20, 0, 0, 0);
 
-        PrimaryButton btnCreateBulk = new PrimaryButton("Batch insert");
+        PrimaryButton btnCreateBulk = new PrimaryButton("Lưu hàng loạt");
         btnCreateBulk.setPreferredSize(new Dimension(180, 45));
         btnCreateBulk.addActionListener(e -> {
             String data = bulkDataInput.getValue().trim();
             if (data.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Ban chua nhap du lieu.", "Loi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Bạn chưa nhập dữ liệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             int rows = data.split("\\n").length;
-            JOptionPane.showMessageDialog(this, "Da nhan " + rows + " dong du lieu. Phan bulk se noi backend sau.", "Thong bao", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Đã nhận " + rows + " dòng dữ liệu. Phần bulk sẽ nối backend sau.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             bulkDataInput.setValue("");
         });
         panel.add(btnCreateBulk, gbc);
@@ -163,21 +163,21 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         String fullName = nameInput.getValue().trim();
 
         if (code.isEmpty() || fullName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui long nhap day du ma va ho ten.", "Loi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ mã và họ tên.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
-            if ("Sinh vien".equals(roleLabel)) {
+            if ("Sinh viên".equals(roleLabel)) {
                 createStudentAccount(code, fullName);
             } else {
                 createLecturerAccount(code, fullName);
             }
 
-            JOptionPane.showMessageDialog(this, "Tao tai khoan thanh cong.", "Thanh cong", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Tạo tài khoản thành công.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
             onEnter();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Loi tao tai khoan: " + ex.getMessage(), "Loi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lỗi tạo tài khoản: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -186,7 +186,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         String dobText = dobInput.getValue().trim();
 
         if (email.isEmpty() || dobText.isEmpty()) {
-            throw new IllegalArgumentException("Sinh vien can email va ngay sinh.");
+            throw new IllegalArgumentException("Sinh viên cần email và ngày sinh.");
         }
 
         Student student = new Student(code, fullName, LocalDate.parse(dobText), email, "");
@@ -195,7 +195,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         student.setTerm(termSelect.getSelectedValue());
 
         if (student.getClassEntity() == null || student.getStudyProgram() == null || student.getTerm() == null) {
-            throw new IllegalArgumentException("Sinh vien can lop, chuong trinh va hoc ky.");
+            throw new IllegalArgumentException("Sinh viên cần lớp, chương trình và học kỳ.");
         }
 
         Account account = new Account(code, "123456", Role.STUDENT);

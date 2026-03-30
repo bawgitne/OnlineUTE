@@ -29,14 +29,15 @@ public class LoginScreen extends JPanel {
     }
 
     private void attemptLogin(String user, String pass) {
+        
         if (user.isEmpty() || pass.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "NHẬP ĐẦY ĐỦ TÀI KHOẢN, MẶT KHẨU DÔ", "Canh bao", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tài khoản và mật khẩu.", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         AppContext.authController.Login(user, pass).ifPresentOrElse(
                 account -> MainNavigator.showDashboard(),
-                () -> JOptionPane.showMessageDialog(this, "TÀI KHOẢN HOẶC PASS SAI", "Loi dang nhap", JOptionPane.ERROR_MESSAGE)
+                () -> JOptionPane.showMessageDialog(this, "Tài khoản hoặc mật khẩu không chính xác.", "Lỗi đăng nhập", JOptionPane.ERROR_MESSAGE)
         );
     }
 }

@@ -30,7 +30,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
-        topPanel.add(new PageTitleLabel("QUAN LY SINH VIEN - DIEM DANH VA NHAP DIEM"), BorderLayout.NORTH);
+        topPanel.add(new PageTitleLabel("QUẢN LÝ SINH VIÊN - ĐIỂM DANH VÀ NHẬP ĐIỂM"), BorderLayout.NORTH);
         add(topPanel, BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane();
@@ -39,7 +39,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
 
         noDataPanel = new JPanel(new BorderLayout());
         noDataPanel.setBackground(Color.WHITE);
-        JLabel noDataLabel = new JLabel("Khong co lop hoc phan nao", SwingConstants.CENTER);
+        JLabel noDataLabel = new JLabel("Không có lớp học phần nào", SwingConstants.CENTER);
         noDataLabel.setFont(new Font("Segoe UI", Font.ITALIC, 16));
         noDataLabel.setForeground(Color.GRAY);
         noDataPanel.add(noDataLabel, BorderLayout.CENTER);
@@ -70,7 +70,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
             remove(noDataPanel);
             add(tabbedPane, BorderLayout.CENTER);
             for (CourseSection sec : mySections) {
-                tabbedPane.addTab(sec.getCourse().getFullName() + " (Lop: " + sec.getId() + ")", createSectionPanel(sec));
+                tabbedPane.addTab(sec.getCourse().getFullName() + " (Lớp: " + sec.getId() + ")", createSectionPanel(sec));
             }
         }
         revalidate();
@@ -84,14 +84,14 @@ public class InputGradesPage extends JPanel implements Refreshable {
 
         String[] columns = new String[21];
         columns[0] = "RegId";
-        columns[1] = "Ma SV";
-        columns[2] = "Ho ten";
+        columns[1] = "Mã SV";
+        columns[2] = "Họ tên";
         for (int i = 1; i <= 15; i++) {
             columns[i + 2] = "T" + i;
         }
-        columns[18] = "Diem QT";
-        columns[19] = "Diem thi";
-        columns[20] = "Tong ket";
+        columns[18] = "Điểm QT";
+        columns[19] = "Điểm thi";
+        columns[20] = "Tổng kết";
 
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -162,7 +162,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.setBackground(Color.WHITE);
-        PrimaryButton btnSave = new PrimaryButton("Luu bang diem");
+        PrimaryButton btnSave = new PrimaryButton("Lưu bảng điểm");
         btnSave.setPreferredSize(new Dimension(150, 40));
         btnSave.addActionListener(e -> saveGrades(table, model, registrations));
         bottomPanel.add(btnSave);
@@ -201,12 +201,12 @@ public class InputGradesPage extends JPanel implements Refreshable {
 
                 AppContext.getMarkService().saveMark(mark);
             }
-            JOptionPane.showMessageDialog(this, "Luu thanh cong bang diem va diem danh.", "Thong bao", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lưu thành công bảng điểm và điểm danh.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             loadTabs();
         } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(this, "Co o diem nhap sai dinh dang hoac vuot khoang 0-10.", "Loi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Có ô điểm nhập sai định dạng hoặc vượt khoảng 0-10.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Loi khi luu bang diem: " + ex.getMessage(), "Loi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lỗi khi lưu bảng điểm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -220,7 +220,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         }
         BigDecimal bd = new BigDecimal(s);
         if (bd.compareTo(BigDecimal.ZERO) < 0 || bd.compareTo(new BigDecimal("10")) > 0) {
-            throw new NumberFormatException("Diem phai nam trong khoang 0-10");
+            throw new NumberFormatException("Điểm phải nằm trong khoảng 0-10");
         }
         return bd;
     }

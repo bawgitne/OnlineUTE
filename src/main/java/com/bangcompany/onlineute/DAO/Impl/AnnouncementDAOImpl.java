@@ -38,7 +38,9 @@ public class AnnouncementDAOImpl implements AnnouncementDAO {
     public List<Announcement> findByTargetType(String targetType) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
-            TypedQuery<Announcement> query = em.createQuery("SELECT a FROM Announcement a WHERE a.targetType = :tt ORDER BY a.createdAt DESC", Announcement.class);
+            TypedQuery<Announcement> query = em.createQuery(
+                    "SELECT a FROM Announcement a WHERE a.targetType = :tt ORDER BY a.createdAt DESC"
+                    , Announcement.class);
             query.setParameter("tt", targetType);
             return query.getResultList();
         } finally {

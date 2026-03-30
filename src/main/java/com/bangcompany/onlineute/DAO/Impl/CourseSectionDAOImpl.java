@@ -54,7 +54,18 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
     public Optional<CourseSection> findById(Long id) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
-            return Optional.ofNullable(em.find(CourseSection.class, id));
+            List<CourseSection> result = em.createQuery(
+                            "SELECT cs FROM CourseSection cs " +
+                                    "JOIN FETCH cs.course " +
+                                    "LEFT JOIN FETCH cs.lecturer " +
+                                    "LEFT JOIN FETCH cs.registrationBatch rb " +
+                                    "LEFT JOIN FETCH rb.term " +
+                                    "WHERE cs.id = :id",
+                            CourseSection.class
+                    )
+                    .setParameter("id", id)
+                    .getResultList();
+            return result.stream().findFirst();
         } finally {
             em.close();
         }
@@ -66,6 +77,48 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
         try {
             return em.createQuery("SELECT cs FROM CourseSection cs WHERE cs.term.id = :termId", CourseSection.class)
                     .setParameter("termId", termId)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<CourseSection> findByRegistrationBatchId(Long registrationBatchId) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT cs FROM CourseSection cs " +
+                                    "JOIN FETCH cs.course " +
+                                    "LEFT JOIN FETCH cs.lecturer " +
+                                    "WHERE cs.registrationBatch.id = :registrationBatchId",
+                            CourseSection.class
+                    )
+                    .setParameter("registrationBatchId", registrationBatchId)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<CourseSection> findConflictingSections(Long termId, Integer dayOfWeek, Integer startSlot, Integer endSlot) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            return em.createQuery(
+                            "SELECT cs FROM CourseSection cs " +
+                                    "JOIN FETCH cs.course " +
+                                    "LEFT JOIN FETCH cs.lecturer " +
+                                    "WHERE cs.term.id = :termId " +
+                                    "AND cs.dayOfWeek = :dayOfWeek " +
+                                    "AND cs.startSlot <= :endSlot " +
+                                    "AND cs.endSlot >= :startSlot",
+                            CourseSection.class
+                    )
+                    .setParameter("termId", termId)
+                    .setParameter("dayOfWeek", dayOfWeek)
+                    .setParameter("startSlot", startSlot)
+                    .setParameter("endSlot", endSlot)
                     .getResultList();
         } finally {
             em.close();

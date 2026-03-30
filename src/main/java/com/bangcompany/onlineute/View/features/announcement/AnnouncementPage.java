@@ -13,7 +13,7 @@ public class AnnouncementPage extends JPanel implements Refreshable {
         setLayout(new BorderLayout());
         announcementTable = new AnnouncementTable();
 
-        PageScaffold scaffold = new PageScaffold("Thong Bao");
+        PageScaffold scaffold = new PageScaffold("Thông báo");
         scaffold.setBody(announcementTable);
         add(scaffold, BorderLayout.CENTER);
     }

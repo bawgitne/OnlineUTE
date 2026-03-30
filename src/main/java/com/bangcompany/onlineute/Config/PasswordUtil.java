@@ -23,11 +23,21 @@ public class PasswordUtil {
     }
 
     // Hash password
-    public static String hashPassword(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static String hashPassword(String password, byte[] salt)  {
         PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH);
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        SecretKeyFactory factory = null;
+        try {
+            factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
 
-        byte[] hash = factory.generateSecret(spec).getEncoded();
+        byte[] hash = null;
+        try {
+            hash = factory.generateSecret(spec).getEncoded();
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
 
         return Base64.getEncoder().encodeToString(hash);
     }

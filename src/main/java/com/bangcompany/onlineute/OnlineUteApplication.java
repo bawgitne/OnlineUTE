@@ -33,7 +33,7 @@ public class OnlineUteApplication {
         SwingUtilities.invokeLater(() -> {
             try {
                 // Start from the new view architecture entrypoint
-                MainNavigator.showLogin();
+                MainNavigator.checkSession();
                 
             } catch (Exception ex) {
                 ex.printStackTrace();

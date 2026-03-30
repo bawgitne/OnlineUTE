@@ -23,6 +23,8 @@
         <class>com.bangcompany.onlineute.Model.Entity.ExamSchedule</class>
         <class>com.bangcompany.onlineute.Model.Entity.Mark</class>
         <class>com.bangcompany.onlineute.Model.Entity.Announcement</class>
+        <class>com.bangcompany.onlineute.Model.Entity.UserProfile</class>
+        <class>com.bangcompany.onlineute.Model.Entity.RegistrationBatch</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>

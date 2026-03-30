@@ -14,6 +14,10 @@ public interface CourseSectionDAO {
     Optional<CourseSection> findById(Long id);
 
     List<CourseSection> findByTermId(Long termId);
+
+    List<CourseSection> findByRegistrationBatchId(Long registrationBatchId);
+
+    List<CourseSection> findConflictingSections(Long termId, Integer dayOfWeek, Integer startSlot, Integer endSlot);
     
     List<CourseSection> findAll();
 }

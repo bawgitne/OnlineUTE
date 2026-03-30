@@ -16,6 +16,10 @@ public class CourseRegistrationController {
         return registrationService.registerToSection(registration);
     }
 
+    public CourseRegistration registerStudentToSection(Long studentId, Long sectionId) {
+        return registrationService.registerStudentToSection(studentId, sectionId);
+    }
+
     public void cancel(CourseRegistration registration) {
         registrationService.cancelRegistration(registration);
     }

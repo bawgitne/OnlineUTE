@@ -1,7 +1,7 @@
 package com.bangcompany.onlineute.View.features.dashboard;
 
 import com.bangcompany.onlineute.Config.SessionManager;
-import com.bangcompany.onlineute.View.Components.SidebarItem;
+import com.bangcompany.onlineute.View.Components.leftbar.SidebarItem;
 import com.bangcompany.onlineute.View.features.account.ChangePasswordPage;
 import com.bangcompany.onlineute.View.features.account.CreateAccountPage;
 import com.bangcompany.onlineute.View.features.announcement.AnnouncementPage;
@@ -10,6 +10,8 @@ import com.bangcompany.onlineute.View.features.attendance.AttendancePage;
 import com.bangcompany.onlineute.View.features.grade.InputGradesPage;
 import com.bangcompany.onlineute.View.features.grade.ViewGradesPage;
 import com.bangcompany.onlineute.View.features.profile.ProfilePage;
+import com.bangcompany.onlineute.View.features.registration.CreateRegistrationBatchPage;
+import com.bangcompany.onlineute.View.features.registration.CourseRegistrationPage;
 import com.bangcompany.onlineute.View.features.schedule.SchedulePage;
 
 import javax.swing.*;
@@ -42,60 +44,72 @@ public class DashboardLayout extends JPanel {
 
     private JPanel createMainArea() {
         JPanel mainArea = new JPanel(new BorderLayout());
-        mainArea.add(new TopHeader("TRUONG DAI HOC CONG NGHE KY THUAT TP.HCM"), BorderLayout.NORTH);
+        mainArea.add(new TopHeader("TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT TP.HCM"), BorderLayout.NORTH);
         mainArea.add(mainContent, BorderLayout.CENTER);
         return mainArea;
     }
 
     private void buildTabs(String role) {
         tabs.clear();
-
         if ("ADMIN".equals(role)) {
             buildAdminTabs();
             return;
         }
-
         if ("LECTURER".equals(role)) {
             buildLecturerTabs();
             return;
         }
-
         buildStudentTabs();
     }
 
     private void buildAdminTabs() {
-        addTab("ANNOUNCEMENT", "Thong bao", "thongTinCaNhan.png");
-        addTab("COMPOSE_ANNOUNCEMENT", "Gui thong bao", "account.png");
-        addTab("CREATE_ACCOUNTS", "Cap tai khoan moi", "account.png");
-        addTab("PROFILE", "Ho so ca nhan", "thongTinCaNhan.png");
-        addTab("CHANGE_PASSWORD", "Doi mat khau", "password.png");
+        addTitle("TRANG CÁ NHÂN");
+        addTab("PROFILE", "Thông tin cá nhân", "thongTinCaNhan.png");
+        addTab("ANNOUNCEMENT", "Thông báo", "trangCuaBan.png");
+        addTab("COMPOSE_ANNOUNCEMENT", "Gửi thông báo", "trangCuaBan.png");
+        addTab("CREATE_ACCOUNTS", "Cấp tài khoản mới", "trangCuaBan.png");
+        addTab("CREATE_REGISTRATION_BATCH", "Tạo đợt đăng ký", "chuongTrinhDaoTao.png");
+        addTab("CHANGE_PASSWORD", "Đổi mật khẩu", "thongTinCaNhan.png");
     }
 
     private void buildLecturerTabs() {
-        addTab("ANNOUNCEMENT", "Thong bao", "thongTinCaNhan.png");
-        addTab("COMPOSE_ANNOUNCEMENT", "Gui thong bao", "account.png");
-        addTab("INPUT_GRADES", "Quan ly sinh vien", "grade.png");
-        addTab("MY_SCHEDULE", "Thoi khoa bieu", "lich.png");
-        addTab("PROFILE", "Ho so ca nhan", "thongTinCaNhan.png");
-        addTab("CHANGE_PASSWORD", "Doi mat khau", "password.png");
+        addTitle("TRANG CÁ NHÂN");
+        addTab("PROFILE", "Thông tin cá nhân", "thongTinCaNhan.png");
+        addTab("ANNOUNCEMENT", "Trang của bạn", "trangCuaBan.png");
+        addTitle("TRA CỨU THÔNG TIN");
+        addTab("MY_SCHEDULE", "Lịch giảng dạy", "lich.png");
+        addTitle("QUẢN LÝ SINH VIÊN");
+        addTab("COMPOSE_ANNOUNCEMENT", "Gửi thông báo", "trangCuaBan.png");
+        addTab("INPUT_GRADES", "Quản lý lớp học", "xemDiem.png");
+        addTab("CHANGE_PASSWORD", "Đổi mật khẩu", "thongTinCaNhan.png");
     }
 
     private void buildStudentTabs() {
-        addTab("ANNOUNCEMENT", "Thong bao", "thongTinCaNhan.png");
-        addTab("MY_SCHEDULE", "Thoi khoa bieu", "lich.png");
-        addTab("MY_GRADES", "Xem diem", "grade.png");
-        addTab("ATTENDANCE", "Chuyen can", "lich.png");
-        addTab("PROFILE", "Ho so ca nhan", "thongTinCaNhan.png");
-        addTab("CHANGE_PASSWORD", "Doi mat khau", "password.png");
+        addTitle("TRANG CÁ NHÂN");
+        addTab("PROFILE", "Thông tin cá nhân", "thongTinCaNhan.png");
+        addTab("ANNOUNCEMENT", "Trang của bạn", "trangCuaBan.png");
+        addTitle("TRA CỨU THÔNG TIN");
+        addTab("REGISTER_COURSES", "Đăng ký môn học", "chuongTrinhDaoTao.png");
+        addTab("MY_SCHEDULE", "Thời khóa biểu", "lich.png");
+        addTab("MY_GRADES", "Xem điểm", "xemDiem.png");
+        addTab("ATTENDANCE", "Xem điểm chuyên cần", "lich.png");
+        addTab("CHANGE_PASSWORD", "Đổi mật khẩu", "thongTinCaNhan.png");
+    }
+
+    private void addTitle(String label) {
+        tabs.add(SidebarItem.title(label));
     }
 
     private void addTab(String key, String label, String icon) {
-        tabs.add(new SidebarItem(key, label, icon));
+        tabs.add(SidebarItem.tab(key, label, icon));
     }
 
     private void registerPages() {
-        for (SidebarItem tab : tabs) {
-            mainContent.registerPage(tab.getKey(), createPage(tab.getKey()));
+        for (SidebarItem item : tabs) {
+            if (item.isTitle()) {
+                continue;
+            }
+            mainContent.registerPage(item.getKey(), createPage(item.getKey()));
         }
     }
 
@@ -104,6 +118,8 @@ public class DashboardLayout extends JPanel {
             case "ANNOUNCEMENT" -> new AnnouncementPage();
             case "COMPOSE_ANNOUNCEMENT" -> new CreateAnnouncementPage();
             case "CREATE_ACCOUNTS" -> new CreateAccountPage();
+            case "CREATE_REGISTRATION_BATCH" -> new CreateRegistrationBatchPage();
+            case "REGISTER_COURSES" -> new CourseRegistrationPage();
             case "CHANGE_PASSWORD" -> new ChangePasswordPage();
             case "PROFILE" -> new ProfilePage();
             case "MY_SCHEDULE" -> new SchedulePage();
@@ -123,11 +139,12 @@ public class DashboardLayout extends JPanel {
     }
 
     private void showFirstTab() {
-        if (tabs.isEmpty()) {
-            return;
+        for (SidebarItem item : tabs) {
+            if (!item.isTitle()) {
+                showPage(item.getKey());
+                return;
+            }
         }
-
-        showPage(tabs.get(0).getKey());
     }
 
     private void showPage(String pageKey) {

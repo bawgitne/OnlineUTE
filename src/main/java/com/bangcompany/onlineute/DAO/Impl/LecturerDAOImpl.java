@@ -4,6 +4,8 @@ import com.bangcompany.onlineute.Config.JpaUtil;
 import com.bangcompany.onlineute.DAO.LecturerDAO;
 import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import jakarta.persistence.EntityManager;
+
+import java.util.List;
 import java.util.Optional;
 
 public class LecturerDAOImpl implements LecturerDAO {
@@ -20,6 +22,17 @@ public class LecturerDAOImpl implements LecturerDAO {
             }
             em.getTransaction().commit();
             return lecturer;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Lecturer> findAll() {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            return em.createQuery("SELECT l FROM Lecturer l ORDER BY l.fullName", Lecturer.class)
+                    .getResultList();
         } finally {
             em.close();
         }

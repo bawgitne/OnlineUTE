@@ -41,4 +41,9 @@ public class Course {
     public void setCredit(Integer credit) { this.credit = credit; }
     public List<CourseSection> getCourseSections() { return courseSections; }
     public void setCourseSections(List<CourseSection> courseSections) { this.courseSections = courseSections; }
+
+    @Override
+    public String toString() {
+        return courseCode + " - " + fullName;
+    }
 }

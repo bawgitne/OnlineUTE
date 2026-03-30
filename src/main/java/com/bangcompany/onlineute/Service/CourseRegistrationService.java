@@ -6,6 +6,8 @@ import java.util.Optional;
 
 public interface CourseRegistrationService {
     CourseRegistration registerToSection(CourseRegistration registration);
+
+    CourseRegistration registerStudentToSection(Long studentId, Long sectionId);
     
     void cancelRegistration(CourseRegistration registration);
     

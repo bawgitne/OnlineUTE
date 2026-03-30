@@ -53,6 +53,17 @@ CREATE TABLE term (
     is_current BOOLEAN NOT NULL DEFAULT FALSE
 ) ENGINE=InnoDB;
 
+CREATE TABLE registration_batch (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    open_at DATETIME NOT NULL,
+    close_at DATETIME NOT NULL,
+    term_id BIGINT NOT NULL,
+    common_start_date DATE NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_registration_batch_term FOREIGN KEY (term_id) REFERENCES term(id)
+) ENGINE=InnoDB;
+
 CREATE TABLE `class` (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     class_name VARCHAR(100) NOT NULL UNIQUE
@@ -75,6 +86,43 @@ CREATE TABLE student (
     CONSTRAINT fk_student_account FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE TABLE user_profile (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    account_id BIGINT NOT NULL UNIQUE,
+    profile_code VARCHAR(50),
+    display_name VARCHAR(150),
+    role_title VARCHAR(100),
+    avatar_url VARCHAR(255),
+    email VARCHAR(150),
+    phone_number VARCHAR(20),
+    alternate_email VARCHAR(150),
+    birth_date DATE,
+    gender VARCHAR(20),
+    place_of_birth VARCHAR(150),
+    nationality VARCHAR(100),
+    ethnicity VARCHAR(100),
+    religion VARCHAR(100),
+    citizen_id_number VARCHAR(50),
+    citizen_id_issue_place VARCHAR(150),
+    citizen_id_issue_date DATE,
+    current_address VARCHAR(500),
+    permanent_address VARCHAR(500),
+    faculty_name VARCHAR(150),
+    class_name VARCHAR(100),
+    study_program_name VARCHAR(255),
+    academic_year VARCHAR(100),
+    expected_graduation_year VARCHAR(100),
+    contact_name VARCHAR(150),
+    contact_phone VARCHAR(20),
+    contact_address VARCHAR(500),
+    father_name VARCHAR(150),
+    father_phone VARCHAR(20),
+    mother_name VARCHAR(150),
+    mother_phone VARCHAR(20),
+    CONSTRAINT fk_user_profile_account
+        FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE course (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     course_code VARCHAR(50) NOT NULL UNIQUE,
@@ -85,11 +133,21 @@ CREATE TABLE course (
 CREATE TABLE course_section (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     section_code VARCHAR(50) NOT NULL,
+    registration_batch_id BIGINT NULL,
     course_id BIGINT NOT NULL,
     term_id BIGINT NOT NULL,
     lecturer_id BIGINT NOT NULL,
     room VARCHAR(50) NOT NULL,
+    max_capacity INT NOT NULL DEFAULT 70,
+    current_capacity INT NOT NULL DEFAULT 0,
+    day_of_week INT NOT NULL DEFAULT 2,
+    start_slot INT NOT NULL DEFAULT 1,
+    end_slot INT NOT NULL DEFAULT 3,
+    total_weeks INT NOT NULL DEFAULT 15,
+    first_study_date DATE NULL,
+    last_study_date DATE NULL,
     CONSTRAINT uk_section_term UNIQUE (section_code, term_id),
+    CONSTRAINT fk_section_batch FOREIGN KEY (registration_batch_id) REFERENCES registration_batch(id),
     CONSTRAINT fk_section_course FOREIGN KEY (course_id) REFERENCES course(id),
     CONSTRAINT fk_section_term FOREIGN KEY (term_id) REFERENCES term(id),
     CONSTRAINT fk_section_lecturer FOREIGN KEY (lecturer_id) REFERENCES lecturer(id)
@@ -125,6 +183,7 @@ CREATE TABLE schedule (
     end_slot INT NOT NULL,
     room VARCHAR(50) NOT NULL,
     week_number INT NOT NULL,
+    study_date DATE NOT NULL,
     CONSTRAINT fk_schedule_section FOREIGN KEY (course_section_id) REFERENCES course_section(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -161,6 +220,9 @@ INSERT INTO term (year_name, term_name, is_current) VALUES
 SET @term_old = 1;
 SET @term_prev = 2;
 SET @term_cur = 3;
+
+INSERT INTO registration_batch (name, open_at, close_at, term_id, common_start_date) VALUES
+('Dang ky hoc phan HK1 2025-2026', '2025-07-20 08:00:00', '2025-08-05 23:59:59', @term_cur, '2025-08-18');
 
 INSERT INTO study_program (program_code, fullname, total_credit) VALUES
 ('CNTT', 'Công nghệ thông tin', 145),
@@ -281,6 +343,83 @@ SELECT
     n + 22
 FROM seq;
 
+INSERT INTO user_profile (
+    account_id, profile_code, display_name, role_title, avatar_url, email, phone_number, alternate_email,
+    birth_date, gender, place_of_birth, nationality, ethnicity, religion, citizen_id_number,
+    citizen_id_issue_place, citizen_id_issue_date, current_address, permanent_address,
+    faculty_name, class_name, study_program_name, academic_year, expected_graduation_year,
+    contact_name, contact_phone, contact_address, father_name, father_phone, mother_name, mother_phone
+)
+SELECT
+    s.account_id,
+    s.code,
+    s.fullname,
+    'Sinh vien',
+    s.avatar_url,
+    s.email,
+    CONCAT('09', LPAD(MOD(s.id * 37, 100000000), 8, '0')),
+    CONCAT(LOWER(REPLACE(s.code, ' ', '')), '@gmail.com'),
+    s.birth_of_date,
+    CASE WHEN MOD(s.id, 2) = 0 THEN 'Nu' ELSE 'Nam' END,
+    'TP Ho Chi Minh',
+    'Viet Nam',
+    'Kinh',
+    'Khong',
+    CONCAT('079', LPAD(s.id, 9, '0')),
+    'Cong an TP Ho Chi Minh',
+    DATE_ADD('2022-01-01', INTERVAL MOD(s.id, 500) DAY),
+    CONCAT('So ', MOD(s.id, 200) + 1, ', TP Thu Duc, TP Ho Chi Minh'),
+    CONCAT('So ', MOD(s.id, 300) + 10, ', Quan ', MOD(s.id, 12) + 1, ', TP Ho Chi Minh'),
+    'Khoa Cong nghe thong tin',
+    c.class_name,
+    sp.fullname,
+    '2024 - 2028',
+    '2028',
+    CONCAT('Nguoi lien he ', s.fullname),
+    CONCAT('08', LPAD(MOD(s.id * 41, 100000000), 8, '0')),
+    CONCAT('So ', MOD(s.id, 90) + 1, ', Khu pho 1, TP Thu Duc'),
+    CONCAT('Cha ', s.fullname),
+    CONCAT('07', LPAD(MOD(s.id * 43, 100000000), 8, '0')),
+    CONCAT('Me ', s.fullname),
+    CONCAT('07', LPAD(MOD(s.id * 47, 100000000), 8, '0'))
+FROM student s
+JOIN `class` c ON c.id = s.class_id
+JOIN study_program sp ON sp.id = s.study_program_id;
+
+INSERT INTO user_profile (
+    account_id, profile_code, display_name, role_title, email, phone_number,
+    nationality, faculty_name, academic_year, current_address
+)
+SELECT
+    l.account_id,
+    l.code,
+    l.fullname,
+    'Giang vien',
+    CONCAT(LOWER(l.code), '@hcmute.edu.vn'),
+    CONCAT('09', LPAD(MOD(l.id * 53, 100000000), 8, '0')),
+    'Viet Nam',
+    'Khoa Cong nghe thong tin',
+    'Cong tac hien tai',
+    CONCAT('So ', MOD(l.id, 50) + 1, ', TP Ho Chi Minh')
+FROM lecturer l;
+
+INSERT INTO user_profile (
+    account_id, profile_code, display_name, role_title, email, phone_number,
+    nationality, faculty_name, academic_year, current_address
+)
+SELECT
+    a.account_id,
+    a.code,
+    a.fullname,
+    'Quan tri vien',
+    CONCAT(LOWER(a.code), '@hcmute.edu.vn'),
+    CONCAT('09', LPAD(MOD(a.id * 59, 100000000), 8, '0')),
+    'Viet Nam',
+    'Phong dao tao',
+    'Nhan su hien tai',
+    'Co so 1 - TP Thu Duc'
+FROM admin a;
+
 -- =========================================================
 -- 6) COURSE SECTIONS (60 Sections per term)
 -- =========================================================
@@ -370,14 +509,15 @@ WHERE cs.term_id = 3 AND cr.status = 'APPROVED';
 -- 9) SCHEDULE
 -- =========================================================
 -- Generate schedules for CURRENT term sections ONLY
-INSERT INTO schedule (course_section_id, day_of_week, start_slot, end_slot, room, week_number)
+INSERT INTO schedule (course_section_id, day_of_week, start_slot, end_slot, room, week_number, study_date)
 SELECT 
     id, 
     MOD(id, 6) + 2, -- Monday (2) to Saturday (7)
     CASE MOD(id, 3) WHEN 0 THEN 1 WHEN 1 THEN 4 ELSE 7 END, -- start slots 1, 4, 7
     CASE MOD(id, 3) WHEN 0 THEN 3 WHEN 1 THEN 6 ELSE 9 END, -- end slots 3, 6, 9
     room,
-    1 -- just week 1 as example
+    1, -- just week 1 as example
+    DATE_ADD('2025-08-18', INTERVAL MOD(id, 6) + 1 DAY)
 FROM course_section 
 WHERE term_id = 3;
 

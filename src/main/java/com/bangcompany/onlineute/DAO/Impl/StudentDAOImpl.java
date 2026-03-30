@@ -26,6 +26,16 @@ public class StudentDAOImpl implements StudentDAO {
     }
 
     @Override
+    public Optional<Student> findById(Long id) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            return Optional.ofNullable(em.find(Student.class, id));
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public Optional<Student> findByAccountId(Long accountId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {

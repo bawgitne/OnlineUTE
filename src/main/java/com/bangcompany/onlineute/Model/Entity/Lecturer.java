@@ -43,4 +43,9 @@ public class Lecturer {
     public void setCourseSections(List<CourseSection> courseSections) { this.courseSections = courseSections; }
     public Account getAccount() { return account; }
     public void setAccount(Account account) { this.account = account; }
+
+    @Override
+    public String toString() {
+        return code + " - " + fullName;
+    }
 }
