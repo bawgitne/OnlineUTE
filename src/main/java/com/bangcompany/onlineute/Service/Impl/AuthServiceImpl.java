@@ -1,15 +1,14 @@
 package com.bangcompany.onlineute.Service.Impl;
 
-import com.bangcompany.onlineute.DAO.AccountDAO;
-import com.bangcompany.onlineute.DAO.StudentDAO;
-import com.bangcompany.onlineute.DAO.LecturerDAO;
-import com.bangcompany.onlineute.DAO.AdminDAO;
-import com.bangcompany.onlineute.Model.Entity.Account;
-import com.bangcompany.onlineute.Model.Entity.Student;
-import com.bangcompany.onlineute.Model.Entity.Lecturer;
-import com.bangcompany.onlineute.Model.Entity.Admin;
-import com.bangcompany.onlineute.Service.AuthService;
 import com.bangcompany.onlineute.Config.SessionManager;
+import com.bangcompany.onlineute.DAO.AccountDAO;
+import com.bangcompany.onlineute.DAO.AdminDAO;
+import com.bangcompany.onlineute.DAO.LecturerDAO;
+import com.bangcompany.onlineute.DAO.StudentDAO;
+import com.bangcompany.onlineute.Model.Entity.Account;
+import com.bangcompany.onlineute.Model.EnumType.Role;
+import com.bangcompany.onlineute.Service.AuthService;
+
 import java.util.Optional;
 
 public class AuthServiceImpl implements AuthService {
@@ -28,27 +27,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Optional<Account> login(String username, String password) {
         Optional<Account> accountOpt = accountDAO.findByUsername(username);
-        
-        if (accountOpt.isPresent()) {
-            Account account = accountOpt.get();
-            if (account.getPasswordHash().equals(password)) {
-                linkProfileToSession(account);
-                return Optional.of(account);
-            }
+        if (accountOpt.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
-    }
 
-    private void linkProfileToSession(Account account) {
-        SessionManager.login(account);
-        
-        if (account.getRole() == com.bangcompany.onlineute.Model.EnumType.Role.STUDENT) {
-            studentDAO.findByAccountId(account.getId()).ifPresent(SessionManager::setCurrentStudent);
-        } else if (account.getRole() == com.bangcompany.onlineute.Model.EnumType.Role.LECTURER) {
-            lecturerDAO.findByAccountId(account.getId()).ifPresent(SessionManager::setCurrentLecturer);
-        } else if (account.getRole() == com.bangcompany.onlineute.Model.EnumType.Role.ADMIN) {
-            adminDAO.findByAccountId(account.getId()).ifPresent(SessionManager::setCurrentAdmin);
+        Account account = accountOpt.get();
+        if (!password.equals(account.getPasswordHash())) {
+            return Optional.empty();
         }
+
+        loadSession(account);
+        return Optional.of(account);
     }
 
     @Override
@@ -56,21 +45,22 @@ public class AuthServiceImpl implements AuthService {
         SessionManager.logout();
     }
 
-    @Override
-    public Account registerStudent(Account account, Student student) {
-        student.setAccount(account); // Linking
-        return studentDAO.save(student).getAccount();
-    }
+    private void loadSession(Account account) {
+        SessionManager.login(account);
 
-    @Override
-    public Account registerLecturer(Account account, Lecturer lecturer) {
-        lecturer.setAccount(account); // Linking
-        return lecturerDAO.save(lecturer).getAccount();
-    }
+        Role role = account.getRole();
+        if (role == Role.STUDENT) {
+            studentDAO.findByAccountId(account.getId()).ifPresent(SessionManager::setCurrentStudent);
+            return;
+        }
 
-    @Override
-    public Account registerAdmin(Account account, Admin admin) {
-        admin.setAccount(account); // Linking
-        return adminDAO.save(admin).getAccount();
+        if (role == Role.LECTURER) {
+            lecturerDAO.findByAccountId(account.getId()).ifPresent(SessionManager::setCurrentLecturer);
+            return;
+        }
+
+        if (role == Role.ADMIN) {
+            adminDAO.findByAccountId(account.getId()).ifPresent(SessionManager::setCurrentAdmin);
+        }
     }
 }

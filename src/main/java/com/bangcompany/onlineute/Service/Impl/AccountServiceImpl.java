@@ -1,45 +1,40 @@
 package com.bangcompany.onlineute.Service.Impl;
 
-import com.bangcompany.onlineute.Config.PasswordUtil;
-import com.bangcompany.onlineute.DAO.AccountDAO;
-import com.bangcompany.onlineute.DAO.StudentDAO;
+import com.bangcompany.onlineute.DAO.AdminDAO;
 import com.bangcompany.onlineute.DAO.LecturerDAO;
+import com.bangcompany.onlineute.DAO.StudentDAO;
 import com.bangcompany.onlineute.Model.Entity.Account;
+import com.bangcompany.onlineute.Model.Entity.Admin;
 import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import com.bangcompany.onlineute.Model.Entity.Student;
 import com.bangcompany.onlineute.Service.AccountService;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-
 public class AccountServiceImpl implements AccountService {
-    private final AccountDAO accountDAO;
     private final StudentDAO studentDAO;
     private final LecturerDAO lecturerDAO;
+    private final AdminDAO adminDAO;
 
-    public AccountServiceImpl(AccountDAO accountDAO, StudentDAO studentDAO, LecturerDAO lecturerDAO) {
-        this.accountDAO = accountDAO;
+    public AccountServiceImpl(StudentDAO studentDAO, LecturerDAO lecturerDAO, AdminDAO adminDAO) {
         this.studentDAO = studentDAO;
         this.lecturerDAO = lecturerDAO;
+        this.adminDAO = adminDAO;
     }
 
     @Override
-    public Account createStudentAccount(Account account, Student student) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] salt = PasswordUtil.generateSalt();
-        account.setSalt(salt);
-        account.setPasswordHash(PasswordUtil.hashPassword(account.getPasswordHash(),salt));
+    public Account createStudentAccount(Account account, Student student) {
         student.setAccount(account);
-        studentDAO.save(student);
-        return account;
+        return studentDAO.save(student).getAccount();
     }
 
     @Override
-    public Account createLecturerAccount(Account account, Lecturer lecturer) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] salt = PasswordUtil.generateSalt();
-        account.setSalt(salt);
-        account.setPasswordHash(PasswordUtil.hashPassword(account.getPasswordHash(),salt));
+    public Account createLecturerAccount(Account account, Lecturer lecturer) {
         lecturer.setAccount(account);
-        lecturerDAO.save(lecturer);
-        return account;
+        return lecturerDAO.save(lecturer).getAccount();
+    }
+
+    @Override
+    public Account createAdminAccount(Account account, Admin admin) {
+        admin.setAccount(account);
+        return adminDAO.save(admin).getAccount();
     }
 }

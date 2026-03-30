@@ -2,7 +2,7 @@ package com.bangcompany.onlineute;
 
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.JpaUtil;
-import com.bangcompany.onlineute.view.navigation.MainNavigator;
+import com.bangcompany.onlineute.View.navigation.MainNavigator;
 import javax.swing.*;
 
 /**

@@ -1,7 +1,7 @@
-package com.bangcompany.onlineute.view.features.auth;
+package com.bangcompany.onlineute.View.features.auth;
 
-import com.bangcompany.onlineute.view.shared.components.InputGroup;
-import com.bangcompany.onlineute.view.shared.components.PrimaryButton;
+import com.bangcompany.onlineute.View.Components.InputGroup;
+import com.bangcompany.onlineute.View.Components.PrimaryButton;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -27,13 +27,13 @@ public class LoginForm extends JPanel {
         setPreferredSize(new Dimension(500, 450));
         setMaximumSize(new Dimension(500, 450));
 
-        JLabel loginTitle = new JLabel("DANG NHAP");
+        JLabel loginTitle = new JLabel("ĐĂNG NHẬP");
         loginTitle.setFont(new Font("Segoe UI", Font.BOLD, 26));
         loginTitle.setForeground(new Color(40, 80, 140));
         loginTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(loginTitle);
 
-        JLabel subTitle = new JLabel("Cong thong tin dao tao");
+        JLabel subTitle = new JLabel("Cổng thông tin đào tạo");
         subTitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         subTitle.setForeground(Color.GRAY);
         subTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -41,7 +41,7 @@ public class LoginForm extends JPanel {
 
         add(Box.createRigidArea(new Dimension(0, 25)));
 
-        usernameGroup = new InputGroup("Ten dang nhap", false);
+        usernameGroup = new InputGroup("Tên đăng nhập", false);
         passwordGroup = new InputGroup("Mat khau", true);
         usernameGroup.setAlignmentX(Component.LEFT_ALIGNMENT);
         passwordGroup.setAlignmentX(Component.LEFT_ALIGNMENT);

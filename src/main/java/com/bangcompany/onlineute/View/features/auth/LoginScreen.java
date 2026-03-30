@@ -1,20 +1,23 @@
-package com.bangcompany.onlineute.view.features.auth;
+package com.bangcompany.onlineute.View.features.auth;
 
 import com.bangcompany.onlineute.Config.AppContext;
-import com.bangcompany.onlineute.view.navigation.MainNavigator;
-import com.bangcompany.onlineute.view.shared.components.AppLogoHeader;
+import com.bangcompany.onlineute.View.navigation.MainNavigator;
+import com.bangcompany.onlineute.View.Components.AppLogoHeader;
 
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * màn hình đăng nhập
+ */
 public class LoginScreen extends JPanel {
     public LoginScreen() {
-        setLayout(new GridBagLayout());
+        setLayout(new GridBagLayout());     // tự đôộng nằm giữa screen
         setBackground(new Color(230, 235, 240));
 
-        JPanel cardHolder = new JPanel();
-        cardHolder.setLayout(new BoxLayout(cardHolder, BoxLayout.Y_AXIS));
-        cardHolder.setOpaque(false);
+        JPanel cardHolder = new JPanel();   //container đăng nhập
+        cardHolder.setLayout(new BoxLayout(cardHolder, BoxLayout.Y_AXIS));// xếp theo chều dọc
+        cardHolder.setOpaque(false); //tỏng suốt background
         add(cardHolder);
 
         cardHolder.add(new AppLogoHeader());
@@ -27,13 +30,13 @@ public class LoginScreen extends JPanel {
 
     private void attemptLogin(String user, String pass) {
         if (user.isEmpty() || pass.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui long nhap day du tai khoan va mat khau!", "Canh bao", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "NHẬP ĐẦY ĐỦ TÀI KHOẢN, MẶT KHẨU DÔ", "Canh bao", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         AppContext.authController.Login(user, pass).ifPresentOrElse(
                 account -> MainNavigator.showDashboard(),
-                () -> JOptionPane.showMessageDialog(this, "Tai khoan hoac mat khau khong chinh xac!", "Loi dang nhap", JOptionPane.ERROR_MESSAGE)
+                () -> JOptionPane.showMessageDialog(this, "TÀI KHOẢN HOẶC PASS SAI", "Loi dang nhap", JOptionPane.ERROR_MESSAGE)
         );
     }
 }

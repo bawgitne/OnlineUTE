@@ -1,17 +1,18 @@
-package com.bangcompany.onlineute.view.navigation;
+package com.bangcompany.onlineute.View.navigation;
 
-import com.bangcompany.onlineute.view.app.WindowManager;
-import com.bangcompany.onlineute.view.features.auth.LoginScreen;
-import com.bangcompany.onlineute.view.layout.DashboardLayout;
+import com.bangcompany.onlineute.View.WindowManager;
+import com.bangcompany.onlineute.View.features.auth.LoginScreen;
+import com.bangcompany.onlineute.View.features.dashboard.DashboardScreen;
 
 public final class MainNavigator {
     private MainNavigator() {}
 
     public static void showLogin() {
-        WindowManager.showScreen(new LoginScreen());
+        WindowManager.show(new LoginScreen());
     }
 
     public static void showDashboard() {
-        WindowManager.showScreen(new DashboardLayout());
+        WindowManager.show(new DashboardScreen());
     }
 }
+// hàm trung gian để lệnh show nó gọn hơn

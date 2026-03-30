@@ -1,4 +1,4 @@
-package com.bangcompany.onlineute.Model.Entity;
+package com.bangcompany.onlineute.Model.EnumType;
 
 public enum RegistrationStatus {
     PENDING,

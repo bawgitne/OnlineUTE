@@ -23,6 +23,7 @@ public final class AppContext {
     public static ClassDAO classDAO;
     public static StudyProgramDAO studyProgramDAO;
     // Services
+    public static AccountService accountService;
     public static AuthService authService;
     public static StudentService studentService;
     public static ScheduleService scheduleService;
@@ -35,6 +36,7 @@ public final class AppContext {
     public static ClassService classService;
     public static StudyProgramService studyProgramService;
     // Controllers
+    public static AccountController accountController;
     public static AuthController authController;
     public static TermController termController;
     public static StudentController studentController;
@@ -64,6 +66,7 @@ public final class AppContext {
         classDAO = new ClassDAOImpl();
         studyProgramDAO = new StudyProgramDAOImpl();
         // 2. Services
+        accountService = new AccountServiceImpl(studentDAO, lecturerDAO, adminDAO);
         authService = new AuthServiceImpl(accountDAO, studentDAO, lecturerDAO, adminDAO);
         studentService = new StudentServiceImpl(studentDAO);
         scheduleService = new ScheduleServiceImpl(scheduleDAO);
@@ -76,6 +79,7 @@ public final class AppContext {
         classService = new ClassServiceImpl(classDAO);
         studyProgramService = new StudyProgramServiceImpl(studyProgramDAO);
         // 3. Controllers
+        accountController = new AccountController(accountService);
         authController = new AuthController(authService);
         termController = new TermController(termService);
         studentController = new StudentController(studentService);
@@ -98,6 +102,8 @@ public final class AppContext {
     public static TermService getTermService() { return termService; }
     public static StudentService getStudentService() { return studentService; }
     public static AuthService getAuthService() { return authService;}
+    public static AccountService getAccountService() { return accountService; }
+    public static AccountController getAccountController() { return accountController; }
     public static ClassService getClassService() { return classService; }
     public static StudyProgramService getStudyProgramService() { return studyProgramService; }
 }

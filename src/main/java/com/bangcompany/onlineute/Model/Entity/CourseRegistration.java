@@ -1,5 +1,6 @@
 package com.bangcompany.onlineute.Model.Entity;
 
+import com.bangcompany.onlineute.Model.EnumType.RegistrationStatus;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
