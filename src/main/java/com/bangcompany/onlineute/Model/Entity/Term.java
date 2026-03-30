@@ -46,4 +46,9 @@ public class Term {
     public void setStudents(List<Student> students) { this.students = students; }
     public List<CourseSection> getCourseSections() { return courseSections; }
     public void setCourseSections(List<CourseSection> courseSections) { this.courseSections = courseSections; }
+
+    @Override
+    public String toString() {
+        return termName + " - " + yearName;
+    }
 }

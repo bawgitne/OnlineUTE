@@ -27,11 +27,10 @@ public class Lecturer {
 
     public Lecturer() {}
 
-    public Lecturer(Long id, String code, String fullName, Account account) {
+    public Lecturer(Long id, String code, String fullName) {
         this.id = id;
         this.code = code;
         this.fullName = fullName;
-        this.account = account;
     }
 
     public Long getId() { return id; }

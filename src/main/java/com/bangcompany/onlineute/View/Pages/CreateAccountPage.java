@@ -1,5 +1,12 @@
 package com.bangcompany.onlineute.View.Pages;
 
+import com.bangcompany.onlineute.Config.AppContext;
+import com.bangcompany.onlineute.Model.Entity.Account;
+import com.bangcompany.onlineute.Model.Entity.Class;
+import com.bangcompany.onlineute.Model.Entity.Student;
+import com.bangcompany.onlineute.Model.Entity.StudyProgram;
+import com.bangcompany.onlineute.Model.Entity.Term;
+import com.bangcompany.onlineute.Model.EnumType.Role;
 import com.bangcompany.onlineute.View.Components.InputGroup;
 import com.bangcompany.onlineute.View.Components.PageTitleLabel;
 import com.bangcompany.onlineute.View.Components.PrimaryButton;
@@ -9,6 +16,7 @@ import com.bangcompany.onlineute.View.Components.TextAreaGroup;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.time.LocalDate;
 
 public class CreateAccountPage extends JPanel implements Refreshable {
     private JTabbedPane tabbedPane;
@@ -18,7 +26,9 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     private InputGroup codeInput;
     private InputGroup nameInput;
     private InputGroup emailInput;
-    private InputGroup classInput;
+    private SelectGroup<Class> classSelect;
+    private SelectGroup<StudyProgram> studyProgramSelect;
+    private SelectGroup<Term> termSelect;
     private InputGroup dobInput;
     private PrimaryButton btnCreateSingle;
 
@@ -80,8 +90,16 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         panel.add(dobInput, gbc);
 
         gbc.gridy++;
-        classInput = new InputGroup("Mã lớp (Ví dụ: CNTT-K24A / Dành cho SV)", false);
-        panel.add(classInput, gbc);
+        classSelect = new SelectGroup<>("Mã lớp (Dành cho SV)", AppContext.getClassService().getAllClasses());
+        panel.add(classSelect, gbc);
+
+        gbc.gridy++;
+        studyProgramSelect = new SelectGroup<>("Chương trình đào tạo (Dành cho SV)", AppContext.getStudyProgramService().getAllStudyPrograms());
+        panel.add(studyProgramSelect, gbc);
+
+        gbc.gridy++;
+        termSelect = new SelectGroup<>("Học kỳ (Dành cho SV)", AppContext.getTermService().getAllTerms());
+        panel.add(termSelect, gbc);
 
         gbc.gridy++;
         gbc.fill = GridBagConstraints.NONE;
@@ -91,9 +109,22 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         btnCreateSingle = new PrimaryButton("Khởi tạo tài khoản");
         btnCreateSingle.setPreferredSize(new Dimension(150, 45));
         panel.add(btnCreateSingle, gbc);
-
         btnCreateSingle.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Chức năng lưu " + roleSelect.getSelectedValue() + " (Mã: " + codeInput.getValue() + ") đang được phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            try {
+                Student student = new Student(codeInput.getValue(), nameInput.getValue(), LocalDate.parse(dobInput.getValue()), emailInput.getValue(), "");
+                student.setClassEntity(classSelect.getSelectedValue());
+                student.setStudyProgram(studyProgramSelect.getSelectedValue());
+                student.setTerm(termSelect.getSelectedValue());
+                
+                AppContext.getAuthService().registerStudent(
+                    new Account(codeInput.getValue(), "123456", Role.STUDENT),
+                    student
+                );
+                JOptionPane.showMessageDialog(this, "Tạo tài khoản thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                onEnter();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi tạo tài khoản: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         // Setup role switch listener if needed, but for dummy UI we can just leave it as is.
@@ -163,8 +194,11 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         codeInput.setValue("");
         nameInput.setValue("");
         emailInput.setValue("");
-        classInput.setValue("");
         dobInput.setValue("");
         bulkDataInput.setValue("");
+        
+        classSelect.setItems(AppContext.getClassService().getAllClasses());
+        studyProgramSelect.setItems(AppContext.getStudyProgramService().getAllStudyPrograms());
+        termSelect.setItems(AppContext.getTermService().getAllTerms());
     }
 }

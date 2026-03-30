@@ -1,8 +1,7 @@
 package com.bangcompany.onlineute.View.Screens;
 
 import com.bangcompany.onlineute.Config.SessionManager;
-import com.bangcompany.onlineute.Model.Entity.Account;
-import com.bangcompany.onlineute.Model.EnumType.MenuItem;
+import com.bangcompany.onlineute.View.Components.SidebarItem;
 import com.bangcompany.onlineute.View.Containers.Sidebar;
 import com.bangcompany.onlineute.View.Containers.MainView;
 import com.bangcompany.onlineute.View.Containers.TopHeader;
@@ -12,11 +11,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DashboardFrame - Smart Container.
- * Handles business logic: role filtering, data preparation, navigation.
- * Passes pre-processed data down to dumb components (Sidebar, MainView, TopHeader).
- */
+
 public class DashboardFrame extends JPanel {
     private MainView mainView;
     private TopHeader topHeader;
@@ -33,7 +28,7 @@ public class DashboardFrame extends JPanel {
         String roleDisplay = SessionManager.getRoleDisplayName();
 
         // Business logic: filter menu items by role
-        List<MenuItem> accessibleItems = getAccessibleMenuItems();
+        List<SidebarItem> accessibleItems = getAccessibleMenuItems();
 
         // --- Assemble dumb components with pre-processed data ---
         mainView = new MainView();
@@ -59,23 +54,18 @@ public class DashboardFrame extends JPanel {
     }
 
     /**
-     * Business logic: Filter MenuItem enum by the current user's role.
+     * Legacy dashboard uses a minimal fixed sidebar list.
      */
-    private List<MenuItem> getAccessibleMenuItems() {
-        String roleName = SessionManager.getRole();
-        if (roleName == null) roleName = "NONE";
-
-        List<MenuItem> items = new ArrayList<>();
-        for (MenuItem item : MenuItem.values()) {
-            if (item.isAccessibleBy(roleName)) {
-                items.add(item);
-            }
-        }
+    private List<SidebarItem> getAccessibleMenuItems() {
+        List<SidebarItem> items = new ArrayList<>();
+        items.add(new SidebarItem("ANNOUNCEMENT", "Thong bao", "thongTinCaNhan.png"));
+        items.add(new SidebarItem("PROFILE", "Ho so ca nhan", "thongTinCaNhan.png"));
+        items.add(new SidebarItem("CHANGE_PASSWORD", "Doi mat khau", "password.png"));
         return items;
     }
 
     private void showDefaultPage() {
-        String defaultPageKey = MenuItem.ANNOUNCEMENT.name();
+        String defaultPageKey = "ANNOUNCEMENT";
         mainView.showPage(defaultPageKey);
         sidebar.setActiveTab(defaultPageKey);
     }

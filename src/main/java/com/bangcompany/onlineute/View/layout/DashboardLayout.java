@@ -1,7 +1,16 @@
 package com.bangcompany.onlineute.view.layout;
 
 import com.bangcompany.onlineute.Config.SessionManager;
-import com.bangcompany.onlineute.Model.EnumType.MenuItem;
+import com.bangcompany.onlineute.View.Components.SidebarItem;
+import com.bangcompany.onlineute.View.Pages.AnnouncementPage;
+import com.bangcompany.onlineute.View.Pages.AttendancePage;
+import com.bangcompany.onlineute.View.Pages.ChangePasswordPage;
+import com.bangcompany.onlineute.View.Pages.CreateAccountPage;
+import com.bangcompany.onlineute.View.Pages.CreateAnnouncementPage;
+import com.bangcompany.onlineute.View.Pages.InputGradesPage;
+import com.bangcompany.onlineute.View.Pages.ProfilePage;
+import com.bangcompany.onlineute.View.Pages.SchedulePage;
+import com.bangcompany.onlineute.View.Pages.ViewGradesPage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,47 +18,120 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DashboardLayout extends JPanel {
-    private final MainContent mainContent;
+    private final com.bangcompany.onlineute.view.layout.MainContent mainContent = new com.bangcompany.onlineute.view.layout.MainContent();
+    private final List<SidebarItem> tabs = new ArrayList<>();
     private final Sidebar sidebar;
 
     public DashboardLayout() {
         setLayout(new BorderLayout());
 
-        String name = SessionManager.getProfileFullName();
-        String code = SessionManager.getProfileCode();
-        String roleDisplay = SessionManager.getRoleDisplayName();
-        List<MenuItem> accessibleItems = getAccessibleMenuItems();
+        String userName = SessionManager.getProfileFullName();
+        String userCode = SessionManager.getProfileCode();
+        String roleDisplayName = SessionManager.getRoleDisplayName();
 
-        mainContent = new MainContent();
-        TopHeader topHeader = new TopHeader("TRUONG DAI HOC CONG NGHE KY THUAT TP.HCM");
-        sidebar = new Sidebar(name, code, roleDisplay, accessibleItems, pageKey -> mainContent.showPage(pageKey));
+        buildTabs(SessionManager.getRole());
+        registerPages();
+
+        sidebar = new Sidebar(userName, userCode, roleDisplayName, tabs, this::showPage);
 
         add(sidebar, BorderLayout.WEST);
+        add(createMainArea(), BorderLayout.CENTER);
 
+        showFirstTab();
+    }
+
+    private JPanel createMainArea() {
         JPanel mainArea = new JPanel(new BorderLayout());
-        mainArea.add(topHeader, BorderLayout.NORTH);
+        mainArea.add(new TopHeader("TRUONG DAI HOC CONG NGHE KY THUAT TP.HCM"), BorderLayout.NORTH);
         mainArea.add(mainContent, BorderLayout.CENTER);
-        add(mainArea, BorderLayout.CENTER);
-
-        showDefaultPage();
+        return mainArea;
     }
 
-    private List<MenuItem> getAccessibleMenuItems() {
-        String roleName = SessionManager.getRole();
-        if (roleName == null) roleName = "NONE";
+    private void buildTabs(String role) {
+        tabs.clear();
 
-        List<MenuItem> items = new ArrayList<>();
-        for (MenuItem item : MenuItem.values()) {
-            if (item.isAccessibleBy(roleName)) {
-                items.add(item);
-            }
+        if ("ADMIN".equals(role)) {
+            buildAdminTabs();
+            return;
         }
-        return items;
+
+        if ("LECTURER".equals(role)) {
+            buildLecturerTabs();
+            return;
+        }
+
+        buildStudentTabs();
     }
 
-    private void showDefaultPage() {
-        String defaultPageKey = MenuItem.ANNOUNCEMENT.name();
-        mainContent.showPage(defaultPageKey);
-        sidebar.setActiveTab(defaultPageKey);
+    private void buildAdminTabs() {
+        addTab("ANNOUNCEMENT", "Thong bao", "thongTinCaNhan.png");
+        addTab("COMPOSE_ANNOUNCEMENT", "Gui thong bao", "account.png");
+        addTab("CREATE_ACCOUNTS", "Cap tai khoan moi", "account.png");
+        addTab("PROFILE", "Ho so ca nhan", "thongTinCaNhan.png");
+        addTab("CHANGE_PASSWORD", "Doi mat khau", "password.png");
+    }
+
+    private void buildLecturerTabs() {
+        addTab("ANNOUNCEMENT", "Thong bao", "thongTinCaNhan.png");
+        addTab("COMPOSE_ANNOUNCEMENT", "Gui thong bao", "account.png");
+        addTab("INPUT_GRADES", "Quan ly sinh vien", "grade.png");
+        addTab("MY_SCHEDULE", "Thoi khoa bieu", "lich.png");
+        addTab("PROFILE", "Ho so ca nhan", "thongTinCaNhan.png");
+        addTab("CHANGE_PASSWORD", "Doi mat khau", "password.png");
+    }
+
+    private void buildStudentTabs() {
+        addTab("ANNOUNCEMENT", "Thong bao", "thongTinCaNhan.png");
+        addTab("MY_SCHEDULE", "Thoi khoa bieu", "lich.png");
+        addTab("MY_GRADES", "Xem diem", "grade.png");
+        addTab("ATTENDANCE", "Chuyen can", "lich.png");
+        addTab("PROFILE", "Ho so ca nhan", "thongTinCaNhan.png");
+        addTab("CHANGE_PASSWORD", "Doi mat khau", "password.png");
+    }
+
+    private void addTab(String key, String label, String icon) {
+        tabs.add(new SidebarItem(key, label, icon));
+    }
+
+    private void registerPages() {
+        for (SidebarItem tab : tabs) {
+            mainContent.registerPage(tab.getKey(), createPage(tab.getKey()));
+        }
+    }
+
+    private JPanel createPage(String pageKey) {
+        return switch (pageKey) {
+            case "ANNOUNCEMENT" -> new AnnouncementPage();
+            case "COMPOSE_ANNOUNCEMENT" -> new CreateAnnouncementPage();
+            case "CREATE_ACCOUNTS" -> new CreateAccountPage();
+            case "CHANGE_PASSWORD" -> new ChangePasswordPage();
+            case "PROFILE" -> new ProfilePage();
+            case "MY_SCHEDULE" -> new SchedulePage();
+            case "INPUT_GRADES" -> new InputGradesPage();
+            case "MY_GRADES" -> new ViewGradesPage();
+            case "ATTENDANCE" -> new AttendancePage();
+            default -> createPlaceholder(pageKey);
+        };
+    }
+
+    private JPanel createPlaceholder(String title) {
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel label = new JLabel(title.toUpperCase(), SwingConstants.CENTER);
+        label.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        panel.add(label, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private void showFirstTab() {
+        if (tabs.isEmpty()) {
+            return;
+        }
+
+        showPage(tabs.get(0).getKey());
+    }
+
+    private void showPage(String pageKey) {
+        mainContent.showPage(pageKey);
+        sidebar.setActiveTab(pageKey);
     }
 }

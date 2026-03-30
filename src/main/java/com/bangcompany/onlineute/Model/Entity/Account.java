@@ -16,14 +16,15 @@ public class Account {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    private byte[] salt;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
 
     public Account() {}
 
-    public Account(Long id, String username, String passwordHash, Role role) {
-        this.id = id;
+    public Account(String username, String passwordHash, Role role) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.role = role;
@@ -37,4 +38,6 @@ public class Account {
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public void setSalt(byte[] salt) { this.salt = salt;}
+    public byte[] getSalt() { return salt; }
 }

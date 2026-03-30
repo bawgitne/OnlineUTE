@@ -47,14 +47,12 @@ public class Student {
 
     public Student() {}
 
-    public Student(Long id, String code, String fullName, LocalDate birthOfDate, String email, String avatarUrl, Account account) {
-        this.id = id;
+    public Student(String code, String fullName, LocalDate birthOfDate, String email, String avatarUrl) {
         this.code = code;
         this.fullName = fullName;
         this.birthOfDate = birthOfDate;
         this.email = email;
         this.avatarUrl = avatarUrl;
-        this.account = account;
     }
 
     public Long getId() { return id; }

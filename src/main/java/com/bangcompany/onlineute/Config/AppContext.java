@@ -20,7 +20,8 @@ public final class AppContext {
     public static CourseRegistrationDAO courseRegistrationDAO;
     public static MarkDAO markDAO;
     public static AnnouncementDAO announcementDAO;
-
+    public static ClassDAO classDAO;
+    public static StudyProgramDAO studyProgramDAO;
     // Services
     public static AuthService authService;
     public static StudentService studentService;
@@ -31,7 +32,8 @@ public final class AppContext {
     public static CourseRegistrationService courseRegistrationService;
     public static MarkService markService;
     public static AnnouncementService announcementService;
-
+    public static ClassService classService;
+    public static StudyProgramService studyProgramService;
     // Controllers
     public static AuthController authController;
     public static TermController termController;
@@ -59,7 +61,8 @@ public final class AppContext {
         courseRegistrationDAO = new CourseRegistrationDAOImpl();
         markDAO = new MarkDAOImpl();
         announcementDAO = new AnnouncementDAOImpl();
-
+        classDAO = new ClassDAOImpl();
+        studyProgramDAO = new StudyProgramDAOImpl();
         // 2. Services
         authService = new AuthServiceImpl(accountDAO, studentDAO, lecturerDAO, adminDAO);
         studentService = new StudentServiceImpl(studentDAO);
@@ -70,7 +73,8 @@ public final class AppContext {
         courseRegistrationService = new CourseRegistrationServiceImpl(courseRegistrationDAO);
         markService = new MarkServiceImpl(markDAO);
         announcementService = new AnnouncementServiceImpl(announcementDAO);
-
+        classService = new ClassServiceImpl(classDAO);
+        studyProgramService = new StudyProgramServiceImpl(studyProgramDAO);
         // 3. Controllers
         authController = new AuthController(authService);
         termController = new TermController(termService);
@@ -93,4 +97,7 @@ public final class AppContext {
     public static NotificationController getNotificationController() { return notificationController; }
     public static TermService getTermService() { return termService; }
     public static StudentService getStudentService() { return studentService; }
+    public static AuthService getAuthService() { return authService;}
+    public static ClassService getClassService() { return classService; }
+    public static StudyProgramService getStudyProgramService() { return studyProgramService; }
 }

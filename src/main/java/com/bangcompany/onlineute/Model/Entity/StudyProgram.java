@@ -41,4 +41,9 @@ public class StudyProgram {
     public void setTotalCredit(Integer totalCredit) { this.totalCredit = totalCredit; }
     public List<Student> getStudents() { return students; }
     public void setStudents(List<Student> students) { this.students = students; }
+
+    @Override
+    public String toString() {
+        return programCode + " - " + fullName;
+    }
 }

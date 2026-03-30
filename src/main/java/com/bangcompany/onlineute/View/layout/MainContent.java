@@ -1,7 +1,6 @@
 package com.bangcompany.onlineute.view.layout;
 
 import com.bangcompany.onlineute.View.Pages.Refreshable;
-import com.bangcompany.onlineute.view.navigation.PageRegistry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,22 +9,28 @@ import java.util.Map;
 
 public class MainContent extends JPanel {
     private final CardLayout cardLayout = new CardLayout();
-    private final Map<String, JPanel> pageCache = new HashMap<>();
+    private final Map<String, JPanel> pages = new HashMap<>();
 
     public MainContent() {
         setLayout(cardLayout);
     }
 
+    public void registerPage(String pageKey, JPanel page) {
+        if (page == null || pages.containsKey(pageKey)) {
+            return;
+        }
+
+        pages.put(pageKey, page);
+        add(page, pageKey);
+    }
+
     public void showPage(String pageKey) {
-        if (!pageCache.containsKey(pageKey)) {
-            JPanel page = PageRegistry.create(pageKey);
-            add(page, pageKey);
-            pageCache.put(pageKey, page);
+        JPanel currentPage = pages.get(pageKey);
+        if (currentPage == null) {
+            return;
         }
 
         cardLayout.show(this, pageKey);
-
-        JPanel currentPage = pageCache.get(pageKey);
         if (currentPage instanceof Refreshable refreshable) {
             refreshable.onEnter();
         }

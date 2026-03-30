@@ -31,4 +31,9 @@ public class Class {
     public void setId(Long id) { this.id = id; }
     public List<Student> getStudents() { return students; }
     public void setStudents(List<Student> students) { this.students = students; }
+
+    @Override
+    public String toString() {
+        return className;
+    }
 }

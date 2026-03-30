@@ -17,7 +17,7 @@ public enum MenuItem {
     // STUDENT
     MY_GRADES("Xem điểm", "STUDENT", "grade.png"),
     ATTENDANCE("Chuyên cần", "STUDENT", "lich.png"),
-    MY_SCHEDULE("Thời khóa biểu", "STUDENT", "lich.png"),
+    MY_SCHEDULE("Thời khóa biểu", "ALL", "lich.png"),
     
     // ALL roles
     PROFILE("Hồ sơ cá nhân", "ALL", "thongTinCaNhan.png"),
