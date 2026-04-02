@@ -16,7 +16,8 @@
         <class>com.bangcompany.onlineute.Model.Entity.Class</class>
         <class>com.bangcompany.onlineute.Model.Entity.Course</class>
         <class>com.bangcompany.onlineute.Model.Entity.Term</class>
-        <class>com.bangcompany.onlineute.Model.Entity.StudyProgram</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Faculty</class>
+        <class>com.bangcompany.onlineute.Model.Entity.Major</class>
         <class>com.bangcompany.onlineute.Model.Entity.CourseSection</class>
         <class>com.bangcompany.onlineute.Model.Entity.CourseRegistration</class>
         <class>com.bangcompany.onlineute.Model.Entity.Schedule</class>

@@ -1,41 +1,37 @@
 package com.bangcompany.onlineute.View.Components;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 public class InputGroup extends JPanel {
+    private static final Color FIELD_BACKGROUND = Color.WHITE;
+    private static final Color BORDER_COLOR = new Color(178, 205, 234);
+    private static final Color LABEL_COLOR = new Color(77, 111, 146);
     private final JTextField textField;
 
     public InputGroup(String labelText, boolean isPassword) {
         setLayout(new BorderLayout());
         setOpaque(true);
-        setBackground(new Color(240, 245, 255)); // Light blue tint
+        setBackground(FIELD_BACKGROUND);
 
-        // TitledBorder overlapping a clear gray/blue border
-        TitledBorder titledBorder = BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(160, 180, 200), 1, true),
+        setBorder(new RoundedTitleBorder(
                 labelText,
-                TitledBorder.LEFT,
-                TitledBorder.TOP,
-                new Font("Segoe UI", Font.PLAIN, 12),
-                new Color(100, 120, 140)
-        );
-
-        setBorder(BorderFactory.createCompoundBorder(
-                titledBorder,
-                new EmptyBorder(2, 5, 5, 5) // inner padding
+                BORDER_COLOR,
+                LABEL_COLOR,
+                FIELD_BACKGROUND,
+                new Font("Segoe UI", Font.BOLD, 11),
+                18
         ));
 
         textField = isPassword ? new JPasswordField() : new JTextField();
-        textField.setOpaque(false); // Make it transparent to show panel's background
-        textField.setBorder(null); // Remove default borders
-        textField.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        textField.setOpaque(false);
+        textField.setBorder(null);
+        textField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         textField.setForeground(new Color(20, 30, 40));
+        textField.setCaretColor(new Color(0, 84, 140));
 
-        setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        setPreferredSize(new Dimension(200, 50));
+        setMaximumSize(new Dimension(Integer.MAX_VALUE, 56));
+        setPreferredSize(new Dimension(200, 56));
 
         add(textField, BorderLayout.CENTER);
     }
@@ -46,5 +42,13 @@ public class InputGroup extends JPanel {
 
     public void setValue(String value) {
         textField.setText(value == null ? "" : value);
+    }
+
+    public void setEditable(boolean editable) {
+        textField.setEditable(editable);
+    }
+
+    public JTextField getTextField() {
+        return textField;
     }
 }

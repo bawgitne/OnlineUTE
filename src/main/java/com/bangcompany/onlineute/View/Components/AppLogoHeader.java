@@ -23,12 +23,6 @@ public class AppLogoHeader extends JPanel {
         } catch (Exception e) {}
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // HCM-UTE subtitle
-        JLabel shortName = new JLabel("HCM-UTE");
-        shortName.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        shortName.setForeground(new Color(0, 85, 141));
-        shortName.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         // Full name line 1
         JLabel uniName1 = new JLabel("TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT");
         uniName1.setFont(new Font("Segoe UI", Font.PLAIN, 18));
@@ -43,7 +37,6 @@ public class AppLogoHeader extends JPanel {
 
         add(logoLabel);
         add(Box.createRigidArea(new Dimension(0, 5)));
-        add(shortName);
         add(Box.createRigidArea(new Dimension(0, 10)));
         add(uniName1);
         add(uniName2);

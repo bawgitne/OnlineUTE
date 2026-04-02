@@ -21,13 +21,15 @@ public final class AppContext {
     public static MarkDAO markDAO;
     public static AnnouncementDAO announcementDAO;
     public static ClassDAO classDAO;
-    public static StudyProgramDAO studyProgramDAO;
+    public static FacultyDAO facultyDAO;
+    public static MajorDAO majorDAO;
     public static UserProfileDAO userProfileDAO;
     public static RegistrationBatchDAO registrationBatchDAO;
     // Services
     public static AccountService accountService;
     public static AuthService authService;
     public static StudentService studentService;
+    public static LecturerService lecturerService;
     public static ScheduleService scheduleService;
     public static TermService termService;
     public static CourseService courseService;
@@ -36,7 +38,8 @@ public final class AppContext {
     public static MarkService markService;
     public static AnnouncementService announcementService;
     public static ClassService classService;
-    public static StudyProgramService studyProgramService;
+    public static FacultyService facultyService;
+    public static MajorService majorService;
     public static UserProfileService userProfileService;
     public static RegistrationBatchService registrationBatchService;
     // Controllers
@@ -44,11 +47,13 @@ public final class AppContext {
     public static AuthController authController;
     public static TermController termController;
     public static StudentController studentController;
+    public static LecturerController lecturerController;
     public static CourseController courseController;
     public static CourseSectionController courseSectionController;
     public static CourseRegistrationController courseRegistrationController;
     public static MarkController markController;
     public static NotificationController notificationController;
+    public static ClassController classController;
     public static UserProfileController userProfileController;
     public static RegistrationBatchController registrationBatchController;
 
@@ -70,13 +75,15 @@ public final class AppContext {
         markDAO = new MarkDAOImpl();
         announcementDAO = new AnnouncementDAOImpl();
         classDAO = new ClassDAOImpl();
-        studyProgramDAO = new StudyProgramDAOImpl();
+        facultyDAO = new FacultyDAOImpl();
+        majorDAO = new MajorDAOImpl();
         userProfileDAO = new UserProfileDAOImpl();
         registrationBatchDAO = new RegistrationBatchDAOImpl();
         // 2. Services
         accountService = new AccountServiceImpl(studentDAO, lecturerDAO, adminDAO);
         authService = new AuthServiceImpl(accountDAO, studentDAO, lecturerDAO, adminDAO);
         studentService = new StudentServiceImpl(studentDAO);
+        lecturerService = new LecturerServiceImpl(lecturerDAO);
         scheduleService = new ScheduleServiceImpl(scheduleDAO);
         termService = new TermServiceImpl(termDAO);
         courseService = new CourseServiceImpl(courseDAO);
@@ -85,7 +92,8 @@ public final class AppContext {
         markService = new MarkServiceImpl(markDAO);
         announcementService = new AnnouncementServiceImpl(announcementDAO);
         classService = new ClassServiceImpl(classDAO);
-        studyProgramService = new StudyProgramServiceImpl(studyProgramDAO);
+        facultyService = new FacultyServiceImpl(facultyDAO);
+        majorService = new MajorServiceImpl(majorDAO);
         userProfileService = new UserProfileServiceImpl(userProfileDAO);
         registrationBatchService = new RegistrationBatchServiceImpl(registrationBatchDAO);
         // 3. Controllers
@@ -93,11 +101,13 @@ public final class AppContext {
         authController = new AuthController(authService);
         termController = new TermController(termService);
         studentController = new StudentController(studentService);
+        lecturerController = new LecturerController(lecturerService);
         courseController = new CourseController(courseService);
         courseSectionController = new CourseSectionController(courseSectionService);
         courseRegistrationController = new CourseRegistrationController(courseRegistrationService);
         markController = new MarkController(markService);
         notificationController = new NotificationController(announcementService, courseSectionService);
+        classController = new ClassController(classService);
         userProfileController = new UserProfileController(userProfileService);
         registrationBatchController = new RegistrationBatchController(registrationBatchService);
 
@@ -116,11 +126,15 @@ public final class AppContext {
     public static NotificationController getNotificationController() { return notificationController; }
     public static TermService getTermService() { return termService; }
     public static StudentService getStudentService() { return studentService; }
+    public static StudentController getStudentController() { return studentController; }
+    public static LecturerController getLecturerController() { return lecturerController; }
     public static AuthService getAuthService() { return authService;}
     public static AccountService getAccountService() { return accountService; }
     public static AccountController getAccountController() { return accountController; }
     public static ClassService getClassService() { return classService; }
-    public static StudyProgramService getStudyProgramService() { return studyProgramService; }
+    public static ClassController getClassController() { return classController; }
+    public static FacultyService getFacultyService() { return facultyService; }
+    public static MajorService getMajorService() { return majorService; }
     public static UserProfileController getUserProfileController() { return userProfileController; }
     public static RegistrationBatchService getRegistrationBatchService() { return registrationBatchService; }
     public static RegistrationBatchController getRegistrationBatchController() { return registrationBatchController; }

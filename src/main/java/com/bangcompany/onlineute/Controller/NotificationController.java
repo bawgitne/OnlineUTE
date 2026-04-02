@@ -1,5 +1,7 @@
 package com.bangcompany.onlineute.Controller;
 
+import com.bangcompany.onlineute.Model.DTO.PageRequest;
+import com.bangcompany.onlineute.Model.DTO.PagedResult;
 import com.bangcompany.onlineute.Model.Entity.Announcement;
 import com.bangcompany.onlineute.Model.Entity.CourseSection;
 import com.bangcompany.onlineute.Service.AnnouncementService;
@@ -23,6 +25,14 @@ public class NotificationController {
 
     public List<Announcement> getAnnouncementsForCurrentUser() {
         return announcementService.getAnnouncementsForCurrentUser();
+    }
+
+    public PagedResult<Announcement> searchAnnouncements(String keyword, PageRequest pageRequest) {
+        return announcementService.searchAnnouncements(keyword, pageRequest);
+    }
+
+    public PagedResult<Announcement> searchAnnouncements(String keyword, int page, int pageSize) {
+        return announcementService.searchAnnouncements(keyword, page, pageSize);
     }
 
     public List<CourseSection> getCourseSectionsByLecturerId(Long lecturerId) {

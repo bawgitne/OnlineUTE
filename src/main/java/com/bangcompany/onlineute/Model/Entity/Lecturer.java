@@ -5,6 +5,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "lecturer", indexes = {
+    @Index(name = "idx_lecturer_code", columnList = "code"),
     @Index(name = "idx_lecturer_fullname", columnList = "fullname")
 })
 public class Lecturer {

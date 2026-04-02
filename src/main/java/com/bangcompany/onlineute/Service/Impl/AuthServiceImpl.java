@@ -26,8 +26,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Optional<Account> login(String username, String password) {
-        Optional<Account> accountOpt = accountDAO.findByUsername(username);
+    public Optional<Account> login(String loginCode, String password) {
+        Optional<Account> accountOpt = accountDAO.findByLoginCode(loginCode);
         if (accountOpt.isEmpty()) {
             return Optional.empty();
         }

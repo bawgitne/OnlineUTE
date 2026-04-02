@@ -1,40 +1,37 @@
 package com.bangcompany.onlineute.View.Components;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 public class TextAreaGroup extends JPanel {
+    private static final Color FIELD_BACKGROUND = Color.WHITE;
+    private static final Color BORDER_COLOR = new Color(178, 205, 234);
+    private static final Color LABEL_COLOR = new Color(77, 111, 146);
     private final JTextArea textArea;
 
     public TextAreaGroup(String labelText, int preferredHeight) {
         setLayout(new BorderLayout());
         setOpaque(true);
-        setBackground(new Color(240, 245, 255)); // Matches InputGroup
+        setBackground(FIELD_BACKGROUND);
 
-        TitledBorder titledBorder = BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(160, 180, 200), 1, true),
+        setBorder(new RoundedTitleBorder(
                 labelText,
-                TitledBorder.LEFT,
-                TitledBorder.TOP,
-                new Font("Segoe UI", Font.PLAIN, 12),
-                new Color(100, 120, 140)
-        );
-
-        setBorder(BorderFactory.createCompoundBorder(
-                titledBorder,
-                new EmptyBorder(5, 5, 5, 5)
+                BORDER_COLOR,
+                LABEL_COLOR,
+                FIELD_BACKGROUND,
+                new Font("Segoe UI", Font.BOLD, 11),
+                18
         ));
 
         textArea = new JTextArea();
         textArea.setOpaque(true);
-        textArea.setBackground(new Color(240, 245, 255));
-        textArea.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        textArea.setBackground(FIELD_BACKGROUND);
+        textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         textArea.setForeground(new Color(20, 30, 40));
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setBorder(null);
+        textArea.setCaretColor(new Color(0, 84, 140));
 
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setBorder(null);

@@ -33,9 +33,6 @@ public class UserProfile {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "alternate_email")
-    private String alternateEmail;
-
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
@@ -75,8 +72,8 @@ public class UserProfile {
     @Column(name = "class_name")
     private String className;
 
-    @Column(name = "study_program_name")
-    private String studyProgramName;
+    @Column(name = "major_name")
+    private String majorName;
 
     @Column(name = "academic_year")
     private String academicYear;
@@ -167,14 +164,6 @@ public class UserProfile {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getAlternateEmail() {
-        return alternateEmail;
-    }
-
-    public void setAlternateEmail(String alternateEmail) {
-        this.alternateEmail = alternateEmail;
     }
 
     public LocalDate getBirthDate() {
@@ -281,12 +270,12 @@ public class UserProfile {
         this.className = className;
     }
 
-    public String getStudyProgramName() {
-        return studyProgramName;
+    public String getMajorName() {
+        return majorName;
     }
 
-    public void setStudyProgramName(String studyProgramName) {
-        this.studyProgramName = studyProgramName;
+    public void setMajorName(String majorName) {
+        this.majorName = majorName;
     }
 
     public String getAcademicYear() {

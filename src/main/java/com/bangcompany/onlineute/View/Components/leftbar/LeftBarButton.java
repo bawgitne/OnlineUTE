@@ -14,18 +14,23 @@ import java.io.IOException;
 
 public class LeftBarButton extends JButton {
     private static final Color DEFAULT_BACKGROUND = new Color(0, 85, 141);
-    private static final Color ACTIVE_BACKGROUND = new Color(0, 66, 110);
+    //private static final Color ACTIVE_BACKGROUND = new Color(0, 66, 110);
+    private static final Color ACTIVE_BACKGROUND = new Color(0, 85, 141);
+    private static final Color DEFAULT_FOREGROUND = Color.WHITE;
+    private static final Color ACTIVE_FOREGROUND = new Color(201, 138, 23);
     private static final int DEFAULT_LEFT_PADDING = 14;
     private static final int HOVER_LEFT_PADDING = 24;
 
-    private final String buttonText;
+    private final String iconName;
+    private final ImageIcon defaultIcon;
+    private final ImageIcon activeIcon;
     private boolean active;
 
     public LeftBarButton(String text, String iconName) {
-        this.buttonText = text;
+        this.iconName = iconName;
         setText(text);
         setHorizontalAlignment(SwingConstants.LEFT);
-        setForeground(Color.WHITE);
+        setForeground(DEFAULT_FOREGROUND);
         setBackground(DEFAULT_BACKGROUND);
         RoundedPainter.prepareButton(this);
         setRolloverEnabled(false);
@@ -35,11 +40,9 @@ public class LeftBarButton extends JButton {
         setIconTextGap(10);
         setBorder(new EmptyBorder(12, DEFAULT_LEFT_PADDING, 12, 16));
 
-        try {
-            setIcon(createWhiteIcon(iconName));
-        } catch (Exception e) {
-            setIcon(null);
-        }
+        defaultIcon = loadIcon(iconName, DEFAULT_FOREGROUND);
+        activeIcon = loadIcon(iconName, ACTIVE_FOREGROUND);
+        setIcon(defaultIcon);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -58,7 +61,8 @@ public class LeftBarButton extends JButton {
         this.active = active;
         setBackground(active ? ACTIVE_BACKGROUND : DEFAULT_BACKGROUND);
         setFont(new Font("Segoe UI", active ? Font.BOLD : Font.PLAIN, 15));
-        setForeground(active ? Color.orange : Color.WHITE);
+        setForeground(active ? ACTIVE_FOREGROUND : DEFAULT_FOREGROUND);
+        setIcon(active ? activeIcon : defaultIcon);
     }
 
     private void applyHoverStyle(boolean hovering) {
@@ -75,12 +79,12 @@ public class LeftBarButton extends JButton {
         super.paintComponent(g);
     }
 
-    private ImageIcon createWhiteIcon(String iconName) {
+    private ImageIcon loadIcon(String iconName, Color color) {
         BufferedImage sourceImage;
         try {
             sourceImage = ImageIO.read(new File("public/Icon/" + iconName));
         } catch (IOException e) {
-            throw new IllegalArgumentException("Cannot load icon: " + iconName, e);
+            return null;
         }
 
         Image scaledImage = sourceImage.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
@@ -89,7 +93,7 @@ public class LeftBarButton extends JButton {
         Graphics2D g2 = tintedImage.createGraphics();
         g2.drawImage(scaledImage, 0, 0, null);
         g2.setComposite(AlphaComposite.SrcIn);
-        g2.setColor(Color.WHITE);
+        g2.setColor(color);
         g2.fillRect(0, 0, 18, 18);
         g2.dispose();
 

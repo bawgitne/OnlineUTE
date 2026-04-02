@@ -83,7 +83,6 @@ public final class SessionManager {
         if (currentStudent != null) return currentStudent.getFullName();
         if (currentLecturer != null) return currentLecturer.getFullName();
         if (currentAdmin != null) return currentAdmin.getFullName();
-        if (currentAccount != null) return currentAccount.getUsername();
         return "Unknown User";
     }
 
@@ -125,18 +124,16 @@ public final class SessionManager {
             return;
         }
 
-        String username = properties.getProperty("account.username");
         String roleText = properties.getProperty("account.role");
         Long accountId = parseLong(properties.getProperty("account.id"));
         Role role = parseRole(roleText);
 
-        if (username == null || role == null) {
+        if (role == null) {
             return;
         }
 
         Account account = new Account();
         account.setId(accountId);
-        account.setUsername(username);
         account.setRole(role);
         currentAccount = account;
 
@@ -168,7 +165,6 @@ public final class SessionManager {
 
         if (currentAccount != null) {
             setIfNotNull(properties, "account.id", currentAccount.getId());
-            setIfNotNull(properties, "account.username", currentAccount.getUsername());
             if (currentAccount.getRole() != null) {
                 properties.setProperty("account.role", currentAccount.getRole().name());
             }

@@ -16,7 +16,6 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE account (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('ADMIN','STUDENT','LECTURER') NOT NULL
 ) ENGINE=InnoDB;
@@ -39,11 +38,20 @@ CREATE TABLE admin (
         FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE TABLE study_program (
+CREATE TABLE faculty (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    program_code VARCHAR(50) NOT NULL UNIQUE,
+    faculty_code VARCHAR(50) NOT NULL UNIQUE,
+    fullname VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE major (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    major_code VARCHAR(50) NOT NULL UNIQUE,
     fullname VARCHAR(255) NOT NULL,
-    total_credit INT NOT NULL
+    total_credit INT NOT NULL,
+    faculty_id BIGINT NOT NULL,
+    CONSTRAINT fk_major_faculty
+        FOREIGN KEY (faculty_id) REFERENCES faculty(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE term (
@@ -66,7 +74,9 @@ CREATE TABLE registration_batch (
 
 CREATE TABLE `class` (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    class_name VARCHAR(100) NOT NULL UNIQUE
+    class_name VARCHAR(100) NOT NULL UNIQUE,
+    faculty_id BIGINT NOT NULL,
+    CONSTRAINT fk_class_faculty FOREIGN KEY (faculty_id) REFERENCES faculty(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE student (
@@ -77,12 +87,9 @@ CREATE TABLE student (
     email VARCHAR(150) NOT NULL UNIQUE,
     avatar_url VARCHAR(255),
     class_id BIGINT NOT NULL,
-    study_program_id BIGINT NOT NULL,
-    academic_term_id BIGINT NOT NULL,
+    enrollment_year INT NOT NULL,
     account_id BIGINT NOT NULL UNIQUE,
     CONSTRAINT fk_student_class FOREIGN KEY (class_id) REFERENCES `class`(id),
-    CONSTRAINT fk_student_program FOREIGN KEY (study_program_id) REFERENCES study_program(id),
-    CONSTRAINT fk_student_term FOREIGN KEY (academic_term_id) REFERENCES term(id),
     CONSTRAINT fk_student_account FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -95,7 +102,6 @@ CREATE TABLE user_profile (
     avatar_url VARCHAR(255),
     email VARCHAR(150),
     phone_number VARCHAR(20),
-    alternate_email VARCHAR(150),
     birth_date DATE,
     gender VARCHAR(20),
     place_of_birth VARCHAR(150),
@@ -109,7 +115,7 @@ CREATE TABLE user_profile (
     permanent_address VARCHAR(500),
     faculty_name VARCHAR(150),
     class_name VARCHAR(100),
-    study_program_name VARCHAR(255),
+    major_name VARCHAR(255),
     academic_year VARCHAR(100),
     expected_graduation_year VARCHAR(100),
     contact_name VARCHAR(150),
@@ -222,169 +228,234 @@ SET @term_prev = 2;
 SET @term_cur = 3;
 
 INSERT INTO registration_batch (name, open_at, close_at, term_id, common_start_date) VALUES
-('Dang ky hoc phan HK1 2025-2026', '2025-07-20 08:00:00', '2025-08-05 23:59:59', @term_cur, '2025-08-18');
+('ÄÄƒng kÃ½ há»c pháº§n HK1 2025-2026', '2025-07-20 08:00:00', '2025-08-05 23:59:59', @term_cur, '2025-08-18');
 
-INSERT INTO study_program (program_code, fullname, total_credit) VALUES
-('CNTT', 'Công nghệ thông tin', 145),
-('KTPM', 'Kỹ thuật phần mềm', 145),
-('HTTT', 'Hệ thống thông tin', 140),
-('ATTT', 'An toàn thông tin', 145),
-('DTVT', 'Điện tử viễn thông', 142),
-('CKM', 'Cơ khí máy', 140),
-('NNA', 'Ngôn ngữ Anh', 135),
-('QTKD', 'Quản trị kinh doanh', 130),
-('KTDN', 'Kế toán doanh nghiệp', 130),
-('TCNH', 'Tài chính ngân hàng', 135);
+INSERT INTO faculty (faculty_code, fullname) VALUES
+('MFG', 'Khoa Co khi Che tao may'),
+('CHEM', 'Khoa Cong nghe Hoa hoc va Thuc pham'),
+('FASHION', 'Khoa Thoi trang va Du lich'),
+('IT', 'Khoa Cong nghe Thong tin'),
+('EEE', 'Khoa Dien - Dien tu'),
+('ECON', 'Khoa Kinh te'),
+('CIVIL', 'Khoa Xay dung'),
+('APSCI', 'Khoa Khoa hoc Ung dung'),
+('LANG', 'Khoa Ngoai ngu'),
+('PRINT', 'Khoa In va Truyen thong'),
+('PED', 'Khoa Su pham'),
+('PEDTECH', 'Khoa Su pham Cong nghe'),
+('AUTO', 'Khoa Co khi Dong luc');
 
-INSERT INTO `class` (class_name) VALUES
-('241101A'), ('241101B'), ('241101C'),
-('241102A'), ('241102B'),
-('241103A'), ('241103B'),
-('231101A'), ('231102A'), ('231103A'),
-('221101A'), ('221102A'), ('221103A');
+SET @faculty_mfg = 1;
+SET @faculty_chem = 2;
+SET @faculty_fashion = 3;
+SET @faculty_it = 4;
+SET @faculty_eee = 5;
+SET @faculty_econ = 6;
+SET @faculty_civil = 7;
+SET @faculty_apsci = 8;
+SET @faculty_lang = 9;
+SET @faculty_print = 10;
+SET @faculty_ped = 11;
+SET @faculty_pedtech = 12;
+SET @faculty_auto = 13;
 
+INSERT INTO major (major_code, fullname, total_credit, faculty_id) VALUES
+('104', 'Ky thuat cong nghiep', 140, @faculty_mfg),
+('109', 'Cong nghe may', 140, @faculty_chem),
+('110', 'Cong nghe thong tin', 145, @faculty_it),
+('116', 'Cong nghe thuc pham', 140, @faculty_chem),
+('119', 'Cong nghe ky thuat may tinh', 145, @faculty_eee),
+('123', 'Thiet ke thoi trang', 140, @faculty_fashion),
+('124', 'Quan ly cong nghiep', 130, @faculty_econ),
+('125', 'Ke toan', 130, @faculty_econ),
+('126', 'Thuong mai dien tu', 130, @faculty_econ),
+('127', 'Ky thuat xay dung cong trinh giao thong', 140, @faculty_civil),
+('128', 'Cong nghe ky thuat hoa hoc', 140, @faculty_chem),
+('129', 'Ky thuat y sinh', 140, @faculty_eee),
+('130', 'Cong nghe vat lieu', 135, @faculty_apsci),
+('131', 'Ngon ngu Anh', 135, @faculty_lang),
+('132', 'Logistics va quan ly chuoi cung ung', 130, @faculty_econ),
+('133', 'Ky thuat du lieu', 145, @faculty_it),
+('134', 'Robot va tri tue nhan tao', 145, @faculty_mfg),
+('135', 'He thong ky thuat cong trinh xay dung', 140, @faculty_civil),
+('136', 'Kinh doanh quoc te', 130, @faculty_econ),
+('138', 'Ky nghe go va noi that', 140, @faculty_mfg),
+('139', 'He thong nhung va IoT', 145, @faculty_eee),
+('140', 'Kien truc noi that', 140, @faculty_civil),
+('142', 'Cong nghe ky thuat dien, dien tu', 145, @faculty_eee),
+('143', 'Cong nghe che tao may', 140, @faculty_mfg),
+('144', 'Cong nghe ky thuat co khi', 140, @faculty_mfg),
+('145', 'Cong nghe ky thuat o to', 145, @faculty_auto),
+('146', 'Cong nghe ky thuat co dien tu', 145, @faculty_mfg),
+('147', 'Cong nghe ky thuat nhiet', 140, @faculty_auto),
+('149', 'Cong nghe ky thuat cong trinh xay dung', 140, @faculty_civil),
+('150', 'Cong nghe ky thuat moi truong', 140, @faculty_chem),
+('151', 'Cong nghe ky thuat dieu khien va tu dong hoa', 145, @faculty_eee),
+('154', 'Nang luong tai tao', 140, @faculty_auto),
+('155', 'Quan ly xay dung', 130, @faculty_civil),
+('156', 'Thiet ke do hoa', 135, @faculty_print),
+('157', 'Kien truc', 140, @faculty_civil),
+('158', 'Cong nghe ky thuat in', 135, @faculty_print),
+('159', 'Quan tri nha hang va dich vu an uong', 130, @faculty_fashion),
+('160', 'Quan ly va van hanh ha tang', 130, @faculty_civil),
+('161', 'Cong nghe ky thuat dien tu - vien thong', 145, @faculty_eee),
+('162', 'An toan thong tin', 145, @faculty_it),
+('163', 'Luat', 130, @faculty_econ),
+('164', 'Tam ly hoc giao duc', 130, @faculty_ped),
+('165', 'Cong nghe truyen thong', 135, @faculty_print),
+('166', 'Quan tri kinh doanh', 130, @faculty_econ),
+('167', 'Cong nghe tai chinh', 130, @faculty_econ),
+('168', 'Vat ly ky thuat', 135, @faculty_apsci),
+('169', 'Moi truong va Phat trien ben vung', 135, @faculty_chem),
+('950', 'Su pham tieng Anh', 135, @faculty_lang),
+('951', 'Su pham Cong nghe', 135, @faculty_pedtech);
+
+INSERT INTO class (class_name, faculty_id) VALUES
+('241101A', @faculty_it), ('241101B', @faculty_it), ('241101C', @faculty_it),
+('241102A', @faculty_eee), ('241102B', @faculty_eee),
+('241103A', @faculty_econ), ('241103B', @faculty_econ),
+('231101A', @faculty_mfg), ('231102A', @faculty_civil), ('231103A', @faculty_chem),
+('221101A', @faculty_lang), ('221102A', @faculty_print), ('221103A', @faculty_auto);
 -- Admin accounts
-INSERT INTO account (username, password_hash, role) VALUES
-('admin', 'admin123', 'ADMIN'),
-('pdt01', 'pdt123', 'ADMIN');
+INSERT INTO account (password_hash, role) VALUES
+('admin123', 'ADMIN'),
+('pdt123', 'ADMIN');
 
 INSERT INTO admin (code, fullname, account_id) VALUES
-('AD001', 'Hệ thống Quản trị', 1),
-('AD002', 'Phòng Đào tạo', 2);
+('AD001', 'Há»‡ thá»‘ng Quáº£n trá»‹', 1),
+('AD002', 'PhÃ²ng ÄÃ o táº¡o', 2);
 
 -- =========================================================
 -- 3) LECTURERS (20)
 -- =========================================================
 -- Generates 20 lecturers
 
-INSERT INTO account (username, password_hash, role) VALUES
-('gv001', '123456', 'LECTURER'), ('gv002', '123456', 'LECTURER'),
-('gv003', '123456', 'LECTURER'), ('gv004', '123456', 'LECTURER'),
-('gv005', '123456', 'LECTURER'), ('gv006', '123456', 'LECTURER'),
-('gv007', '123456', 'LECTURER'), ('gv008', '123456', 'LECTURER'),
-('gv009', '123456', 'LECTURER'), ('gv010', '123456', 'LECTURER'),
-('gv011', '123456', 'LECTURER'), ('gv012', '123456', 'LECTURER'),
-('gv013', '123456', 'LECTURER'), ('gv014', '123456', 'LECTURER'),
-('gv015', '123456', 'LECTURER'), ('gv016', '123456', 'LECTURER'),
-('gv017', '123456', 'LECTURER'), ('gv018', '123456', 'LECTURER'),
-('gv019', '123456', 'LECTURER'), ('gv020', '123456', 'LECTURER');
+INSERT INTO account (password_hash, role) VALUES
+('123456', 'LECTURER'), ('123456', 'LECTURER'),
+('123456', 'LECTURER'), ('123456', 'LECTURER'),
+('123456', 'LECTURER'), ('123456', 'LECTURER'),
+('123456', 'LECTURER'), ('123456', 'LECTURER'),
+('123456', 'LECTURER'), ('123456', 'LECTURER'),
+('123456', 'LECTURER'), ('123456', 'LECTURER'),
+('123456', 'LECTURER'), ('123456', 'LECTURER'),
+('123456', 'LECTURER'), ('123456', 'LECTURER'),
+('123456', 'LECTURER'), ('123456', 'LECTURER'),
+('123456', 'LECTURER'), ('123456', 'LECTURER');
 
 INSERT INTO lecturer (code, fullname, account_id) VALUES
-('GV001', 'Nguyễn Minh Đạo', 3), ('GV002', 'Võ Lê Phúc Hậu', 4),
-('GV003', 'Trần Thanh Sơn', 5), ('GV004', 'Phạm Quang Huy', 6),
-('GV005', 'Lê Anh Tuấn', 7), ('GV006', 'Đỗ Thị Thu Hà', 8),
-('GV007', 'Nguyễn Thị Bích Ngọc', 9), ('GV008', 'Trần Văn Khoa', 10),
-('GV009', 'Bùi Gia Bảo', 11), ('GV010', 'Phạm Minh Châu', 12),
-('GV011', 'Đặng Quốc Đạt', 13), ('GV012', 'Ngô Thanh Long', 14),
-('GV013', 'Hồ Vĩnh Hoàng', 15), ('GV014', 'Lý Phương Thảo', 16),
-('GV015', 'Trịnh Hữu Thọ', 17), ('GV016', 'Đinh Công Trứ', 18),
-('GV017', 'Lương Tấn Tài', 19), ('GV018', 'Mai Quỳnh Hương', 20),
-('GV019', 'Vũ Anh Kiệt', 21), ('GV020', 'Cao Tiến Đạt', 22);
+('GV001', 'Nguyá»…n Minh Äáº¡o', 3), ('GV002', 'VÃµ LÃª PhÃºc Háº­u', 4),
+('GV003', 'Tráº§n Thanh SÆ¡n', 5), ('GV004', 'Pháº¡m Quang Huy', 6),
+('GV005', 'LÃª Anh Tuáº¥n', 7), ('GV006', 'Äá»— Thá»‹ Thu HÃ ', 8),
+('GV007', 'Nguyá»…n Thá»‹ BÃ­ch Ngá»c', 9), ('GV008', 'Tráº§n VÄƒn Khoa', 10),
+('GV009', 'BÃ¹i Gia Báº£o', 11), ('GV010', 'Pháº¡m Minh ChÃ¢u', 12),
+('GV011', 'Äáº·ng Quá»‘c Äáº¡t', 13), ('GV012', 'NgÃ´ Thanh Long', 14),
+('GV013', 'Há»“ VÄ©nh HoÃ ng', 15), ('GV014', 'LÃ½ PhÆ°Æ¡ng Tháº£o', 16),
+('GV015', 'Trá»‹nh Há»¯u Thá»', 17), ('GV016', 'Äinh CÃ´ng Trá»©', 18),
+('GV017', 'LÆ°Æ¡ng Táº¥n TÃ i', 19), ('GV018', 'Mai Quá»³nh HÆ°Æ¡ng', 20),
+('GV019', 'VÅ© Anh Kiá»‡t', 21), ('GV020', 'Cao Tiáº¿n Äáº¡t', 22);
 
 -- =========================================================
 -- 4) COURSES (30)
 -- =========================================================
 
 INSERT INTO course (course_code, fullname, credit) VALUES
-('MATH132401', 'Toán 1', 3),
-('MATH132501', 'Toán 2', 3),
-('PHYS130902', 'Vật lý 1', 3),
-('PHYS131002', 'Vật lý 2', 3),
-('LLCT130105', 'Triết học Mác - Lênin', 3),
-('LLCT220405', 'Kinh tế chính trị Mác - Lênin', 2),
-('ENG120100', 'Tiếng Anh 1', 2),
-('ENG120200', 'Tiếng Anh 2', 2),
-('ENG120300', 'Tiếng Anh 3', 2),
-('GDTC110130', 'Giáo dục thể chất 1', 1),
-('GDQP110131', 'Giáo dục quốc phòng 1', 1),
-('PRTE230385', 'Kỹ thuật lập trình', 3),
-('IT001', 'Nhập môn lập trình', 4),
-('IT002', 'Lập trình hướng đối tượng', 3),
-('IT003', 'Cấu trúc dữ liệu và giải thuật', 3),
-('IT004', 'Cơ sở dữ liệu', 3),
-('IT005', 'Hệ quản trị CSDL', 3),
-('IT006', 'Phân tích thiết kế hệ thống', 3),
-('IT007', 'Mạng máy tính', 3),
-('IT008', 'Hệ điều hành', 3),
-('IT009', 'Lập trình Web', 3),
-('IT010', 'Lập trình Windows', 3),
-('IT011', 'Lập trình thiết bị di động', 3),
-('IT012', 'Trí tuệ nhân tạo', 3),
-('IT013', 'Học máy', 3),
-('IT014', 'Khai thác dữ liệu', 3),
-('IT015', 'Điện toán đám mây', 3),
-('IT016', 'Bảo mật thông tin', 3),
-('IT017', 'Đồ án cơ sở', 2),
-('IT018', 'Đồ án chuyên ngành', 3);
+('MATH132401', 'ToÃ¡n 1', 3),
+('MATH132501', 'ToÃ¡n 2', 3),
+('PHYS130902', 'Váº­t lÃ½ 1', 3),
+('PHYS131002', 'Váº­t lÃ½ 2', 3),
+('LLCT130105', 'Triáº¿t há»c MÃ¡c - LÃªnin', 3),
+('LLCT220405', 'Kinh táº¿ chÃ­nh trá»‹ MÃ¡c - LÃªnin', 2),
+('ENG120100', 'Tiáº¿ng Anh 1', 2),
+('ENG120200', 'Tiáº¿ng Anh 2', 2),
+('ENG120300', 'Tiáº¿ng Anh 3', 2),
+('GDTC110130', 'GiÃ¡o dá»¥c thá»ƒ cháº¥t 1', 1),
+('GDQP110131', 'GiÃ¡o dá»¥c quá»‘c phÃ²ng 1', 1),
+('PRTE230385', 'Ká»¹ thuáº­t láº­p trÃ¬nh', 3),
+('IT001', 'Nháº­p mÃ´n láº­p trÃ¬nh', 4),
+('IT002', 'Láº­p trÃ¬nh hÆ°á»›ng Ä‘á»‘i tÆ°á»£ng', 3),
+('IT003', 'Cáº¥u trÃºc dá»¯ liá»‡u vÃ  giáº£i thuáº­t', 3),
+('IT004', 'CÆ¡ sá»Ÿ dá»¯ liá»‡u', 3),
+('IT005', 'Há»‡ quáº£n trá»‹ CSDL', 3),
+('IT006', 'PhÃ¢n tÃ­ch thiáº¿t káº¿ há»‡ thá»‘ng', 3),
+('IT007', 'Máº¡ng mÃ¡y tÃ­nh', 3),
+('IT008', 'Há»‡ Ä‘iá»u hÃ nh', 3),
+('IT009', 'Láº­p trÃ¬nh Web', 3),
+('IT010', 'Láº­p trÃ¬nh Windows', 3),
+('IT011', 'Láº­p trÃ¬nh thiáº¿t bá»‹ di Ä‘á»™ng', 3),
+('IT012', 'TrÃ­ tuá»‡ nhÃ¢n táº¡o', 3),
+('IT013', 'Há»c mÃ¡y', 3),
+('IT014', 'Khai thÃ¡c dá»¯ liá»‡u', 3),
+('IT015', 'Äiá»‡n toÃ¡n Ä‘Ã¡m mÃ¢y', 3),
+('IT016', 'Báº£o máº­t thÃ´ng tin', 3),
+('IT017', 'Äá»“ Ã¡n cÆ¡ sá»Ÿ', 2),
+('IT018', 'Äá»“ Ã¡n chuyÃªn ngÃ nh', 3);
 
 -- =========================================================
 -- 5) GENERATE STUDENTS (200 Students via CTE)
 -- =========================================================
 -- Account IDs 23 -> 222
-INSERT INTO account (username, password_hash, role)
+INSERT INTO account (password_hash, role)
 WITH RECURSIVE seq AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM seq WHERE n < 200)
-SELECT CONCAT('24110', LPAD(n, 3, '0')), '123456', 'STUDENT' FROM seq;
+SELECT '123456', 'STUDENT' FROM seq;
 
-INSERT INTO student (code, fullname, birth_of_date, email, avatar_url, class_id, study_program_id, academic_term_id, account_id)
+INSERT INTO student (code, fullname, birth_of_date, email, avatar_url, class_id, enrollment_year, account_id)
 WITH RECURSIVE seq AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM seq WHERE n < 200)
 SELECT
     CONCAT('24110', LPAD(n, 3, '0')),
     CONCAT(
-        ELT(MOD(n, 7) + 1, 'Nguyễn ', 'Trần ', 'Lê ', 'Phạm ', 'Hoàng ', 'Huỳnh ', 'Võ '),
-        ELT(MOD(n, 5) + 1, 'Viết ', 'Thị ', 'Xuân ', 'Minh ', 'Thanh '),
-        ELT(MOD(n, 11) + 1, 'Hùng', 'Dũng', 'Lan', 'Hoa', 'Ngọc', 'Tâm', 'Bảo', 'Vy', 'Vinh', 'Luân', 'Trang')
+        ELT(MOD(n, 7) + 1, 'Nguyá»…n ', 'Tráº§n ', 'LÃª ', 'Pháº¡m ', 'HoÃ ng ', 'Huá»³nh ', 'VÃµ '),
+        ELT(MOD(n, 5) + 1, 'Viáº¿t ', 'Thá»‹ ', 'XuÃ¢n ', 'Minh ', 'Thanh '),
+        ELT(MOD(n, 11) + 1, 'HÃ¹ng', 'DÅ©ng', 'Lan', 'Hoa', 'Ngá»c', 'TÃ¢m', 'Báº£o', 'Vy', 'Vinh', 'LuÃ¢n', 'Trang')
     ),
     DATE_ADD('2004-01-01', INTERVAL MOD(n, 1000) DAY),
     CONCAT('24110', LPAD(n, 3, '0'), '@student.hcmute.edu.vn'),
     CONCAT('https://i.pravatar.cc/150?img=', MOD(n, 70)+1),
     MOD(n, 13) + 1,
-    MOD(n, 10) + 1,
-    @term_cur,
+    2024,
     n + 22
 FROM seq;
 
 INSERT INTO user_profile (
-    account_id, profile_code, display_name, role_title, avatar_url, email, phone_number, alternate_email,
+    account_id, profile_code, display_name, role_title, avatar_url, email, phone_number,
     birth_date, gender, place_of_birth, nationality, ethnicity, religion, citizen_id_number,
     citizen_id_issue_place, citizen_id_issue_date, current_address, permanent_address,
-    faculty_name, class_name, study_program_name, academic_year, expected_graduation_year,
+    faculty_name, class_name, major_name, academic_year, expected_graduation_year,
     contact_name, contact_phone, contact_address, father_name, father_phone, mother_name, mother_phone
 )
 SELECT
     s.account_id,
     s.code,
     s.fullname,
-    'Sinh vien',
+    'Sinh viÃªn',
     s.avatar_url,
     s.email,
     CONCAT('09', LPAD(MOD(s.id * 37, 100000000), 8, '0')),
-    CONCAT(LOWER(REPLACE(s.code, ' ', '')), '@gmail.com'),
     s.birth_of_date,
-    CASE WHEN MOD(s.id, 2) = 0 THEN 'Nu' ELSE 'Nam' END,
-    'TP Ho Chi Minh',
-    'Viet Nam',
+    CASE WHEN MOD(s.id, 2) = 0 THEN 'Ná»¯' ELSE 'Nam' END,
+    'TP. Há»“ ChÃ­ Minh',
+    'Viá»‡t Nam',
     'Kinh',
-    'Khong',
+    'KhÃ´ng',
     CONCAT('079', LPAD(s.id, 9, '0')),
-    'Cong an TP Ho Chi Minh',
+    'CÃ´ng an TP. Há»“ ChÃ­ Minh',
     DATE_ADD('2022-01-01', INTERVAL MOD(s.id, 500) DAY),
-    CONCAT('So ', MOD(s.id, 200) + 1, ', TP Thu Duc, TP Ho Chi Minh'),
-    CONCAT('So ', MOD(s.id, 300) + 10, ', Quan ', MOD(s.id, 12) + 1, ', TP Ho Chi Minh'),
-    'Khoa Cong nghe thong tin',
+    CONCAT('Sá»‘ ', MOD(s.id, 200) + 1, ', TP. Thá»§ Äá»©c, TP. Há»“ ChÃ­ Minh'),
+    CONCAT('Sá»‘ ', MOD(s.id, 300) + 10, ', Quáº­n ', MOD(s.id, 12) + 1, ', TP. Há»“ ChÃ­ Minh'),
+    f.fullname,
     c.class_name,
-    sp.fullname,
+    NULL,
     '2024 - 2028',
     '2028',
-    CONCAT('Nguoi lien he ', s.fullname),
+    CONCAT('NgÆ°á»i liÃªn há»‡ ', s.fullname),
     CONCAT('08', LPAD(MOD(s.id * 41, 100000000), 8, '0')),
-    CONCAT('So ', MOD(s.id, 90) + 1, ', Khu pho 1, TP Thu Duc'),
+    CONCAT('Sá»‘ ', MOD(s.id, 90) + 1, ', Khu phá»‘ 1, TP. Thá»§ Äá»©c'),
     CONCAT('Cha ', s.fullname),
     CONCAT('07', LPAD(MOD(s.id * 43, 100000000), 8, '0')),
-    CONCAT('Me ', s.fullname),
+    CONCAT('Máº¹ ', s.fullname),
     CONCAT('07', LPAD(MOD(s.id * 47, 100000000), 8, '0'))
 FROM student s
 JOIN `class` c ON c.id = s.class_id
-JOIN study_program sp ON sp.id = s.study_program_id;
+JOIN faculty f ON f.id = c.faculty_id;
 
 INSERT INTO user_profile (
     account_id, profile_code, display_name, role_title, email, phone_number,
@@ -394,13 +465,13 @@ SELECT
     l.account_id,
     l.code,
     l.fullname,
-    'Giang vien',
+    'Giáº£ng viÃªn',
     CONCAT(LOWER(l.code), '@hcmute.edu.vn'),
     CONCAT('09', LPAD(MOD(l.id * 53, 100000000), 8, '0')),
-    'Viet Nam',
-    'Khoa Cong nghe thong tin',
-    'Cong tac hien tai',
-    CONCAT('So ', MOD(l.id, 50) + 1, ', TP Ho Chi Minh')
+    'Viá»‡t Nam',
+    'Khoa CÃ´ng nghá»‡ thÃ´ng tin',
+    'CÃ´ng tÃ¡c hiá»‡n táº¡i',
+    CONCAT('Sá»‘ ', MOD(l.id, 50) + 1, ', TP. Há»“ ChÃ­ Minh')
 FROM lecturer l;
 
 INSERT INTO user_profile (
@@ -411,13 +482,13 @@ SELECT
     a.account_id,
     a.code,
     a.fullname,
-    'Quan tri vien',
+    'Quáº£n trá»‹ viÃªn',
     CONCAT(LOWER(a.code), '@hcmute.edu.vn'),
     CONCAT('09', LPAD(MOD(a.id * 59, 100000000), 8, '0')),
-    'Viet Nam',
-    'Phong dao tao',
-    'Nhan su hien tai',
-    'Co so 1 - TP Thu Duc'
+    'Viá»‡t Nam',
+    'PhÃ²ng ÄÃ o táº¡o',
+    'NhÃ¢n sá»± hiá»‡n táº¡i',
+    'CÆ¡ sá»Ÿ 1 - TP. Thá»§ Äá»©c'
 FROM admin a;
 
 -- =========================================================
@@ -539,11 +610,11 @@ LIMIT 50;
 -- 11) ANNOUNCEMENTS
 -- =========================================================
 INSERT INTO announcement (title, content, target_type, course_section_id, sender_name, created_at) VALUES
-('Thông báo kế hoạch nghỉ Tết Dương lịch 2026', 'Trường Đại học Sư phạm Kỹ thuật TP.HCM thông báo kế hoạch nghỉ Tết Dương lịch cho toàn thể CBVC và sinh viên nghỉ từ ngày 01/01/2026.', 'ALL', NULL, 'Phòng Đào Tạo', '2025-12-01 08:00:00'),
-('Thông báo mở đăng ký học phần Học kỳ 1 năm học 2026-2027', 'Sinh viên các khóa lưu ý thời gian đăng ký học phần sẽ bắt đầu từ 8h00 ngày 25/08.', 'ALL_STUDENTS', NULL, 'Phòng Đào Tạo', '2025-12-05 09:30:00'),
-('Nhắc nhở đóng học phí', 'Đề nghị toàn thể sinh viên hoàn thành nghĩa vụ học phí trước ngày 15/12 để tránh bị hủy học phần.', 'ALL_STUDENTS', NULL, 'Phòng Tài Chính', '2025-12-10 14:00:00'),
-('Dời lịch học môn Nhập môn lập trình', 'Lớp học bị dời sang chiều thứ 5 tại phòng A3-104 do giảng viên đi công tác.', 'COURSE_SECTION', 121, 'GV. Nguyễn Minh Đạo', '2025-12-11 16:30:00'),
-('Nộp tài liệu Đồ án Cơ sở', 'Các em lưu ý nộp bản báo cáo định dạng PDF lên hệ thống LMS trước thứ bảy tuần này.', 'COURSE_SECTION', 150, 'GV. Vũ Anh Kiệt', '2025-12-12 10:15:00');
+('ThÃ´ng bÃ¡o káº¿ hoáº¡ch nghá»‰ Táº¿t DÆ°Æ¡ng lá»‹ch 2026', 'TrÆ°á»ng Äáº¡i há»c SÆ° pháº¡m Ká»¹ thuáº­t TP.HCM thÃ´ng bÃ¡o káº¿ hoáº¡ch nghá»‰ Táº¿t DÆ°Æ¡ng lá»‹ch cho toÃ n thá»ƒ CBVC vÃ  sinh viÃªn nghá»‰ tá»« ngÃ y 01/01/2026.', 'ALL', NULL, 'PhÃ²ng ÄÃ o Táº¡o', '2025-12-01 08:00:00'),
+('ThÃ´ng bÃ¡o má»Ÿ Ä‘Äƒng kÃ½ há»c pháº§n Há»c ká»³ 1 nÄƒm há»c 2026-2027', 'Sinh viÃªn cÃ¡c khÃ³a lÆ°u Ã½ thá»i gian Ä‘Äƒng kÃ½ há»c pháº§n sáº½ báº¯t Ä‘áº§u tá»« 8h00 ngÃ y 25/08.', 'ALL_STUDENTS', NULL, 'PhÃ²ng ÄÃ o Táº¡o', '2025-12-05 09:30:00'),
+('Nháº¯c nhá»Ÿ Ä‘Ã³ng há»c phÃ­', 'Äá» nghá»‹ toÃ n thá»ƒ sinh viÃªn hoÃ n thÃ nh nghÄ©a vá»¥ há»c phÃ­ trÆ°á»›c ngÃ y 15/12 Ä‘á»ƒ trÃ¡nh bá»‹ há»§y há»c pháº§n.', 'ALL_STUDENTS', NULL, 'PhÃ²ng TÃ i ChÃ­nh', '2025-12-10 14:00:00'),
+('Dá»i lá»‹ch há»c mÃ´n Nháº­p mÃ´n láº­p trÃ¬nh', 'Lá»›p há»c bá»‹ dá»i sang chiá»u thá»© 5 táº¡i phÃ²ng A3-104 do giáº£ng viÃªn Ä‘i cÃ´ng tÃ¡c.', 'COURSE_SECTION', 121, 'GV. Nguyá»…n Minh Äáº¡o', '2025-12-11 16:30:00'),
+('Ná»™p tÃ i liá»‡u Äá»“ Ã¡n CÆ¡ sá»Ÿ', 'CÃ¡c em lÆ°u Ã½ ná»™p báº£n bÃ¡o cÃ¡o Ä‘á»‹nh dáº¡ng PDF lÃªn há»‡ thá»‘ng LMS trÆ°á»›c thá»© báº£y tuáº§n nÃ y.', 'COURSE_SECTION', 150, 'GV. VÅ© Anh Kiá»‡t', '2025-12-12 10:15:00');
 
 -- =========================================================
 -- 12) AUDIT & METRICS 

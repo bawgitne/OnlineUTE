@@ -10,6 +10,10 @@ public class UserProfileController {
         this.userProfileService = userProfileService;
     }
 
+    public UserProfile save(UserProfile userProfile) {
+        return userProfileService.save(userProfile);
+    }
+
     public UserProfile getCurrentUserProfile() {
         return userProfileService.getCurrentUserProfile();
     }

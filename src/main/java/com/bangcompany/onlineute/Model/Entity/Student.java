@@ -5,7 +5,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "student")
+@Table(name = "student", indexes = {
+        @Index(name = "idx_student_code", columnList = "code"),
+        @Index(name = "idx_student_fullname", columnList = "fullname"),
+        @Index(name = "idx_student_email", columnList = "email")
+})
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +34,8 @@ public class Student {
     @JoinColumn(name = "class_id", nullable = false)
     private Class classEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "study_program_id", nullable = false)
-    private StudyProgram studyProgram;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "academic_term_id", nullable = false)
-    private Term term;
+    @Column(name = "enrollment_year", nullable = false)
+    private Integer enrollmentYear;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id", nullable = false)
@@ -69,10 +68,8 @@ public class Student {
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
     public Class getClassEntity() { return classEntity; }
     public void setClassEntity(Class classEntity) { this.classEntity = classEntity; }
-    public StudyProgram getStudyProgram() { return studyProgram; }
-    public void setStudyProgram(StudyProgram studyProgram) { this.studyProgram = studyProgram; }
-    public Term getTerm() { return term; }
-    public void setTerm(Term term) { this.term = term; }
+    public Integer getEnrollmentYear() { return enrollmentYear; }
+    public void setEnrollmentYear(Integer enrollmentYear) { this.enrollmentYear = enrollmentYear; }
     public Account getAccount() { return account; }
     public void setAccount(Account account) { this.account = account; }
     public List<CourseRegistration> getCourseRegistrations() { return courseRegistrations; }

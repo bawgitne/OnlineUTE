@@ -14,6 +14,10 @@ public class Class {
     @Column(name = "class_name", nullable = false)
     private String className;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "faculty_id", nullable = false)
+    private Faculty faculty;
+
     @OneToMany(mappedBy = "classEntity", fetch = FetchType.LAZY)
     private List<Student> students = new ArrayList<>();
 
@@ -26,6 +30,8 @@ public class Class {
 
     public String getClassName() { return className; }
     public void setClassName(String className) { this.className = className; }
+    public Faculty getFaculty() { return faculty; }
+    public void setFaculty(Faculty faculty) { this.faculty = faculty; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

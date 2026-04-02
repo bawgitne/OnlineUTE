@@ -2,6 +2,9 @@ package com.bangcompany.onlineute.Service.Impl;
 
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.DAO.AnnouncementDAO;
+import com.bangcompany.onlineute.Model.DTO.PageRequest;
+import com.bangcompany.onlineute.Model.DTO.PagedResult;
+import com.bangcompany.onlineute.Model.DTO.PaginationSupport;
 import com.bangcompany.onlineute.Model.Entity.Announcement;
 import com.bangcompany.onlineute.Service.AnnouncementService;
 import java.util.List;
@@ -18,6 +21,19 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     public void createAnnouncement(String title, String content, String targetType, Long courseSectionId, String senderName) {
         Announcement announcement = new Announcement(title, content, targetType, courseSectionId, senderName);
         announcementDAO.create(announcement);
+    }
+
+    @Override
+    public PagedResult<Announcement> searchAnnouncements(String keyword, PageRequest pageRequest) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return PaginationSupport.empty(pageRequest);
+        }
+        return announcementDAO.search(keyword.trim(), pageRequest);
+    }
+
+    @Override
+    public PagedResult<Announcement> searchAnnouncements(String keyword, int page, int pageSize) {
+        return searchAnnouncements(keyword, PaginationSupport.normalize(page, pageSize));
     }
 
     @Override

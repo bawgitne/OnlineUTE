@@ -38,7 +38,7 @@ public class ProfilePage extends JPanel implements Refreshable {
     private JComponent createLoadingState() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
-        panel.add(new JLabel("Đang thử tải", SwingConstants.CENTER), BorderLayout.CENTER);
+        panel.add(new JLabel("Đang tải", SwingConstants.CENTER), BorderLayout.CENTER);
         return panel;
     }
 
@@ -145,7 +145,7 @@ public class ProfilePage extends JPanel implements Refreshable {
         card.addField("Vai trò", valueOf(profile.getRoleTitle()));
         card.addField("Khoa / Đơn vị", valueOf(profile.getFacultyName()));
         card.addField("Lớp", valueOf(profile.getClassName()));
-        card.addField("Ngành", valueOf(profile.getStudyProgramName()));
+        card.addField("Ngành", valueOf(profile.getMajorName()));
         card.addField("Niên khóa", valueOf(profile.getAcademicYear()));
         card.addField("Năm tốt nghiệp dự kiến", valueOf(profile.getExpectedGraduationYear()));
         return card;
@@ -156,7 +156,6 @@ public class ProfilePage extends JPanel implements Refreshable {
         card.addField("Người liên hệ", valueOf(profile.getContactName()));
         card.addField("Điện thoại liên hệ", valueOf(profile.getContactPhone()));
         card.addField("Địa chỉ liên hệ", valueOf(profile.getContactAddress()));
-        card.addField("Email phụ", valueOf(profile.getAlternateEmail()));
         card.addField("Họ tên cha", valueOf(profile.getFatherName()));
         card.addField("Điện thoại cha", valueOf(profile.getFatherPhone()));
         card.addField("Họ tên mẹ", valueOf(profile.getMotherName()));
@@ -187,3 +186,4 @@ public class ProfilePage extends JPanel implements Refreshable {
         return (first + last).toUpperCase();
     }
 }
+

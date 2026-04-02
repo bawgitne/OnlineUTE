@@ -3,6 +3,9 @@ package com.bangcompany.onlineute.DAO.Impl;
 import com.bangcompany.onlineute.Config.JpaUtil;
 import com.bangcompany.onlineute.DAO.AccountDAO;
 import com.bangcompany.onlineute.Model.Entity.Account;
+import com.bangcompany.onlineute.Model.Entity.Admin;
+import com.bangcompany.onlineute.Model.Entity.Lecturer;
+import com.bangcompany.onlineute.Model.Entity.Student;
 import jakarta.persistence.EntityManager;
 import java.util.Optional;
 
@@ -26,11 +29,18 @@ public class AccountDAOImpl implements AccountDAO {
     }
 
     @Override
-    public Optional<Account> findByUsername(String username) {
+    public Optional<Account> findByLoginCode(String loginCode) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
-            Account account = em.createQuery("SELECT a FROM Account a WHERE a.username = :username", Account.class)
-                    .setParameter("username", username)
+            String normalizedCode = loginCode == null ? "" : loginCode.trim().toLowerCase();
+            Account account = em.createQuery(
+                            "SELECT a FROM Account a " +
+                                    "WHERE EXISTS (SELECT s.id FROM Student s WHERE s.account.id = a.id AND LOWER(s.code) = :loginCode) " +
+                                    "OR EXISTS (SELECT l.id FROM Lecturer l WHERE l.account.id = a.id AND LOWER(l.code) = :loginCode) " +
+                                    "OR EXISTS (SELECT ad.id FROM Admin ad WHERE ad.account.id = a.id AND LOWER(ad.code) = :loginCode)",
+                            Account.class
+                    )
+                    .setParameter("loginCode", normalizedCode)
                     .getSingleResult();
             return Optional.of(account);
         } catch (Exception e) {

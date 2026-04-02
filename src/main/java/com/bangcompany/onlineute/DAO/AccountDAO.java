@@ -5,5 +5,5 @@ import java.util.Optional;
 
 public interface AccountDAO {
     Account save(Account account);
-    Optional<Account> findByUsername(String username);
+    Optional<Account> findByLoginCode(String loginCode);
 }

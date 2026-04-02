@@ -12,8 +12,8 @@ public class AuthController {
         this.authService = authService;
     }
 
-    public Optional<Account> Login(String username, String password) {
-        return authService.login(username, password);
+    public Optional<Account> Login(String loginCode, String password) {
+        return authService.login(loginCode, password);
     }
 
     public void Logout() {

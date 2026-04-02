@@ -20,6 +20,11 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
+    public UserProfile save(UserProfile userProfile) {
+        return userProfileDAO.save(userProfile);
+    }
+
+    @Override
     public Optional<UserProfile> findByAccountId(Long accountId) {
         return userProfileDAO.findByAccountId(accountId);
     }
@@ -47,6 +52,12 @@ public class UserProfileServiceImpl implements UserProfileService {
             profile.setEmail(student.getEmail());
             profile.setBirthDate(student.getBirthOfDate());
             profile.setAvatarUrl(student.getAvatarUrl());
+            if (student.getClassEntity() != null) {
+                profile.setClassName(student.getClassEntity().getClassName());
+                if (student.getClassEntity().getFaculty() != null) {
+                    profile.setFacultyName(student.getClassEntity().getFaculty().getFullName());
+                }
+            }
             return profile;
         }
 

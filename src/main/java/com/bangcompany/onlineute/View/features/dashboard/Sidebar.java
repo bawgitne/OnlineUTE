@@ -75,7 +75,7 @@ public class Sidebar extends JPanel {
         bottomPanel.setBackground(new Color(0, 85, 141));
         bottomPanel.setBorder(new EmptyBorder(10, 10, 20, 10));
 
-        JButton logoutButton = new JButton("DANG XUAT");
+        JButton logoutButton = new JButton("ĐĂNG XUẤT");
         logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         logoutButton.setForeground(Color.WHITE);
         logoutButton.setBackground(new Color(220, 53, 69));

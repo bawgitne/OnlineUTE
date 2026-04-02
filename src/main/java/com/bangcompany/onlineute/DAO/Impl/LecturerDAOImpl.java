@@ -2,6 +2,9 @@ package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
 import com.bangcompany.onlineute.DAO.LecturerDAO;
+import com.bangcompany.onlineute.Model.DTO.PageRequest;
+import com.bangcompany.onlineute.Model.DTO.PagedResult;
+import com.bangcompany.onlineute.Model.DTO.PaginationSupport;
 import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import jakarta.persistence.EntityManager;
 
@@ -48,6 +51,49 @@ public class LecturerDAOImpl implements LecturerDAO {
             return Optional.of(lecturer);
         } catch (Exception e) {
             return Optional.empty();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public PagedResult<Lecturer> search(String keyword, PageRequest pageRequest) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            String normalizedKeyword = "%" + keyword.toLowerCase() + "%";
+            List<Lecturer> items = em.createQuery(
+                            "SELECT DISTINCT l FROM Lecturer l " +
+                                    "WHERE LOWER(l.code) LIKE :keyword " +
+                                    "OR LOWER(l.fullName) LIKE :keyword " +
+                                    "ORDER BY l.fullName, l.code",
+                            Lecturer.class
+                    )
+                    .setParameter("keyword", normalizedKeyword)
+                    .setFirstResult(PaginationSupport.offset(pageRequest))
+                    .setMaxResults(pageRequest.getPageSize())
+                    .getResultList();
+
+            Long totalItems = em.createQuery(
+                            "SELECT COUNT(DISTINCT l.id) FROM Lecturer l " +
+                                    "WHERE LOWER(l.code) LIKE :keyword " +
+                                    "OR LOWER(l.fullName) LIKE :keyword",
+                            Long.class
+                    )
+                    .setParameter("keyword", normalizedKeyword)
+                    .getSingleResult();
+
+            return PaginationSupport.of(items, pageRequest, totalItems);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public long countAll() {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            return em.createQuery("SELECT COUNT(l) FROM Lecturer l", Long.class)
+                    .getSingleResult();
         } finally {
             em.close();
         }

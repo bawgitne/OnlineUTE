@@ -19,8 +19,6 @@ public class Term {
     @Column(name = "is_current", nullable = false)
     private Boolean isCurrent;
 
-    @OneToMany(mappedBy = "term", fetch = FetchType.LAZY)
-    private List<Student> students;
 
     @OneToMany(mappedBy = "term", fetch = FetchType.LAZY)
     private List<CourseSection> courseSections;
@@ -42,8 +40,6 @@ public class Term {
     public void setTermName(String termName) { this.termName = termName; }
     public Boolean getIsCurrent() { return isCurrent; }
     public void setIsCurrent(Boolean isCurrent) { this.isCurrent = isCurrent; }
-    public List<Student> getStudents() { return students; }
-    public void setStudents(List<Student> students) { this.students = students; }
     public List<CourseSection> getCourseSections() { return courseSections; }
     public void setCourseSections(List<CourseSection> courseSections) { this.courseSections = courseSections; }
 
