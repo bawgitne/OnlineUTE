@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PaginationPanel extends JPanel {
-    private final JButton previousButton = new JButton("Trang truoc");
+    private final JButton previousButton = new JButton("Trang trước");
     private final JButton nextButton = new JButton("Trang sau");
     private final JLabel infoLabel = new JLabel("Trang 1 / 1");
 

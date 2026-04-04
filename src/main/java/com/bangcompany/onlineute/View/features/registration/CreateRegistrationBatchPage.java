@@ -219,7 +219,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         int selectedRow = batchTable.getSelectedRow();
         if (selectedRow < 0) {
             selectedBatch = null;
-            selectedBatchLabel.setText("Chon mot dot dang ky o bang ben tren de mo popup tao course section.");
+            selectedBatchLabel.setText("Chọn một đợt đăng ký ở bảng bên trên để mở popup tạo lớp học phần.");
             return;
         }
 

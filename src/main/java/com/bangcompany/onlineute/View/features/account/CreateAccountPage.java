@@ -60,12 +60,12 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     private final boolean studentMode;
 
     public CreateAccountPage() {
-        this("Sinh vien");
+        this("Sinh viên");
     }
 
     public CreateAccountPage(String initialRole) {
-        this.initialRole = initialRole == null || initialRole.isBlank() ? "Sinh vien" : initialRole;
-        this.studentMode = "Sinh vien".equalsIgnoreCase(this.initialRole);
+        this.initialRole = initialRole == null || initialRole.isBlank() ? "Sinh viên" : initialRole;
+        this.studentMode = "Sinh viên".equalsIgnoreCase(this.initialRole);
 
         setLayout(new BorderLayout(0, 20));
         setBackground(new Color(248, 249, 250));
@@ -79,31 +79,31 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         content.setOpaque(false);
         content.setBorder(new EmptyBorder(0, 0, 8, 0));
 
-        codeInput = new InputGroup("Ma dinh danh *", false);
+        codeInput = new InputGroup("Mã định danh *", false);
         codeInput.setEditable(true);
 
-        nameInput = new InputGroup("Ho va ten *", false);
+        nameInput = new InputGroup("Họ và tên *", false);
         emailInput = new InputGroup("Email *", false);
-        phoneInput = new InputGroup("So dien thoai", false);
-        dobInput = new InputGroup("Ngay sinh * (YYYY-MM-DD)", false);
-        genderSelect = new SelectGroup<>("Gioi tinh", List.of("Nam", "Nu", "Khac"));
-        placeOfBirthInput = new InputGroup("Noi sinh", false);
-        nationalityInput = new InputGroup("Quoc tich", false);
+        phoneInput = new InputGroup("Số điện thoại", false);
+        dobInput = new InputGroup("Ngày sinh * (YYYY-MM-DD)", false);
+        genderSelect = new SelectGroup<>("Giới tính", List.of("Nam", "Nữ", "Khác"));
+        placeOfBirthInput = new InputGroup("Nơi sinh", false);
+        nationalityInput = new InputGroup("Quốc tịch", false);
         facultySelect = new SelectGroup<>("Khoa *", AppContext.getFacultyService().getAllFaculties());
-        majorSelect = new SelectGroup<>("Nganh *", List.of());
-        classSelect = new SelectGroup<>("Lop *", List.of());
-        enrollmentYearInput = new InputGroup("Nam nhap hoc *", false);
-        expectedGraduationYearInput = new InputGroup("Nam tot nghiep du kien", false);
-        studentCodePreviewInput = new InputGroup("MSSV tu dong", false);
+        majorSelect = new SelectGroup<>("Ngành *", List.of());
+        classSelect = new SelectGroup<>("Lớp *", List.of());
+        enrollmentYearInput = new InputGroup("Năm nhập học *", false);
+        expectedGraduationYearInput = new InputGroup("Năm tốt nghiệp dự kiến", false);
+        studentCodePreviewInput = new InputGroup("MSSV tự động", false);
         studentCodePreviewInput.setEditable(false);
 
         citizenIdInput = new InputGroup("CCCD/CMND", false);
-        citizenIssuePlaceInput = new InputGroup("Noi cap", false);
-        citizenIssueDateInput = new InputGroup("Ngay cap (YYYY-MM-DD)", false);
-        currentAddressInput = new TextAreaGroup("Dia chi hien tai", 96);
-        permanentAddressInput = new TextAreaGroup("Dia chi thuong tru", 96);
-        contactNameInput = new InputGroup("Nguoi lien he", false);
-        contactPhoneInput = new InputGroup("SDT lien he", false);
+        citizenIssuePlaceInput = new InputGroup("Nơi cấp", false);
+        citizenIssueDateInput = new InputGroup("Ngày cấp (YYYY-MM-DD)", false);
+        currentAddressInput = new TextAreaGroup("Địa chỉ hiện tại", 96);
+        permanentAddressInput = new TextAreaGroup("Địa chỉ thường trú", 96);
+        contactNameInput = new InputGroup("Người liên hệ", false);
+        contactPhoneInput = new InputGroup("SĐT liên hệ", false);
 
         facultySelect.getComboBox().addActionListener(e -> {
             refreshAcademicOptions();
@@ -146,7 +146,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             refreshAcademicOptions();
             enrollmentYearInput.setValue(String.valueOf(Year.now().getValue()));
             expectedGraduationYearInput.setValue(String.valueOf(Year.now().getValue() + 4));
-            nationalityInput.setValue("Viet Nam");
+            nationalityInput.setValue("Việt Nam");
         }
         refreshGeneratedStudentCode();
         return createHiddenScrollPane(content);
@@ -168,13 +168,13 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         bar.setOpaque(true);
 
         if (studentMode) {
-            JButton rawDataButton = new JButton("Nhap du lieu tho");
+            JButton rawDataButton = new JButton("Nhập dữ liệu thô");
             styleGhostButton(rawDataButton);
             rawDataButton.addActionListener(e -> openBulkInputDialog());
             bar.add(rawDataButton);
         }
 
-        PrimaryButton createButton = new PrimaryButton(studentMode ? "Luu sinh vien" : "Luu giang vien");
+        PrimaryButton createButton = new PrimaryButton(studentMode ? "Lưu sinh viên" : "Lưu giảng viên");
         createButton.setPreferredSize(new Dimension(170, 42));
         createButton.addActionListener(e -> createSingleAccount());
         bar.add(createButton);
@@ -208,7 +208,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 0, 20, 0);
 
-        JLabel helpLabel = new JLabel("<html>Moi dong 7 cot, cach nhau boi dau |<br>Ho ten|Email|Ngay sinh (YYYY-MM-DD)|Ma khoa|Ma nganh|Lop|Nam nhap hoc<br>He thong sap xep theo ten truoc khi sinh 3 so cuoi.</html>");
+        JLabel helpLabel = new JLabel("<html>Mỗi dòng 7 cột, cách nhau bởi dấu |<br>Họ tên|Email|Ngày sinh (YYYY-MM-DD)|Mã khoa|Mã ngành|Lớp|Năm nhập học<br>Hệ thống sắp xếp theo tên trước khi sinh 3 số cuối.</html>");
         helpLabel.setFont(new Font("Segoe UI", Font.ITALIC, 13));
         helpLabel.setForeground(new Color(110, 110, 110));
         panel.add(helpLabel, gbc);
@@ -216,7 +216,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.gridy++;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        bulkDataInput = new TextAreaGroup("Du lieu bulk", 350);
+        bulkDataInput = new TextAreaGroup("Dữ liệu bulk", 350);
         panel.add(bulkDataInput, gbc);
 
         gbc.gridy++;
@@ -225,7 +225,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(20, 0, 0, 0);
 
-        PrimaryButton btnCreateBulk = new PrimaryButton("Luu hang loat");
+        PrimaryButton btnCreateBulk = new PrimaryButton("Lưu hàng loạt");
         btnCreateBulk.setPreferredSize(new Dimension(180, 45));
         btnCreateBulk.addActionListener(e -> createBulkStudents());
         panel.add(btnCreateBulk, gbc);
@@ -233,7 +233,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     }
 
     private void openBulkInputDialog() {
-        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Nhap du lieu tho", Dialog.ModalityType.APPLICATION_MODAL);
+        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Nhập dữ liệu thô", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setContentPane(createHiddenScrollPane(createBulkPanel()));
         dialog.setSize(760, 560);
@@ -283,7 +283,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     private void createSingleAccount() {
         String fullName = nameInput.getValue().trim();
         if (fullName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui long nhap ho ten.", "Loi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập họ tên.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -294,10 +294,10 @@ public class CreateAccountPage extends JPanel implements Refreshable {
                 createLecturerAccount(fullName);
             }
 
-            JOptionPane.showMessageDialog(this, "Tao tai khoan thanh cong.", "Thanh cong", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Tạo tài khoản thành công.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
             onEnter();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Loi tao tai khoan: " + ex.getMessage(), "Loi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lỗi tạo tài khoản: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     private void createStudentAccount(String fullName) {
@@ -306,26 +306,26 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         String enrollmentYearText = enrollmentYearInput.getValue().trim();
 
         if (email.isEmpty() || dobText.isEmpty() || enrollmentYearText.isEmpty()) {
-            throw new IllegalArgumentException("Sinh vien can email, ngay sinh va nam nhap hoc.");
+            throw new IllegalArgumentException("Sinh viên cần email, ngày sinh và năm nhập học.");
         }
 
         Faculty selectedFaculty = facultySelect.getSelectedValue();
         Major selectedMajor = majorSelect.getSelectedValue();
         Class selectedClass = classSelect.getSelectedValue();
         if (selectedFaculty == null || selectedMajor == null || selectedClass == null) {
-            throw new IllegalArgumentException("Sinh vien can chon khoa, nganh va lop.");
+            throw new IllegalArgumentException("Sinh viên cần chọn khoa, ngành và lớp.");
         }
 
         if (selectedClass.getFaculty() == null || !Objects.equals(selectedClass.getFaculty().getId(), selectedFaculty.getId())) {
-            throw new IllegalArgumentException("Lop phai thuoc dung khoa da chon.");
+            throw new IllegalArgumentException("Lớp phải thuộc đúng khoa đã chọn.");
         }
         if (selectedMajor.getFaculty() == null || !Objects.equals(selectedMajor.getFaculty().getId(), selectedFaculty.getId())) {
-            throw new IllegalArgumentException("Nganh phai thuoc dung khoa da chon.");
+            throw new IllegalArgumentException("Ngành phải thuộc đúng khoa đã chọn.");
         }
 
         String code = autoPreviewStudentCode();
         if (code.isBlank()) {
-            throw new IllegalArgumentException("Khong the tao MSSV. Vui long kiem tra nganh va nam nhap hoc.");
+            throw new IllegalArgumentException("Không thể tạo MSSV. Vui lòng kiểm tra ngành và năm nhập học.");
         }
 
         Student student = new Student(code, fullName, LocalDate.parse(dobText), email, "");
@@ -340,7 +340,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     private void createLecturerAccount(String fullName) {
         String code = codeInput.getValue().trim();
         if (code.isBlank()) {
-            throw new IllegalArgumentException("Giang vien can ma giang vien.");
+            throw new IllegalArgumentException("Giảng viên cần mã giảng viên.");
         }
 
         Lecturer lecturer = new Lecturer();
@@ -355,7 +355,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     private void createBulkStudents() {
         String rawData = bulkDataInput.getValue().trim();
         if (rawData.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ban chua nhap du lieu.", "Loi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Bạn chưa nhập dữ liệu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -385,12 +385,12 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             created++;
         }
 
-        JOptionPane.showMessageDialog(this, "Da tao " + created + " sinh vien.", "Thanh cong", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Đã tạo " + created + " sinh viên.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
         bulkDataInput.setValue("");
     }
 
     private UserProfile buildStudentProfile(Account account, Student student, Faculty faculty, Major major) {
-        UserProfile profile = buildCommonProfile(account, student.getCode(), student.getFullName(), "Sinh vien");
+        UserProfile profile = buildCommonProfile(account, student.getCode(), student.getFullName(), "Sinh viên");
         profile.setEmail(student.getEmail());
         profile.setBirthDate(student.getBirthOfDate());
         profile.setFacultyName(faculty != null ? faculty.getFullName() : "");
@@ -402,7 +402,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     }
 
     private UserProfile buildLecturerProfile(Account account, Lecturer lecturer) {
-        UserProfile profile = buildCommonProfile(account, lecturer.getCode(), lecturer.getFullName(), "Giang vien");
+        UserProfile profile = buildCommonProfile(account, lecturer.getCode(), lecturer.getFullName(), "Giảng viên");
         profile.setEmail(emailInput.getValue().trim());
         return profile;
     }
@@ -449,7 +449,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
 
             String[] parts = line.split("\\|");
             if (parts.length != 7) {
-                throw new IllegalArgumentException("Dong " + (i + 1) + " phai co 7 cot: Ho ten|Email|Ngay sinh|Ma khoa|Ma nganh|Lop|Nam nhap hoc");
+                throw new IllegalArgumentException("Dòng " + (i + 1) + " phải có 7 cột: Họ tên|Email|Ngày sinh|Mã khoa|Mã ngành|Lớp|Năm nhập học");
             }
 
             String fullName = parts[0].trim();
@@ -462,17 +462,17 @@ public class CreateAccountPage extends JPanel implements Refreshable {
 
             Faculty faculty = facultyByCode.get(facultyCode);
             if (faculty == null) {
-                throw new IllegalArgumentException("Khong tim thay khoa " + facultyCode + " o dong " + (i + 1));
+                throw new IllegalArgumentException("Không tìm thấy khoa " + facultyCode + " ở dòng " + (i + 1));
             }
 
             Major major = findMajorByFacultyAndCode(faculty.getId(), majorCode);
             if (major == null) {
-                throw new IllegalArgumentException("Khong tim thay nganh " + majorCode + " trong khoa " + facultyCode + " o dong " + (i + 1));
+                throw new IllegalArgumentException("Không tìm thấy ngành " + majorCode + " trong khoa " + facultyCode + " ở dòng " + (i + 1));
             }
 
             Class classEntity = findClassByFacultyAndName(faculty.getId(), className);
             if (classEntity == null) {
-                throw new IllegalArgumentException("Khong tim thay lop " + className + " trong khoa " + facultyCode + " o dong " + (i + 1));
+                throw new IllegalArgumentException("Không tìm thấy lớp " + className + " trong khoa " + facultyCode + " ở dòng " + (i + 1));
             }
 
             rows.add(new BulkStudentRow(fullName, email, birthDate, faculty, major, classEntity, enrollmentYear));
@@ -616,7 +616,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         if (studentMode) {
             if (enrollmentYearInput != null) enrollmentYearInput.setValue(String.valueOf(Year.now().getValue()));
             if (expectedGraduationYearInput != null) expectedGraduationYearInput.setValue(String.valueOf(Year.now().getValue() + 4));
-            if (nationalityInput != null) nationalityInput.setValue("Viet Nam");
+            if (nationalityInput != null) nationalityInput.setValue("Việt Nam");
             if (facultySelect != null) facultySelect.setItems(AppContext.getFacultyService().getAllFaculties());
             refreshAcademicOptions();
             refreshGeneratedStudentCode();

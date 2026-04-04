@@ -69,7 +69,7 @@ public class SelectGroup<T> extends JPanel {
         comboBox.setUI(new BasicComboBoxUI() {
             @Override
             protected JButton createArrowButton() {
-                JButton button = new JButton("\u25BE");
+                JButton button = new JButton("▾");
                 button.setFont(new Font("Segoe UI", Font.BOLD, 9));
                 button.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 2));
                 button.setContentAreaFilled(false);

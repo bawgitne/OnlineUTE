@@ -21,7 +21,7 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
-        topPanel.add(new PageTitleLabel("DOI MAT KHAU"), BorderLayout.NORTH);
+        topPanel.add(new PageTitleLabel("ĐỔI MẬT KHẨU"), BorderLayout.NORTH);
         add(topPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new GridBagLayout());
@@ -38,13 +38,13 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
         form.setPreferredSize(new Dimension(500, 450));
         form.setMaximumSize(new Dimension(500, 450));
 
-        JLabel title = new JLabel("DOI MAT KHAU");
+        JLabel title = new JLabel("ĐỔI MẬT KHẨU");
         title.setFont(new Font("Segoe UI", Font.BOLD, 26));
         title.setForeground(new Color(40, 80, 140));
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
         form.add(title);
 
-        JLabel subTitle = new JLabel("Nhap mat khau moi de bao mat tai khoan");
+        JLabel subTitle = new JLabel("Nhập mật khẩu mới để bảo mật tài khoản");
         subTitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         subTitle.setForeground(Color.GRAY);
         subTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -52,9 +52,9 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
 
         form.add(Box.createRigidArea(new Dimension(0, 25)));
 
-        oldPassInput = new InputGroup("Mat khau hien tai", true);
-        newPassInput = new InputGroup("Mat khau moi", true);
-        confirmPassInput = new InputGroup("Xac nhan mat khau moi", true);
+        oldPassInput = new InputGroup("Mật khẩu hiện tại", true);
+        newPassInput = new InputGroup("Mật khẩu mới", true);
+        confirmPassInput = new InputGroup("Xác nhận mật khẩu mới", true);
 
         oldPassInput.setAlignmentX(Component.LEFT_ALIGNMENT);
         newPassInput.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -67,13 +67,13 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
         form.add(confirmPassInput);
         form.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        PrimaryButton btnSave = new PrimaryButton("Cap nhat mat khau");
+        PrimaryButton btnSave = new PrimaryButton("Cập nhật mật khẩu");
         btnSave.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         btnSave.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnSave.addActionListener(e -> JOptionPane.showMessageDialog(
                 this,
-                "Chuc nang doi mat khau dang duoc phat trien.",
-                "Thong bao",
+                "Chức năng đổi mật khẩu đang được phát triển.",
+                "Thông báo",
                 JOptionPane.INFORMATION_MESSAGE
         ));
         form.add(btnSave);

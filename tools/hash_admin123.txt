@@ -1,0 +1,5 @@
+﻿# Password: admin123
+# Iterations: 65536
+# KeyLength: 256 bits
+id,salt_base64,hash_base64
+1,b0BCNeKjIPAmpx+BKf2Cuw==,BH4wEHOGUXWnr9CeyNtuPArhbJ61DOmpWzZirw3WzM4=

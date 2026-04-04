@@ -13,7 +13,7 @@ import java.util.function.IntConsumer;
 
 public class StudentSearchResultPanel extends JPanel {
     private final DefaultTableModel tableModel;
-    private final JLabel resultLabel = new JLabel("0 ket qua");
+    private final JLabel resultLabel = new JLabel("0 kết quả");
     private final PaginationPanel paginationPanel;
     private IntConsumer onPageRequested;
 
@@ -27,7 +27,7 @@ public class StudentSearchResultPanel extends JPanel {
         resultLabel.setBorder(new EmptyBorder(0, 4, 0, 0));
 
         tableModel = new DefaultTableModel(
-                new Object[]{"Ma SV", "Ho ten", "Email", "Lop", "Khoa", "Nam nhap hoc"},
+                new Object[]{"Mã SV", "Họ tên", "Email", "Lớp", "Khoa", "Năm nhập học"},
                 0
         ) {
             @Override
@@ -86,7 +86,7 @@ public class StudentSearchResultPanel extends JPanel {
             });
         }
 
-        resultLabel.setText(result.getTotalItems() + " ket qua cho: " + keyword.trim());
+        resultLabel.setText(result.getTotalItems() + " kết quả cho: " + keyword.trim());
         paginationPanel.updateState(result.getPage(), result.getTotalPages(), result.hasPrevious(), result.hasNext());
     }
 

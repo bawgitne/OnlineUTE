@@ -29,7 +29,7 @@ public class SimpleManagementDashboard extends JPanel {
                 new EmptyBorder(20, 20, 20, 20)
         ));
 
-        JLabel titleLabel = new JLabel("\u0042\u1eaf\u0074\u0020\u0111\u1ea7\u0075\u0020\u0062\u1eb1\u006e\u0067\u0020\u00f4\u0020\u0074\u00ec\u006d\u0020\u006b\u0069\u1ebf\u006d");
+        JLabel titleLabel = new JLabel("Bắt đầu bằng ô tìm kiếm");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
         titleLabel.setForeground(new Color(0, 85, 141));
 

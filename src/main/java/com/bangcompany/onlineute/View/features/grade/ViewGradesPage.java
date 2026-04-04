@@ -25,7 +25,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
     public ViewGradesPage() {
         setLayout(new BorderLayout());
 
-        String[] cols = {"STT", "Ma mon hoc", "Ten mon hoc", "So TC", "Diem he 10", "Diem he 4", "Diem chu", "Ket qua"};
+        String[] cols = {"STT", "Mã môn học", "Tên môn học", "Số TC", "Điểm hệ 10", "Điểm hệ 4", "Điểm chữ", "Kết quả"};
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -44,7 +44,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
         JScrollPane scrollPane = new JScrollPane(table);
         TableStyles.styleScrollPane(scrollPane);
 
-        PageScaffold scaffold = new PageScaffold("Ket qua hoc tap");
+        PageScaffold scaffold = new PageScaffold("Kết quả học tập");
         scaffold.setBody(scrollPane);
         add(scaffold, BorderLayout.CENTER);
     }
@@ -65,7 +65,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
 
         Set<Long> studiedCourseIds = new HashSet<>();
 
-        addHeaderRow("--- CAC MON DA VA DANG HOC ---");
+        addHeaderRow("--- CÁC MÔN ĐÃ VÀ ĐANG HỌC ---");
         int stt = 1;
         for (CourseRegistration registration : registrations) {
             Course course = registration.getCourseSection() != null ? registration.getCourseSection().getCourse() : null;
@@ -95,7 +95,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
                 }
 
                 diemChu = mark.getGradeChar() != null ? mark.getGradeChar() : "";
-                ketQua = !"0.0".equals(diem4) ? "Dat" : "Rot";
+                ketQua = !"0.0".equals(diem4) ? "Đạt" : "Rớt";
             }
 
             tableModel.addRow(new Object[]{
@@ -107,7 +107,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
             });
         }
 
-        addHeaderRow("--- CAC MON CHUA HOC (THAM KHAO) ---");
+        addHeaderRow("--- CÁC MÔN CHƯA HỌC (THAM KHẢO) ---");
         stt = 1;
         for (Course course : allCourses) {
             if (!studiedCourseIds.contains(course.getId())) {
@@ -126,4 +126,3 @@ public class ViewGradesPage extends JPanel implements Refreshable {
         tableModel.addRow(new Object[]{"", "", text, "", "", "", "", ""});
     }
 }
-

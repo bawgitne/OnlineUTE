@@ -51,7 +51,7 @@ public class DashboardLayout extends JPanel {
 
         JPanel headerWrapper = new JPanel(new BorderLayout());
         headerWrapper.setOpaque(false);
-        headerWrapper.add(new TopHeader("\u0054\u0052\u01af\u1edc\u004e\u0047\u0020\u0110\u1ea0\u0049\u0020\u0048\u1ecc\u0043\u0020\u0043\u00d4\u004e\u0047\u0020\u004e\u0047\u0048\u1ec6\u0020\u004b\u1ef8\u0020\u0054\u0048\u0055\u1eac\u0054\u0020\u0054\u0050\u002e\u0048\u0043\u004d"), BorderLayout.NORTH);
+        headerWrapper.add(new TopHeader("TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT TP.HCM"), BorderLayout.NORTH);
 
         mainArea.add(headerWrapper, BorderLayout.NORTH);
         mainArea.add(mainContent, BorderLayout.CENTER);
@@ -72,38 +72,38 @@ public class DashboardLayout extends JPanel {
     }
 
     private void buildAdminTabs() {
-        addTitle("\u0054\u0052\u0041\u004e\u0047\u0020\u0043\u00c1\u0020\u004e\u0048\u00c2\u004e");
-        addTab("PROFILE", "\u0054\u0068\u00f4\u006e\u0067\u0020\u0074\u0069\u006e\u0020\u0063\u00e1\u0020\u006e\u0068\u00e2\u006e", "thongTinCaNhan.png");
-        addTab("ANNOUNCEMENT", "\u0054\u0068\u00f4\u006e\u0067\u0020\u0062\u00e1\u006f", "trangCuaBan.png");
-        addTitle("\u0051\u0055\u1ea2\u004e\u0020\u004c\u00dd");
-        addTab("MANAGE_DATA", "\u0051\u0075\u0061\u006e\u0020\u006c\u00fd\u0020\u0064\u1eef\u0020\u006c\u0069\u1ec7\u0075", "trangCuaBan.png");
-        addTab("CREATE_REGISTRATION_BATCH", "\u0054\u1ea1\u006f\u0020\u0111\u1ee3\u0074\u0020\u0111\u0103\u006e\u0067\u0020\u006b\u00fd\u0020\u006d\u00f4\u006e", "chuongTrinhDaoTao.png");
-        addTab("COMPOSE_ANNOUNCEMENT", "\u0047\u1eed\u0069\u0020\u0074\u0068\u00f4\u006e\u0067\u0020\u0062\u00e1\u006f", "trangCuaBan.png");
-        addTab("CHANGE_PASSWORD", "\u0110\u1ed5\u0069\u0020\u006d\u1ead\u0074\u0020\u006b\u0068\u1ea9\u0075", "thongTinCaNhan.png");
+        addTitle("TRANG CÁ NHÂN");
+        addTab("PROFILE", "Thông tin cá nhân", "thongTinCaNhan.png");
+        addTab("ANNOUNCEMENT", "Thông báo", "trangCuaBan.png");
+        addTitle("QUẢN LÝ");
+        addTab("MANAGE_DATA", "Quản lý dữ liệu", "trangCuaBan.png");
+        addTab("CREATE_REGISTRATION_BATCH", "Tạo đợt đăng ký môn", "chuongTrinhDaoTao.png");
+        addTab("COMPOSE_ANNOUNCEMENT", "Gửi thông báo", "trangCuaBan.png");
+        addTab("CHANGE_PASSWORD", "Đổi mật khẩu", "thongTinCaNhan.png");
     }
 
     private void buildLecturerTabs() {
-        addTitle("\u0054\u0052\u0041\u004e\u0047\u0020\u0043\u00c1\u0020\u004e\u0048\u00c2\u004e");
-        addTab("PROFILE", "\u0054\u0068\u00f4\u006e\u0067\u0020\u0074\u0069\u006e\u0020\u0063\u00e1\u0020\u006e\u0068\u00e2\u006e", "thongTinCaNhan.png");
-        addTab("ANNOUNCEMENT", "\u0054\u0068\u00f4\u006e\u0067\u0020\u0062\u00e1\u006f", "trangCuaBan.png");
-        addTitle("\u0054\u0052\u0041\u0020\u0043\u1ee8\u0055\u0020\u0054\u0048\u00d4\u004e\u0047\u0020\u0054\u0049\u004e");
-        addTab("MY_SCHEDULE", "\u004c\u1ecb\u0063\u0068\u0020\u0067\u0069\u1ea3\u006e\u0067\u0020\u0064\u1ea1\u0079", "lich.png");
-        addTitle("\u0051\u0055\u1ea2\u004e\u0020\u004c\u00dd\u0020\u0053\u0049\u004e\u0048\u0020\u0056\u0049\u00ca\u004e");
-        addTab("COMPOSE_ANNOUNCEMENT", "\u0047\u1eed\u0069\u0020\u0074\u0068\u00f4\u006e\u0067\u0020\u0062\u00e1\u006f", "trangCuaBan.png");
-        addTab("INPUT_GRADES", "\u0051\u0075\u1ea3\u006e\u0020\u006c\u00fd\u0020\u006c\u1edb\u0070\u0020\u0068\u1ecd\u0063", "xemDiem.png");
-        addTab("CHANGE_PASSWORD", "\u0110\u1ed5\u0069\u0020\u006d\u1ead\u0074\u0020\u006b\u0068\u1ea9\u0075", "thongTinCaNhan.png");
+        addTitle("TRANG CÁ NHÂN");
+        addTab("PROFILE", "Thông tin cá nhân", "thongTinCaNhan.png");
+        addTab("ANNOUNCEMENT", "Thông báo", "trangCuaBan.png");
+        addTitle("TRA CỨU THÔNG TIN");
+        addTab("MY_SCHEDULE", "Lịch giảng dạy", "lich.png");
+        addTitle("QUẢN LÝ SINH VIÊN");
+        addTab("COMPOSE_ANNOUNCEMENT", "Gửi thông báo", "trangCuaBan.png");
+        addTab("INPUT_GRADES", "Quản lý lớp học", "xemDiem.png");
+        addTab("CHANGE_PASSWORD", "Đổi mật khẩu", "thongTinCaNhan.png");
     }
 
     private void buildStudentTabs() {
-        addTitle("\u0054\u0052\u0041\u004e\u0047\u0020\u0043\u00c1\u0020\u004e\u0048\u00c2\u004e");
-        addTab("PROFILE", "\u0054\u0068\u00f4\u006e\u0067\u0020\u0074\u0069\u006e\u0020\u0063\u00e1\u0020\u006e\u0068\u00e2\u006e", "thongTinCaNhan.png");
-        addTab("ANNOUNCEMENT", "\u0054\u0068\u00f4\u006e\u0067\u0020\u0062\u00e1\u006f", "trangCuaBan.png");
-        addTitle("\u0054\u0052\u0041\u0020\u0043\u1ee8\u0055\u0020\u0054\u0048\u00d4\u004e\u0047\u0020\u0054\u0049\u004e");
-        addTab("REGISTER_COURSES", "\u0110\u0103\u006e\u0067\u0020\u006b\u00fd\u0020\u006d\u00f4\u006e\u0020\u0068\u1ecd\u0063", "chuongTrinhDaoTao.png");
-        addTab("MY_SCHEDULE", "\u0054\u0068\u1eddi\u0020\u006b\u0068\u00f3\u0061\u0020\u0062\u0069\u1ec3\u0075", "lich.png");
-        addTab("MY_GRADES", "\u0058\u0065\u006d\u0020\u0111\u0069\u1ec3\u006d", "xemDiem.png");
-        addTab("ATTENDANCE", "\u0058\u0065\u006d\u0020\u0111\u0069\u1ec3\u006d\u0020\u0063\u0068\u0075\u0079\u00ea\u006e\u0020\u0063\u1ea7\u006e", "lich.png");
-        addTab("CHANGE_PASSWORD", "\u0110\u1ed5\u0069\u0020\u006d\u1ead\u0074\u0020\u006b\u0068\u1ea9\u0075", "thongTinCaNhan.png");
+        addTitle("TRANG CÁ NHÂN");
+        addTab("PROFILE", "Thông tin cá nhân", "thongTinCaNhan.png");
+        addTab("ANNOUNCEMENT", "Thông báo", "trangCuaBan.png");
+        addTitle("TRA CỨU THÔNG TIN");
+        addTab("REGISTER_COURSES", "Đăng ký môn học", "chuongTrinhDaoTao.png");
+        addTab("MY_SCHEDULE", "Thời khóa biểu", "lich.png");
+        addTab("MY_GRADES", "Xem điểm", "xemDiem.png");
+        addTab("ATTENDANCE", "Xem điểm chuyên cần", "lich.png");
+        addTab("CHANGE_PASSWORD", "Đổi mật khẩu", "thongTinCaNhan.png");
     }
 
     private void addTitle(String label) {

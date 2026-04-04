@@ -24,7 +24,7 @@ public class StudentManagementPage extends ManagementShellPage {
 
     private StudentManagementPage(StudentManagementDashboard dashboardPanel) {
         super(
-                "Tim theo ma sinh vien, ho ten, email, lop, khoa",
+                "Tìm theo mã sinh viên, họ tên, email, lớp, khoa",
                 null,
                 null,
                 2,
@@ -34,7 +34,7 @@ public class StudentManagementPage extends ManagementShellPage {
         this.dashboardPanel = dashboardPanel;
         this.searchResultPanel = (StudentSearchResultPanel) getResultComponent();
         this.searchResultPanel.setPageHandler(this::changePage);
-        configureCreateAction("Tao moi", this::openCreateStudentDialog);
+        configureCreateAction("Tạo mới", this::openCreateStudentDialog);
     }
 
     @Override
@@ -69,9 +69,9 @@ public class StudentManagementPage extends ManagementShellPage {
 
     private void openCreateStudentDialog() {
         Window owner = SwingUtilities.getWindowAncestor(this);
-        JDialog dialog = new JDialog(owner, "Tao moi sinh vien", Dialog.ModalityType.APPLICATION_MODAL);
+        JDialog dialog = new JDialog(owner, "Tạo mới sinh viên", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        dialog.setContentPane(new CreateAccountPage("Sinh vien"));
+        dialog.setContentPane(new CreateAccountPage("Sinh viên"));
         dialog.setSize(1100, 760);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);

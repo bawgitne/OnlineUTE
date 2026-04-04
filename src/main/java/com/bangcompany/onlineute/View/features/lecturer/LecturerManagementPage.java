@@ -24,7 +24,7 @@ public class LecturerManagementPage extends ManagementShellPage {
 
     private LecturerManagementPage(LecturerManagementDashboard dashboardPanel) {
         super(
-                "Tim theo ma giang vien, ho ten",
+                "Tìm theo mã giảng viên, họ tên",
                 null,
                 null,
                 2,
@@ -34,7 +34,7 @@ public class LecturerManagementPage extends ManagementShellPage {
         this.dashboardPanel = dashboardPanel;
         this.searchResultPanel = (LecturerSearchResultPanel) getResultComponent();
         this.searchResultPanel.setPageHandler(this::changePage);
-        configureCreateAction("Tao moi", this::openCreateLecturerDialog);
+        configureCreateAction("Tạo mới", this::openCreateLecturerDialog);
     }
 
     @Override
@@ -69,9 +69,9 @@ public class LecturerManagementPage extends ManagementShellPage {
 
     private void openCreateLecturerDialog() {
         Window owner = SwingUtilities.getWindowAncestor(this);
-        JDialog dialog = new JDialog(owner, "Tao moi giang vien", Dialog.ModalityType.APPLICATION_MODAL);
+        JDialog dialog = new JDialog(owner, "Tạo mới giảng viên", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        dialog.setContentPane(new CreateAccountPage("Giang vien"));
+        dialog.setContentPane(new CreateAccountPage("Giảng viên"));
         dialog.setSize(1100, 760);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);

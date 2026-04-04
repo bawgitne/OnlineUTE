@@ -22,8 +22,8 @@ public class AttendancePage extends JPanel implements Refreshable {
 
         String[] cols = new String[18];
         cols[0] = "STT";
-        cols[1] = "Ma mon hoc";
-        cols[2] = "Ten mon hoc";
+        cols[1] = "Mã môn học";
+        cols[2] = "Tên môn học";
         for (int i = 1; i <= 15; i++) {
             cols[i + 2] = "B " + i;
         }
@@ -55,7 +55,7 @@ public class AttendancePage extends JPanel implements Refreshable {
         JScrollPane scrollPane = new JScrollPane(table);
         TableStyles.styleScrollPane(scrollPane);
 
-        PageScaffold scaffold = new PageScaffold("Bang chuyen can");
+        PageScaffold scaffold = new PageScaffold("Bảng chuyên cần");
         scaffold.setBody(scrollPane);
         add(scaffold, BorderLayout.CENTER);
     }
@@ -92,4 +92,3 @@ public class AttendancePage extends JPanel implements Refreshable {
         }
     }
 }
-

@@ -12,7 +12,7 @@ public class SearchActionTopbar extends JPanel {
 
     private final JTextField searchField = new JTextField();
     private final Timer debounceTimer;
-    private final JButton clearButton = new JButton("\u00d7");
+    private final JButton clearButton = new JButton("×");
     private final JPanel actionPanel = new JPanel(new BorderLayout());
     private final int minSearchLength;
 

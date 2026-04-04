@@ -147,7 +147,7 @@ public class CourseSectionDialog extends JDialog {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         actions.setOpaque(false);
 
-        PrimaryButton createSectionButton = new PrimaryButton("\u0054\u1ea1\u006f\u0020\u006c\u1edb\u0070\u0020\u0068\u1ecd\u0063\u0020\u0070\u0068\u1ea7\u006e");
+        PrimaryButton createSectionButton = new PrimaryButton("Tạo lớp học phần");
         createSectionButton.setPreferredSize(new Dimension(180, 40));
         createSectionButton.addActionListener(e -> createCourseSection());
 
