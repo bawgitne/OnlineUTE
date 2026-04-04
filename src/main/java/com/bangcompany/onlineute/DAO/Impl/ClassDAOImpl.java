@@ -69,4 +69,22 @@ public class ClassDAOImpl implements ClassDAO {
             em.close();
         }
     }
+
+    @Override
+    public Class save(Class classEntity) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(classEntity);
+            em.getTransaction().commit();
+            return classEntity;
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw ex;
+        } finally {
+            em.close();
+        }
+    }
 }

@@ -75,6 +75,9 @@ public class CourseSectionDialog extends JDialog {
         splitPane.setBorder(BorderFactory.createEmptyBorder());
         splitPane.setResizeWeight(0.42);
         splitPane.setDividerLocation(360);
+        splitPane.setDividerSize(0);
+        splitPane.setEnabled(false);
+        splitPane.setOneTouchExpandable(false);
         container.add(splitPane, BorderLayout.CENTER);
 
         return container;
@@ -144,15 +147,10 @@ public class CourseSectionDialog extends JDialog {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         actions.setOpaque(false);
 
-        JButton closeButton = new JButton("Đóng");
-        closeButton.setPreferredSize(new Dimension(100, 40));
-        closeButton.addActionListener(e -> dispose());
-
-        PrimaryButton createSectionButton = new PrimaryButton("Tạo lớp học phần");
+        PrimaryButton createSectionButton = new PrimaryButton("\u0054\u1ea1\u006f\u0020\u006c\u1edb\u0070\u0020\u0068\u1ecd\u0063\u0020\u0070\u0068\u1ea7\u006e");
         createSectionButton.setPreferredSize(new Dimension(180, 40));
         createSectionButton.addActionListener(e -> createCourseSection());
 
-        actions.add(closeButton);
         actions.add(createSectionButton);
         panel.add(actions, gbc);
 
@@ -170,7 +168,7 @@ public class CourseSectionDialog extends JDialog {
         panel.add(title, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(sectionTable);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        TableStyles.styleScrollPane(scrollPane);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
@@ -182,7 +180,7 @@ public class CourseSectionDialog extends JDialog {
         sectionTable.setSelectionForeground(new Color(30, 30, 30));
         sectionTable.setGridColor(new Color(230, 235, 240));
         sectionTable.setFillsViewportHeight(true);
-        TableStyles.applyBlueHeader(sectionTable);
+        TableStyles.applyModernTable(sectionTable);
         TableStyles.centerColumns(sectionTable, 0, 1, 4, 5, 6, 7, 8);
     }
 

@@ -8,6 +8,7 @@ import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import com.bangcompany.onlineute.Model.Entity.Mark;
 import com.bangcompany.onlineute.View.Components.PageTitleLabel;
 import com.bangcompany.onlineute.View.Components.PrimaryButton;
+import com.bangcompany.onlineute.View.Components.TableStyles;
 import com.bangcompany.onlineute.View.navigation.Refreshable;
 
 import javax.swing.*;
@@ -134,10 +135,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         }
 
         JTable table = new JTable(model);
-        table.setRowHeight(30);
-        table.getTableHeader().setBackground(new Color(0, 84, 140));
-        table.getTableHeader().setForeground(Color.WHITE);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        TableStyles.applyModernTable(table);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         table.getColumnModel().removeColumn(table.getColumnModel().getColumn(0));
@@ -158,6 +156,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         table.getColumnModel().getColumn(19).setCellRenderer(centerRender);
 
         JScrollPane scrollPane = new JScrollPane(table);
+        TableStyles.styleScrollPane(scrollPane);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

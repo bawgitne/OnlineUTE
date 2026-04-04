@@ -35,7 +35,8 @@ public class AccountDAOImpl implements AccountDAO {
             String normalizedCode = loginCode == null ? "" : loginCode.trim().toLowerCase();
             Account account = em.createQuery(
                             "SELECT a FROM Account a " +
-                                    "WHERE EXISTS (SELECT s.id FROM Student s WHERE s.account.id = a.id AND LOWER(s.code) = :loginCode) " +
+                                    "WHERE LOWER(a.username) = :loginCode " +
+                                    "OR EXISTS (SELECT s.id FROM Student s WHERE s.account.id = a.id AND LOWER(s.code) = :loginCode) " +
                                     "OR EXISTS (SELECT l.id FROM Lecturer l WHERE l.account.id = a.id AND LOWER(l.code) = :loginCode) " +
                                     "OR EXISTS (SELECT ad.id FROM Admin ad WHERE ad.account.id = a.id AND LOWER(ad.code) = :loginCode)",
                             Account.class

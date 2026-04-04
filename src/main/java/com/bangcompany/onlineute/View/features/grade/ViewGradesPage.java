@@ -34,7 +34,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
         };
 
         JTable table = new JTable(tableModel);
-        TableStyles.applyBlueHeader(table);
+        TableStyles.applyModernTable(table);
         TableStyles.centerColumns(table, 0, 1, 3, 4, 5, 6, 7);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(40);
@@ -42,7 +42,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
         table.getColumnModel().getColumn(2).setPreferredWidth(300);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        TableStyles.styleScrollPane(scrollPane);
 
         PageScaffold scaffold = new PageScaffold("Ket qua hoc tap");
         scaffold.setBody(scrollPane);

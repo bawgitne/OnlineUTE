@@ -128,7 +128,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         panel.add(title, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(batchTable);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        TableStyles.styleScrollPane(scrollPane);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
@@ -157,7 +157,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         batchTable.setGridColor(new Color(230, 235, 240));
         batchTable.setFillsViewportHeight(true);
         batchTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        TableStyles.applyBlueHeader(batchTable);
+        TableStyles.applyModernTable(batchTable);
         TableStyles.centerColumns(batchTable, 0, 3, 4, 5);
         batchTable.getSelectionModel().addListSelectionListener(this::onBatchTableSelectionChanged);
         batchTable.addMouseListener(new MouseAdapter() {

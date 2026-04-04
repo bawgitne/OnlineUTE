@@ -10,4 +10,5 @@ public interface ClassService {
     List<Class> getClassesByFaculty(Long facultyId);
     PagedResult<Class> searchClasses(String keyword, PageRequest pageRequest);
     PagedResult<Class> searchClasses(String keyword, int page, int pageSize);
+    Class createClass(Class classEntity);
 }

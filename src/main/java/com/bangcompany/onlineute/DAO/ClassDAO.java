@@ -9,4 +9,5 @@ public interface ClassDAO {
     List<Class> findAll();
     List<Class> findByFacultyId(Long facultyId);
     PagedResult<Class> search(String keyword, PageRequest pageRequest);
+    Class save(Class classEntity);
 }

@@ -16,6 +16,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE account (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('ADMIN','STUDENT','LECTURER') NOT NULL
 ) ENGINE=InnoDB;
@@ -317,9 +318,9 @@ INSERT INTO class (class_name, faculty_id) VALUES
 ('231101A', @faculty_mfg), ('231102A', @faculty_civil), ('231103A', @faculty_chem),
 ('221101A', @faculty_lang), ('221102A', @faculty_print), ('221103A', @faculty_auto);
 -- Admin accounts
-INSERT INTO account (password_hash, role) VALUES
-('admin123', 'ADMIN'),
-('pdt123', 'ADMIN');
+INSERT INTO account (username, password_hash, role) VALUES
+('AD001', 'admin123', 'ADMIN'),
+('AD002', 'pdt123', 'ADMIN');
 
 INSERT INTO admin (code, fullname, account_id) VALUES
 ('AD001', 'Há»‡ thá»‘ng Quáº£n trá»‹', 1),
@@ -330,17 +331,17 @@ INSERT INTO admin (code, fullname, account_id) VALUES
 -- =========================================================
 -- Generates 20 lecturers
 
-INSERT INTO account (password_hash, role) VALUES
-('123456', 'LECTURER'), ('123456', 'LECTURER'),
-('123456', 'LECTURER'), ('123456', 'LECTURER'),
-('123456', 'LECTURER'), ('123456', 'LECTURER'),
-('123456', 'LECTURER'), ('123456', 'LECTURER'),
-('123456', 'LECTURER'), ('123456', 'LECTURER'),
-('123456', 'LECTURER'), ('123456', 'LECTURER'),
-('123456', 'LECTURER'), ('123456', 'LECTURER'),
-('123456', 'LECTURER'), ('123456', 'LECTURER'),
-('123456', 'LECTURER'), ('123456', 'LECTURER'),
-('123456', 'LECTURER'), ('123456', 'LECTURER');
+INSERT INTO account (username, password_hash, role) VALUES
+('GV001', '123456', 'LECTURER'), ('GV002', '123456', 'LECTURER'),
+('GV003', '123456', 'LECTURER'), ('GV004', '123456', 'LECTURER'),
+('GV005', '123456', 'LECTURER'), ('GV006', '123456', 'LECTURER'),
+('GV007', '123456', 'LECTURER'), ('GV008', '123456', 'LECTURER'),
+('GV009', '123456', 'LECTURER'), ('GV010', '123456', 'LECTURER'),
+('GV011', '123456', 'LECTURER'), ('GV012', '123456', 'LECTURER'),
+('GV013', '123456', 'LECTURER'), ('GV014', '123456', 'LECTURER'),
+('GV015', '123456', 'LECTURER'), ('GV016', '123456', 'LECTURER'),
+('GV017', '123456', 'LECTURER'), ('GV018', '123456', 'LECTURER'),
+('GV019', '123456', 'LECTURER'), ('GV020', '123456', 'LECTURER');
 
 INSERT INTO lecturer (code, fullname, account_id) VALUES
 ('GV001', 'Nguyá»…n Minh Äáº¡o', 3), ('GV002', 'VÃµ LÃª PhÃºc Háº­u', 4),
@@ -394,9 +395,9 @@ INSERT INTO course (course_code, fullname, credit) VALUES
 -- 5) GENERATE STUDENTS (200 Students via CTE)
 -- =========================================================
 -- Account IDs 23 -> 222
-INSERT INTO account (password_hash, role)
+INSERT INTO account (username, password_hash, role)
 WITH RECURSIVE seq AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM seq WHERE n < 200)
-SELECT '123456', 'STUDENT' FROM seq;
+SELECT CONCAT('24110', LPAD(n, 3, '0')), '123456', 'STUDENT' FROM seq;
 
 INSERT INTO student (code, fullname, birth_of_date, email, avatar_url, class_id, enrollment_year, account_id)
 WITH RECURSIVE seq AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM seq WHERE n < 200)

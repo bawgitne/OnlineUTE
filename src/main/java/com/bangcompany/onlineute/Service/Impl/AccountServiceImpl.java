@@ -29,18 +29,21 @@ public class AccountServiceImpl implements AccountService {
         byte[] salt = PasswordUtil.generateSalt();
         account.setSalt(salt);
         account.setPasswordHash(PasswordUtil.hashPassword(account.getPasswordHash(),salt));
+        account.setUsername(student.getCode());
         student.setAccount(account);
         return studentDAO.save(student).getAccount();
     }
 
     @Override
     public Account createLecturerAccount(Account account, Lecturer lecturer) {
+        account.setUsername(lecturer.getCode());
         lecturer.setAccount(account);
         return lecturerDAO.save(lecturer).getAccount();
     }
 
     @Override
     public Account createAdminAccount(Account account, Admin admin) {
+        account.setUsername(admin.getCode());
         admin.setAccount(account);
         return adminDAO.save(admin).getAccount();
     }

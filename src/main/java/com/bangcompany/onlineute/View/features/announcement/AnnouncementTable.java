@@ -26,11 +26,10 @@ public class AnnouncementTable extends JPanel {
         loadAnnouncements();
 
         JTable table = new JTable(model);
-        TableStyles.applyBlueHeader(table);
-        table.setRowHeight(40);
+        TableStyles.applyModernTable(table);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
+        TableStyles.styleScrollPane(scrollPane);
         add(scrollPane, BorderLayout.CENTER);
     }
 

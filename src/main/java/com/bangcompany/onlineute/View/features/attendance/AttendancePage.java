@@ -41,7 +41,7 @@ public class AttendancePage extends JPanel implements Refreshable {
         };
 
         JTable table = new JTable(tableModel);
-        TableStyles.applyBlueHeader(table);
+        TableStyles.applyModernTable(table);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         TableStyles.centerColumns(table, 0, 1);
 
@@ -53,7 +53,7 @@ public class AttendancePage extends JPanel implements Refreshable {
         }
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        TableStyles.styleScrollPane(scrollPane);
 
         PageScaffold scaffold = new PageScaffold("Bang chuyen can");
         scaffold.setBody(scrollPane);

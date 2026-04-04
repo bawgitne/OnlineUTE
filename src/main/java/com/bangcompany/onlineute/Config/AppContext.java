@@ -54,6 +54,8 @@ public final class AppContext {
     public static MarkController markController;
     public static NotificationController notificationController;
     public static ClassController classController;
+    public static FacultyController facultyController;
+    public static MajorController majorController;
     public static UserProfileController userProfileController;
     public static RegistrationBatchController registrationBatchController;
 
@@ -108,6 +110,8 @@ public final class AppContext {
         markController = new MarkController(markService);
         notificationController = new NotificationController(announcementService, courseSectionService);
         classController = new ClassController(classService);
+        facultyController = new FacultyController(facultyService);
+        majorController = new MajorController(majorService);
         userProfileController = new UserProfileController(userProfileService);
         registrationBatchController = new RegistrationBatchController(registrationBatchService);
 
@@ -133,6 +137,9 @@ public final class AppContext {
     public static AccountController getAccountController() { return accountController; }
     public static ClassService getClassService() { return classService; }
     public static ClassController getClassController() { return classController; }
+    public static FacultyController getFacultyController() { return facultyController; }
+    public static MajorController getMajorController() { return majorController; }
+    public static CourseController getCourseController() { return courseController; }
     public static FacultyService getFacultyService() { return facultyService; }
     public static MajorService getMajorService() { return majorService; }
     public static UserProfileController getUserProfileController() { return userProfileController; }

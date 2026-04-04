@@ -107,7 +107,7 @@ public class CourseRegistrationPage extends JPanel implements Refreshable {
         panel.add(batchInfoLabel, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(sectionTable);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        TableStyles.styleScrollPane(scrollPane);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -152,7 +152,7 @@ public class CourseRegistrationPage extends JPanel implements Refreshable {
         sectionTable.setSelectionForeground(new Color(30, 30, 30));
         sectionTable.setGridColor(new Color(230, 235, 240));
         sectionTable.setFillsViewportHeight(true);
-        TableStyles.applyBlueHeader(sectionTable);
+        TableStyles.applyModernTable(sectionTable);
         TableStyles.centerColumns(sectionTable, 0, 1, 4, 5, 6, 7, 8);
     }
 

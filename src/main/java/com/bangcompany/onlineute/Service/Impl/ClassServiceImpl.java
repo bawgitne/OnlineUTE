@@ -40,4 +40,12 @@ public class ClassServiceImpl implements ClassService {
     public PagedResult<Class> searchClasses(String keyword, int page, int pageSize) {
         return searchClasses(keyword, PaginationSupport.normalize(page, pageSize));
     }
+
+    @Override
+    public Class createClass(Class classEntity) {
+        if (classEntity == null) {
+            throw new IllegalArgumentException("Class is required.");
+        }
+        return classDAO.save(classEntity);
+    }
 }
