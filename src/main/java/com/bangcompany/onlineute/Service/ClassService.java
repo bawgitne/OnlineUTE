@@ -7,8 +7,10 @@ import java.util.List;
 
 public interface ClassService {
     List<Class> getAllClasses();
-    List<Class> getClassesByFaculty(Long facultyId);
+    List<Class> getClassesByMajor(Long majorId);
     PagedResult<Class> searchClasses(String keyword, PageRequest pageRequest);
     PagedResult<Class> searchClasses(String keyword, int page, int pageSize);
     Class createClass(Class classEntity);
+    Class updateClass(Class classEntity);
+    void deleteClass(Long id);
 }

@@ -19,4 +19,12 @@ public class FacultyController {
     public Faculty createFaculty(Faculty faculty) {
         return facultyService.createFaculty(faculty);
     }
+
+    public Faculty updateFaculty(Faculty faculty) {
+        return facultyService.updateFaculty(faculty);
+    }
+
+    public void deleteFaculty(Long id) {
+        facultyService.deleteFaculty(id);
+    }
 }

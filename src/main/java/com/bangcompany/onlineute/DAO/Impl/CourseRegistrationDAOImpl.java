@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -15,8 +16,10 @@ public class CourseRegistrationDAOImpl implements CourseRegistrationDAO {
         try {
             em.getTransaction().begin();
             if (registration.getId() == null) {
+                // Thêm mới đăng ký
                 em.persist(registration);
             } else {
+                // Cập nhật thông tin đăng ký
                 registration = em.merge(registration);
             }
             em.getTransaction().commit();
@@ -39,6 +42,7 @@ public class CourseRegistrationDAOImpl implements CourseRegistrationDAO {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             em.getTransaction().begin();
+            // Cần merge vào persistence context trước khi xóa
             registration = em.merge(registration);
             em.remove(registration);
             em.getTransaction().commit();
@@ -64,6 +68,7 @@ public class CourseRegistrationDAOImpl implements CourseRegistrationDAO {
     public List<CourseRegistration> findByStudentId(Long studentId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Danh sách các học phần mà sinh viên đăng ký, kèm kết quả điểm nếu có
             return em.createQuery("SELECT cr FROM CourseRegistration cr JOIN FETCH cr.courseSection cs JOIN FETCH cs.course LEFT JOIN FETCH cr.mark WHERE cr.student.id = :studentId", CourseRegistration.class)
                     .setParameter("studentId", studentId)
                     .getResultList();
@@ -76,6 +81,7 @@ public class CourseRegistrationDAOImpl implements CourseRegistrationDAO {
     public List<CourseRegistration> findByCourseSectionId(Long sectionId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Danh sách các sinh viên đăng ký vào một lớp học phần cụ thể
             return em.createQuery("SELECT cr FROM CourseRegistration cr JOIN FETCH cr.student LEFT JOIN FETCH cr.mark WHERE cr.courseSection.id = :sectionId", CourseRegistration.class)
                     .setParameter("sectionId", sectionId)
                     .getResultList();
@@ -88,6 +94,7 @@ public class CourseRegistrationDAOImpl implements CourseRegistrationDAO {
     public boolean isRegistered(Long studentId, Long sectionId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Kiểm tra xem sinh viên đã đăng ký học phần này chưa
             Long count = em.createQuery(
                 "SELECT COUNT(cr) FROM CourseRegistration cr WHERE cr.student.id = :studentId AND cr.courseSection.id = :sectionId", Long.class)
                 .setParameter("studentId", studentId)

@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -26,22 +27,25 @@ public class AnnouncementDAOImpl implements AnnouncementDAO {
             em.close();
         }
     }
-
+    // tìm ra tất cả thông báo cho role admin
     @Override
     public List<Announcement> findAll() {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Lấy tất cả thông báo sắp xếp theo thời gian tạo mới nhất
             return em.createQuery("SELECT a FROM Announcement a ORDER BY a.createdAt DESC", Announcement.class).getResultList();
         } finally {
             em.close();
         }
     }
 
+    // tìm kiếm thông báo 
     @Override
     public PagedResult<Announcement> search(String keyword, PageRequest pageRequest) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             String normalizedKeyword = "%" + keyword.toLowerCase() + "%";
+            // Tìm kiếm thông báo theo tiêu đề, nội dung, người gửi hoặc loại đối tượng nhận
             List<Announcement> items = em.createQuery(
                             "SELECT a FROM Announcement a " +
                                     "WHERE LOWER(a.title) LIKE :keyword " +
@@ -56,6 +60,7 @@ public class AnnouncementDAOImpl implements AnnouncementDAO {
                     .setMaxResults(pageRequest.getPageSize())
                     .getResultList();
 
+            // Đếm tổng số lượng kết quả tìm được
             Long totalItems = em.createQuery(
                             "SELECT COUNT(a) FROM Announcement a " +
                                     "WHERE LOWER(a.title) LIKE :keyword " +
@@ -93,6 +98,7 @@ public class AnnouncementDAOImpl implements AnnouncementDAO {
 
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // thông báo cho sinh viên gồm admin và giảng viên
             return em.createQuery("""
                     SELECT a
                     FROM Announcement a

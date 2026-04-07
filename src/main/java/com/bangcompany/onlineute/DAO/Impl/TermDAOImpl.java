@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -13,6 +14,7 @@ public class TermDAOImpl implements TermDAO {
     public List<Term> findAll() {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Lấy toàn bộ danh sách các học kỳ
             return em.createQuery("SELECT t FROM Term t", Term.class).getResultList();
         } finally {
             em.close();
@@ -33,6 +35,7 @@ public class TermDAOImpl implements TermDAO {
     public Optional<Term> findCurrentTerm() {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tìm học kỳ đang được thiết lập là học kỳ hiện tại
             return em.createQuery("SELECT t FROM Term t WHERE t.isCurrent = true", Term.class)
                     .getResultStream()
                     .findFirst();
@@ -47,8 +50,10 @@ public class TermDAOImpl implements TermDAO {
         try {
             em.getTransaction().begin();
             if (term.getId() == null) {
+                // Thêm mới học kỳ
                 em.persist(term);
             } else {
+                // Cập nhật thông tin học kỳ
                 term = em.merge(term);
             }
             em.getTransaction().commit();
@@ -63,7 +68,7 @@ public class TermDAOImpl implements TermDAO {
 
     @Override
     public Term update(Term term) {
-        return save(term); // save/merge is used for updates in Hibernate/JPA if logic is same
+        return save(term); 
     }
 
     @Override
@@ -71,7 +76,8 @@ public class TermDAOImpl implements TermDAO {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             em.getTransaction().begin();
-            term = em.merge(term); // Ensure it's attached
+            // Đảm bảo đối tượng được đính kèm vào persistence context trước khi xóa
+            term = em.merge(term); 
             em.remove(term);
             em.getTransaction().commit();
         } catch (Exception e) {

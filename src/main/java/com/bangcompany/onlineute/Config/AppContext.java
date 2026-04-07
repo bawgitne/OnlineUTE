@@ -82,7 +82,7 @@ public final class AppContext {
         userProfileDAO = new UserProfileDAOImpl();
         registrationBatchDAO = new RegistrationBatchDAOImpl();
         // 2. Services
-        accountService = new AccountServiceImpl(studentDAO, lecturerDAO, adminDAO);
+        accountService = new AccountServiceImpl(accountDAO, studentDAO, lecturerDAO, adminDAO);
         authService = new AuthServiceImpl(accountDAO, studentDAO, lecturerDAO, adminDAO);
         studentService = new StudentServiceImpl(studentDAO);
         lecturerService = new LecturerServiceImpl(lecturerDAO);

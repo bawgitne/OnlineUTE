@@ -20,6 +20,18 @@ public class LecturerController {
         return lecturerService.searchLecturers(keyword, page, pageSize);
     }
 
+    public java.util.List<Lecturer> getAllLecturers() {
+        return lecturerService.getAllLecturers();
+    }
+
+    public Lecturer updateLecturer(Lecturer lecturer) {
+        return lecturerService.updateLecturer(lecturer);
+    }
+
+    public void deleteLecturer(Long id) {
+        lecturerService.deleteLecturer(id);
+    }
+
     public long countAllLecturers() {
         return lecturerService.countAllLecturers();
     }

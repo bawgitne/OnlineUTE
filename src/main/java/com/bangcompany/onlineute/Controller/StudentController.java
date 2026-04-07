@@ -19,6 +19,14 @@ public class StudentController {
         studentService.createStudent(student, account);
     }
 
+    public Student updateStudent(Student student) {
+        return studentService.updateStudent(student);
+    }
+
+    public void deleteStudent(Long id) {
+        studentService.deleteStudent(id);
+    }
+
     public List<Student> getAllStudents() {
         return studentService.getAllStudents();
     }

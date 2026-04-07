@@ -18,8 +18,8 @@ public class ClassController {
         return classService.getAllClasses();
     }
 
-    public List<Class> getClassesByFaculty(Long facultyId) {
-        return classService.getClassesByFaculty(facultyId);
+    public List<Class> getClassesByMajor(Long majorId) {
+        return classService.getClassesByMajor(majorId);
     }
 
     public PagedResult<Class> searchClasses(String keyword, PageRequest pageRequest) {
@@ -32,5 +32,13 @@ public class ClassController {
 
     public Class createClass(Class classEntity) {
         return classService.createClass(classEntity);
+    }
+
+    public Class updateClass(Class classEntity) {
+        return classService.updateClass(classEntity);
+    }
+
+    public void deleteClass(Long id) {
+        classService.deleteClass(id);
     }
 }

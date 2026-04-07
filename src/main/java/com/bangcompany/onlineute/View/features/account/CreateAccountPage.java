@@ -9,19 +9,21 @@ import com.bangcompany.onlineute.Model.Entity.Major;
 import com.bangcompany.onlineute.Model.Entity.Student;
 import com.bangcompany.onlineute.Model.Entity.UserProfile;
 import com.bangcompany.onlineute.Model.EnumType.Role;
-import com.bangcompany.onlineute.View.Components.InputGroup;
-import com.bangcompany.onlineute.View.Components.PrimaryButton;
-import com.bangcompany.onlineute.View.Components.RoundedOutlineBorder;
-import com.bangcompany.onlineute.View.Components.SelectGroup;
-import com.bangcompany.onlineute.View.Components.TextAreaGroup;
-import com.bangcompany.onlineute.View.navigation.Refreshable;
+import com.bangcompany.onlineute.View.Components.ui.Card;
+import com.bangcompany.onlineute.View.Components.ui.FormRow;
+import com.bangcompany.onlineute.View.Components.ui.TextInput;
+import com.bangcompany.onlineute.View.Components.ui.Button;
+import com.bangcompany.onlineute.View.Components.ui.SelectInput;
+import com.bangcompany.onlineute.View.Components.theme.SwingUtils;
+import com.bangcompany.onlineute.View.Components.ui.TextAreaInput;
+import com.bangcompany.onlineute.View.shared.Refreshable;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
@@ -33,28 +35,27 @@ import java.util.Map;
 import java.util.Objects;
 
 public class CreateAccountPage extends JPanel implements Refreshable {
-    private InputGroup codeInput;
-    private InputGroup nameInput;
-    private InputGroup emailInput;
-    private InputGroup phoneInput;
-    private InputGroup dobInput;
-    private SelectGroup<String> genderSelect;
-    private InputGroup placeOfBirthInput;
-    private InputGroup nationalityInput;
-    private SelectGroup<Faculty> facultySelect;
-    private SelectGroup<Major> majorSelect;
-    private SelectGroup<Class> classSelect;
-    private InputGroup enrollmentYearInput;
-    private InputGroup expectedGraduationYearInput;
-    private InputGroup studentCodePreviewInput;
-    private InputGroup citizenIdInput;
-    private InputGroup citizenIssuePlaceInput;
-    private InputGroup citizenIssueDateInput;
-    private TextAreaGroup currentAddressInput;
-    private TextAreaGroup permanentAddressInput;
-    private InputGroup contactNameInput;
-    private InputGroup contactPhoneInput;
-    private TextAreaGroup bulkDataInput;
+    private TextInput codeInput;
+    private TextInput nameInput;
+    private TextInput emailInput;
+    private TextInput phoneInput;
+    private TextInput dobInput;
+    private SelectInput<String> genderSelect;
+    private TextInput placeOfBirthInput;
+    private TextInput nationalityInput;
+    private SelectInput<Faculty> facultySelect;
+    private SelectInput<Major> majorSelect;
+    private TextInput enrollmentYearInput;
+    private TextInput expectedGraduationYearInput;
+    private TextInput studentCodePreviewInput;
+    private TextInput citizenIdInput;
+    private TextInput citizenIssuePlaceInput;
+    private TextInput citizenIssueDateInput;
+    private TextAreaInput currentAddressInput;
+    private TextAreaInput permanentAddressInput;
+    private TextInput contactNameInput;
+    private TextInput contactPhoneInput;
+    private TextAreaInput bulkDataInput;
 
     private final String initialRole;
     private final boolean studentMode;
@@ -65,7 +66,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
 
     public CreateAccountPage(String initialRole) {
         this.initialRole = initialRole == null || initialRole.isBlank() ? "Sinh viên" : initialRole;
-        this.studentMode = "Sinh viên".equalsIgnoreCase(this.initialRole);
+        this.studentMode = isStudentRole(this.initialRole);
 
         setLayout(new BorderLayout(0, 20));
         setBackground(new Color(248, 249, 250));
@@ -79,65 +80,67 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         content.setOpaque(false);
         content.setBorder(new EmptyBorder(0, 0, 8, 0));
 
-        codeInput = new InputGroup("Mã định danh *", false);
+        codeInput = new TextInput("Mã định danh *", false);
         codeInput.setEditable(true);
 
-        nameInput = new InputGroup("Họ và tên *", false);
-        emailInput = new InputGroup("Email *", false);
-        phoneInput = new InputGroup("Số điện thoại", false);
-        dobInput = new InputGroup("Ngày sinh * (YYYY-MM-DD)", false);
-        genderSelect = new SelectGroup<>("Giới tính", List.of("Nam", "Nữ", "Khác"));
-        placeOfBirthInput = new InputGroup("Nơi sinh", false);
-        nationalityInput = new InputGroup("Quốc tịch", false);
-        facultySelect = new SelectGroup<>("Khoa *", AppContext.getFacultyService().getAllFaculties());
-        majorSelect = new SelectGroup<>("Ngành *", List.of());
-        classSelect = new SelectGroup<>("Lớp *", List.of());
-        enrollmentYearInput = new InputGroup("Năm nhập học *", false);
-        expectedGraduationYearInput = new InputGroup("Năm tốt nghiệp dự kiến", false);
-        studentCodePreviewInput = new InputGroup("MSSV tự động", false);
+        nameInput = new TextInput("Họ và tên *", false);
+        emailInput = new TextInput("Email *", false);
+        phoneInput = new TextInput("Số điện thoại", false);
+        dobInput = new TextInput("Ngày sinh * (YYYY-MM-DD)", false);
+        genderSelect = new SelectInput<>("Giới tính", List.of("Nam", "Nữ", "Khác"));
+        placeOfBirthInput = new TextInput("Nơi sinh", false);
+        nationalityInput = new TextInput("Quốc tịch", false);
+        facultySelect = new SelectInput<>("Khoa *", AppContext.getFacultyService().getAllFaculties());
+        majorSelect = new SelectInput<>("Ngành *", List.of());
+        enrollmentYearInput = new TextInput("Năm nhập học *", false);
+        expectedGraduationYearInput = new TextInput("Năm tốt nghiệp dự kiến", false);
+        studentCodePreviewInput = new TextInput("MSSV tự động", false);
         studentCodePreviewInput.setEditable(false);
 
-        citizenIdInput = new InputGroup("CCCD/CMND", false);
-        citizenIssuePlaceInput = new InputGroup("Nơi cấp", false);
-        citizenIssueDateInput = new InputGroup("Ngày cấp (YYYY-MM-DD)", false);
-        currentAddressInput = new TextAreaGroup("Địa chỉ hiện tại", 96);
-        permanentAddressInput = new TextAreaGroup("Địa chỉ thường trú", 96);
-        contactNameInput = new InputGroup("Người liên hệ", false);
-        contactPhoneInput = new InputGroup("SĐT liên hệ", false);
+        citizenIdInput = new TextInput("CCCD/CMND", false);
+        citizenIssuePlaceInput = new TextInput("Nơi cấp", false);
+        citizenIssueDateInput = new TextInput("Ngày cấp (YYYY-MM-DD)", false);
+        currentAddressInput = new TextAreaInput("Địa chỉ hiện tại", 96);
+        permanentAddressInput = new TextAreaInput("Địa chỉ thường trú", 96);
+        contactNameInput = new TextInput("Người liên hệ", false);
+        contactPhoneInput = new TextInput("SĐT liên hệ", false);
 
         facultySelect.getComboBox().addActionListener(e -> {
             refreshAcademicOptions();
             refreshGeneratedStudentCode();
         });
-        majorSelect.getComboBox().addActionListener(e -> refreshGeneratedStudentCode());
-        enrollmentYearInput.getTextField().getDocument().addDocumentListener(new SimpleDocumentListener(this::refreshGeneratedStudentCode));
+        majorSelect.getComboBox().addActionListener(e -> {
+            refreshAcademicOptions();
+            refreshGeneratedStudentCode();
+        });
+        enrollmentYearInput.getTextField().getDocument()
+                .addDocumentListener(new SimpleDocumentListener(this::refreshGeneratedStudentCode));
 
-        //content.add(createHeroPanel());
         content.add(Box.createVerticalStrut(18));
         content.add(createSectionPanel(
-                studentMode ? createSingleRow(nameInput) : createTwoColumnRow(codeInput, nameInput),
-                createTwoColumnRow(emailInput, phoneInput),
-                createThreeColumnRow(dobInput, genderSelect, nationalityInput)
+                studentMode ? FormRow.single(nameInput) : FormRow.two(codeInput, nameInput),
+                FormRow.two(emailInput, phoneInput),
+                FormRow.three(dobInput, genderSelect, nationalityInput)
         ));
         content.add(Box.createVerticalStrut(16));
 
         if (studentMode) {
             content.add(createSectionPanel(
-                    createThreeColumnRow(facultySelect, majorSelect, classSelect),
-                    createThreeColumnRow(enrollmentYearInput, expectedGraduationYearInput, studentCodePreviewInput)
+                    FormRow.three(enrollmentYearInput, facultySelect, majorSelect),
+                    FormRow.two(expectedGraduationYearInput, studentCodePreviewInput)
             ));
             content.add(Box.createVerticalStrut(16));
         }
 
         content.add(createSectionPanel(
-                createThreeColumnRow(citizenIdInput, citizenIssuePlaceInput, citizenIssueDateInput),
-                createTwoColumnRow(contactNameInput, contactPhoneInput)
+                FormRow.three(citizenIdInput, citizenIssuePlaceInput, citizenIssueDateInput),
+                FormRow.two(contactNameInput, contactPhoneInput)
         ));
         content.add(Box.createVerticalStrut(16));
 
         content.add(createSectionPanel(
-                createSingleRow(permanentAddressInput),
-                createSingleRow(currentAddressInput)
+                FormRow.single(permanentAddressInput),
+                FormRow.single(currentAddressInput)
         ));
         content.add(Box.createVerticalStrut(18));
         content.add(createActionBar());
@@ -149,9 +152,8 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             nationalityInput.setValue("Việt Nam");
         }
         refreshGeneratedStudentCode();
-        return createHiddenScrollPane(content);
+        return SwingUtils.hiddenScrollPane(content);
     }
-
 
     private JPanel createActionBar() {
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -161,39 +163,24 @@ public class CreateAccountPage extends JPanel implements Refreshable {
 
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         bar.setBackground(Color.WHITE);
-        bar.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedOutlineBorder(new Color(221, 227, 235), 24, new Insets(14, 18, 14, 18)),
-                new EmptyBorder(14, 18, 14, 18)
+        bar.setBorder(com.bangcompany.onlineute.View.Components.theme.RoundedBorders.paddedOutline(
+                com.bangcompany.onlineute.View.Components.theme.AppTheme.RADIUS_PANEL,
+                new Insets(14, 18, 14, 18)
         ));
         bar.setOpaque(true);
 
         if (studentMode) {
-            JButton rawDataButton = new JButton("Nhập dữ liệu thô");
-            styleGhostButton(rawDataButton);
+            Button rawDataButton = new Button("Nhập dữ liệu thô", new Color(245, 247, 250), new Color(60, 80, 110));
             rawDataButton.addActionListener(e -> openBulkInputDialog());
             bar.add(rawDataButton);
         }
 
-        PrimaryButton createButton = new PrimaryButton(studentMode ? "Lưu sinh viên" : "Lưu giảng viên");
+        Button createButton = new Button(studentMode ? "Lưu sinh viên" : "Lưu giảng viên");
         createButton.setPreferredSize(new Dimension(170, 42));
         createButton.addActionListener(e -> createSingleAccount());
         bar.add(createButton);
         wrapper.add(bar, BorderLayout.CENTER);
         return wrapper;
-    }
-
-    private void styleGhostButton(JButton button) {
-        button.setOpaque(true);
-        button.setBackground(Color.WHITE);
-        button.setForeground(new Color(0, 91, 191));
-        button.setFocusPainted(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        button.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedOutlineBorder(new Color(198, 210, 227), 18, new Insets(10, 16, 10, 16)),
-                new EmptyBorder(10, 16, 10, 16)
-        ));
-        button.setContentAreaFilled(false);
     }
 
     private JPanel createBulkPanel() {
@@ -208,7 +195,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 0, 20, 0);
 
-        JLabel helpLabel = new JLabel("<html>Mỗi dòng 7 cột, cách nhau bởi dấu |<br>Họ tên|Email|Ngày sinh (YYYY-MM-DD)|Mã khoa|Mã ngành|Lớp|Năm nhập học<br>Hệ thống sắp xếp theo tên trước khi sinh 3 số cuối.</html>");
+        JLabel helpLabel = new JLabel("<html>Mỗi dòng 6 cột, cách nhau bởi dấu |<br>Họ tên|Email|Ngày sinh (YYYY-MM-DD)|Mã khoa|Mã ngành|Năm nhập học<br>Hệ thống sắp xếp theo tên trước khi sinh 3 số cuối.</html>");
         helpLabel.setFont(new Font("Segoe UI", Font.ITALIC, 13));
         helpLabel.setForeground(new Color(110, 110, 110));
         panel.add(helpLabel, gbc);
@@ -216,7 +203,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.gridy++;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        bulkDataInput = new TextAreaGroup("Dữ liệu bulk", 350);
+        bulkDataInput = new TextAreaInput("Dữ liệu bulk", 350);
         panel.add(bulkDataInput, gbc);
 
         gbc.gridy++;
@@ -225,7 +212,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(20, 0, 0, 0);
 
-        PrimaryButton btnCreateBulk = new PrimaryButton("Lưu hàng loạt");
+        Button btnCreateBulk = new Button("Lưu hàng loạt");
         btnCreateBulk.setPreferredSize(new Dimension(180, 45));
         btnCreateBulk.addActionListener(e -> createBulkStudents());
         panel.add(btnCreateBulk, gbc);
@@ -235,49 +222,10 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     private void openBulkInputDialog() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Nhập dữ liệu thô", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        dialog.setContentPane(createHiddenScrollPane(createBulkPanel()));
+        dialog.setContentPane(SwingUtils.hiddenScrollPane(createBulkPanel()));
         dialog.setSize(760, 560);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
-    }
-
-    private JScrollPane createHiddenScrollPane(JComponent content) {
-        JScrollPane scrollPane = new JScrollPane(content);
-        scrollPane.setBorder(null);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setWheelScrollingEnabled(true);
-        scrollPane.getViewport().setBackground(Color.WHITE);
-        JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
-        verticalBar.setUnitIncrement(18);
-        verticalBar.setPreferredSize(new Dimension(0, 0));
-        verticalBar.setOpaque(false);
-        verticalBar.setUI(new BasicScrollBarUI() {
-            @Override
-            protected void configureScrollBarColors() {
-            }
-
-            @Override
-            protected JButton createDecreaseButton(int orientation) {
-                return createZeroButton();
-            }
-
-            @Override
-            protected JButton createIncreaseButton(int orientation) {
-                return createZeroButton();
-            }
-
-            private JButton createZeroButton() {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(0, 0));
-                button.setMinimumSize(new Dimension(0, 0));
-                button.setMaximumSize(new Dimension(0, 0));
-                return button;
-            }
-        });
-        return scrollPane;
     }
 
     private void createSingleAccount() {
@@ -300,6 +248,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             JOptionPane.showMessageDialog(this, "Lỗi tạo tài khoản: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
+
     private void createStudentAccount(String fullName) {
         String email = emailInput.getValue().trim();
         String dobText = dobInput.getValue().trim();
@@ -311,17 +260,15 @@ public class CreateAccountPage extends JPanel implements Refreshable {
 
         Faculty selectedFaculty = facultySelect.getSelectedValue();
         Major selectedMajor = majorSelect.getSelectedValue();
-        Class selectedClass = classSelect.getSelectedValue();
-        if (selectedFaculty == null || selectedMajor == null || selectedClass == null) {
-            throw new IllegalArgumentException("Sinh viên cần chọn khoa, ngành và lớp.");
+        if (selectedFaculty == null || selectedMajor == null) {
+            throw new IllegalArgumentException("Sinh viên cần chọn khoa và ngành.");
         }
 
-        if (selectedClass.getFaculty() == null || !Objects.equals(selectedClass.getFaculty().getId(), selectedFaculty.getId())) {
-            throw new IllegalArgumentException("Lớp phải thuộc đúng khoa đã chọn.");
-        }
         if (selectedMajor.getFaculty() == null || !Objects.equals(selectedMajor.getFaculty().getId(), selectedFaculty.getId())) {
             throw new IllegalArgumentException("Ngành phải thuộc đúng khoa đã chọn.");
         }
+
+        Class selectedClass = resolveClassByMajorAndYear(selectedFaculty, selectedMajor, enrollmentYearText);
 
         String code = autoPreviewStudentCode();
         if (code.isBlank()) {
@@ -448,8 +395,8 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             }
 
             String[] parts = line.split("\\|");
-            if (parts.length != 7) {
-                throw new IllegalArgumentException("Dòng " + (i + 1) + " phải có 7 cột: Họ tên|Email|Ngày sinh|Mã khoa|Mã ngành|Lớp|Năm nhập học");
+            if (parts.length != 6) {
+                throw new IllegalArgumentException("Dòng " + (i + 1) + " phải có 6 cột: Họ tên|Email|Ngày sinh|Mã khoa|Mã ngành|Năm nhập học");
             }
 
             String fullName = parts[0].trim();
@@ -457,8 +404,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             LocalDate birthDate = LocalDate.parse(parts[2].trim());
             String facultyCode = parts[3].trim().toUpperCase(Locale.ROOT);
             String majorCode = parts[4].trim();
-            String className = parts[5].trim();
-            int enrollmentYear = Integer.parseInt(parts[6].trim());
+            int enrollmentYear = Integer.parseInt(parts[5].trim());
 
             Faculty faculty = facultyByCode.get(facultyCode);
             if (faculty == null) {
@@ -470,16 +416,14 @@ public class CreateAccountPage extends JPanel implements Refreshable {
                 throw new IllegalArgumentException("Không tìm thấy ngành " + majorCode + " trong khoa " + facultyCode + " ở dòng " + (i + 1));
             }
 
-            Class classEntity = findClassByFacultyAndName(faculty.getId(), className);
-            if (classEntity == null) {
-                throw new IllegalArgumentException("Không tìm thấy lớp " + className + " trong khoa " + facultyCode + " ở dòng " + (i + 1));
-            }
+            Class classEntity = resolveClassByMajorAndYear(faculty, major, String.valueOf(enrollmentYear));
 
             rows.add(new BulkStudentRow(fullName, email, birthDate, faculty, major, classEntity, enrollmentYear));
         }
 
         return rows;
     }
+
     private Major findMajorByFacultyAndCode(Long facultyId, String majorCode) {
         return AppContext.getMajorService().getMajorsByFaculty(facultyId).stream()
                 .filter(major -> major.getMajorCode().equalsIgnoreCase(majorCode))
@@ -487,11 +431,28 @@ public class CreateAccountPage extends JPanel implements Refreshable {
                 .orElse(null);
     }
 
-    private Class findClassByFacultyAndName(Long facultyId, String className) {
-        return AppContext.getClassService().getClassesByFaculty(facultyId).stream()
-                .filter(classEntity -> classEntity.getClassName().equalsIgnoreCase(className))
-                .findFirst()
-                .orElse(null);
+    private Class resolveClassByMajorAndYear(Faculty faculty, Major major, String enrollmentYearText) {
+        if (faculty == null || major == null || enrollmentYearText == null || enrollmentYearText.isBlank()) {
+            throw new IllegalArgumentException("Cần chọn năm nhập học, khoa và ngành.");
+        }
+        String yearPrefix = enrollmentYearText.trim();
+        if (yearPrefix.length() >= 2) {
+            yearPrefix = yearPrefix.substring(yearPrefix.length() - 2);
+        }
+        String majorCode = major.getMajorCode() == null ? "" : major.getMajorCode().trim();
+        String yearPart = yearPrefix;
+        List<Class> classes = AppContext.getClassService().getClassesByMajor(major.getId());
+        for (Class classEntity : classes) {
+            String name = classEntity.getClassName() == null ? "" : classEntity.getClassName();
+            if (!majorCode.isEmpty() && !name.contains(majorCode)) {
+                continue;
+            }
+            if (!yearPart.isEmpty() && !name.startsWith(yearPart)) {
+                continue;
+            }
+            return classEntity;
+        }
+        throw new IllegalArgumentException("Không tìm thấy lớp phù hợp theo ngành và năm nhập học.");
     }
 
     private void refreshAcademicOptions() {
@@ -502,9 +463,6 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         Faculty selectedFaculty = facultySelect.getSelectedValue();
         if (majorSelect != null) {
             majorSelect.setItems(selectedFaculty == null ? List.of() : AppContext.getMajorService().getMajorsByFaculty(selectedFaculty.getId()));
-        }
-        if (classSelect != null) {
-            classSelect.setItems(selectedFaculty == null ? List.of() : AppContext.getClassService().getClassesByFaculty(selectedFaculty.getId()));
         }
     }
 
@@ -539,47 +497,24 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         return yearPart + majorCode;
     }
 
-    private JPanel createTwoColumnRow(Component left, Component right) {
-        JPanel row = new JPanel(new GridLayout(1, 2, 14, 0));
-        row.setOpaque(false);
-        row.add(left);
-        row.add(right);
-        return row;
-    }
+    private Card createSectionPanel(Component... rows) {
+        Card section = new Card();
+        section.setLayout(new BorderLayout());
 
-    private JPanel createThreeColumnRow(Component left, Component middle, Component right) {
-        JPanel row = new JPanel(new GridLayout(1, 3, 14, 0));
-        row.setOpaque(false);
-        row.add(left);
-        row.add(middle);
-        row.add(right);
-        return row;
-    }
-
-    private JPanel createSingleRow(Component component) {
-        JPanel row = new JPanel(new BorderLayout());
-        row.setOpaque(false);
-        row.add(component, BorderLayout.CENTER);
-        return row;
-    }
-
-    private JPanel createSectionPanel(Component... rows) {
-        JPanel section = new JPanel();
-        section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
-        section.setBackground(Color.WHITE);
-        section.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedOutlineBorder(new Color(225, 230, 236), 26, new Insets(20, 20, 20, 20)),
-                new EmptyBorder(20, 20, 20, 20)
-        ));
+        JPanel content = new JPanel();
+        content.setOpaque(false);
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
         for (int i = 0; i < rows.length; i++) {
             Component row = rows[i];
-            row.setMaximumSize(new Dimension(Integer.MAX_VALUE, row.getPreferredSize().height));
-            section.add(row);
-            if (i < rows.length - 1) {
-                section.add(Box.createVerticalStrut(12));
+            if (row != null) {
+                content.add(row);
+                if (i < rows.length - 1) {
+                    content.add(Box.createRigidArea(new Dimension(0, 12)));
+                }
             }
         }
+        section.add(content, BorderLayout.CENTER);
         return section;
     }
 
@@ -664,5 +599,18 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         public void changedUpdate(DocumentEvent e) {
             onChange.run();
         }
+    }
+
+    private boolean isStudentRole(String role) {
+        String normalized = normalizeRole(role);
+        return "sinh vien".equalsIgnoreCase(normalized) || "student".equalsIgnoreCase(normalized);
+    }
+
+    private String normalizeRole(String value) {
+        if (value == null) {
+            return "";
+        }
+        String normalized = Normalizer.normalize(value, Normalizer.Form.NFD);
+        return normalized.replaceAll("\\p{M}+", "").trim().toLowerCase();
     }
 }

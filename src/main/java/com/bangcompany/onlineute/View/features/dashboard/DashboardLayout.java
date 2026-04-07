@@ -1,7 +1,10 @@
+/**
+ * Layout chính của Dashboard
+ */
 package com.bangcompany.onlineute.View.features.dashboard;
 
 import com.bangcompany.onlineute.Config.SessionManager;
-import com.bangcompany.onlineute.View.Components.leftbar.SidebarItem;
+import com.bangcompany.onlineute.View.features.leftbar.SidebarItem;
 import com.bangcompany.onlineute.View.features.account.ChangePasswordPage;
 import com.bangcompany.onlineute.View.features.account.CreateAccountPage;
 import com.bangcompany.onlineute.View.features.announcement.AnnouncementPage;

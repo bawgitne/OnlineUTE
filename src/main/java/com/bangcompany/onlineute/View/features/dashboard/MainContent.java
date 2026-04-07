@@ -1,6 +1,9 @@
+/**
+ * Vùng hiển thị nội dung chính sử dụng CardLayout
+ */
 package com.bangcompany.onlineute.View.features.dashboard;
 
-import com.bangcompany.onlineute.View.navigation.Refreshable;
+import com.bangcompany.onlineute.View.shared.Refreshable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,6 +27,7 @@ public class MainContent extends JPanel {
         add(page, pageKey);
     }
 
+    // hiển thị trang và refresh data
     public void showPage(String pageKey) {
         JPanel currentPage = pages.get(pageKey);
         if (currentPage == null) {

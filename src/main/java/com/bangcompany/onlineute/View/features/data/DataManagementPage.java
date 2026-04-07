@@ -1,17 +1,20 @@
+/**
+ * Quản lý dữ liệu hệ thống
+ */
 package com.bangcompany.onlineute.View.features.data;
 
+import com.bangcompany.onlineute.View.Components.ui.Card;
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.Class;
 import com.bangcompany.onlineute.Model.Entity.Course;
 import com.bangcompany.onlineute.Model.Entity.Faculty;
 import com.bangcompany.onlineute.Model.Entity.Major;
-import com.bangcompany.onlineute.View.Components.PageTitleLabel;
-import com.bangcompany.onlineute.View.Components.InputGroup;
-import com.bangcompany.onlineute.View.Components.PrimaryButton;
-import com.bangcompany.onlineute.View.Components.SelectGroup;
+import com.bangcompany.onlineute.View.Components.ui.TextInput;
+import com.bangcompany.onlineute.View.Components.ui.Button;
+import com.bangcompany.onlineute.View.Components.ui.SelectInput;
 import com.bangcompany.onlineute.View.features.lecturer.LecturerManagementPage;
 import com.bangcompany.onlineute.View.features.student.StudentManagementPage;
-import com.bangcompany.onlineute.View.navigation.Refreshable;
+import com.bangcompany.onlineute.View.shared.Refreshable;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,6 +24,8 @@ public class DataManagementPage extends JPanel implements Refreshable {
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final StudentManagementPage studentManagementPage = new StudentManagementPage();
     private final LecturerManagementPage lecturerManagementPage = new LecturerManagementPage();
+    
+    // trang quản lý khoa
     private final SimpleEntityManagementPage<Faculty> facultyManagementPage = new SimpleEntityManagementPage<>(
             "Tìm theo mã khoa, tên khoa",
             "Tổng khoa",
@@ -35,6 +40,8 @@ public class DataManagementPage extends JPanel implements Refreshable {
             faculty -> new Object[]{faculty.getFacultyCode(), faculty.getFullName()},
             faculty -> faculty.getFacultyCode() + " " + faculty.getFullName()
     );
+
+    // trang quản lý ngành
     private final SimpleEntityManagementPage<Major> majorManagementPage = new SimpleEntityManagementPage<>(
             "Tìm theo mã ngành, tên ngành, khoa",
             "Tổng ngành",
@@ -57,6 +64,8 @@ public class DataManagementPage extends JPanel implements Refreshable {
             major -> major.getMajorCode() + " " + major.getFullName()
                     + " " + (major.getFaculty() == null ? "" : major.getFaculty().getFullName())
     );
+
+    // trang quản lý lớp
     private final SimpleEntityManagementPage<Class> classManagementPage = new SimpleEntityManagementPage<>(
             "Tìm theo lớp, khoa",
             "Tổng lớp",
@@ -64,14 +73,22 @@ public class DataManagementPage extends JPanel implements Refreshable {
             "Tạo mới",
             this::openCreateClassDialog,
             () -> AppContext.getClassService().getAllClasses(),
-            new String[]{"Lớp", "Khoa"},
+            new String[]{"Lớp", "Ngành", "Khoa"},
             classEntity -> new Object[]{
                     classEntity.getClassName(),
-                    classEntity.getFaculty() == null ? "" : classEntity.getFaculty().getFullName()
+                    classEntity.getMajor() == null ? "" : classEntity.getMajor().getFullName(),
+                    classEntity.getMajor() != null && classEntity.getMajor().getFaculty() != null
+                            ? classEntity.getMajor().getFaculty().getFullName()
+                            : ""
             },
             classEntity -> classEntity.getClassName()
-                    + " " + (classEntity.getFaculty() == null ? "" : classEntity.getFaculty().getFullName())
+                    + " " + (classEntity.getMajor() == null ? "" : classEntity.getMajor().getFullName())
+                    + " " + (classEntity.getMajor() != null && classEntity.getMajor().getFaculty() != null
+                    ? classEntity.getMajor().getFaculty().getFullName()
+                    : "")
     );
+
+    // trang quản lý môn học
     private final SimpleEntityManagementPage<Course> courseManagementPage = new SimpleEntityManagementPage<>(
             "Tìm theo mã môn, tên môn",
             "Tổng môn học",
@@ -88,12 +105,13 @@ public class DataManagementPage extends JPanel implements Refreshable {
             course -> course.getCourseCode() + " " + course.getFullName()
     );
 
+    // khởi tạo các tab quản lý
     public DataManagementPage() {
         setLayout(new BorderLayout(0, 16));
         setBackground(new Color(245, 245, 245));
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        PageTitleLabel titleLabel = new PageTitleLabel("Quản lý dữ liệu");
+        Card titleLabel = Card.titleCard("Quản lý dữ liệu");
 
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
         tabbedPane.addTab("Sinh viên", studentManagementPage);
@@ -113,6 +131,7 @@ public class DataManagementPage extends JPanel implements Refreshable {
         refreshSelectedTab();
     }
 
+    // reload tab đang chọn
     private void refreshSelectedTab() {
         Component selectedComponent = tabbedPane.getSelectedComponent();
         if (selectedComponent instanceof Refreshable refreshable) {
@@ -120,9 +139,10 @@ public class DataManagementPage extends JPanel implements Refreshable {
         }
     }
 
+    // dialog tạo mới khoa
     private void openCreateFacultyDialog() {
-        InputGroup codeInput = new InputGroup("Mã khoa", false);
-        InputGroup nameInput = new InputGroup("Tên khoa", false);
+        TextInput codeInput = new TextInput("Mã khoa", false);
+        TextInput nameInput = new TextInput("Tên khoa", false);
 
         JPanel form = new JPanel(new GridLayout(2, 1, 0, 12));
         form.setOpaque(false);
@@ -138,11 +158,12 @@ public class DataManagementPage extends JPanel implements Refreshable {
         });
     }
 
+    // dialog tạo mới ngành
     private void openCreateMajorDialog() {
-        InputGroup codeInput = new InputGroup("Mã ngành", false);
-        InputGroup nameInput = new InputGroup("Tên ngành", false);
-        InputGroup creditInput = new InputGroup("Tổng tín chỉ", false);
-        SelectGroup<Faculty> facultySelect = new SelectGroup<>("Khoa", AppContext.getFacultyService().getAllFaculties());
+        TextInput codeInput = new TextInput("Mã ngành", false);
+        TextInput nameInput = new TextInput("Tên ngành", false);
+        TextInput creditInput = new TextInput("Tổng tín chỉ", false);
+        SelectInput<Faculty> facultySelect = new SelectInput<>("Khoa", AppContext.getFacultyService().getAllFaculties());
 
         JPanel form = new JPanel(new GridLayout(4, 1, 0, 12));
         form.setOpaque(false);
@@ -162,28 +183,30 @@ public class DataManagementPage extends JPanel implements Refreshable {
         });
     }
 
+    // dialog tạo mới lớp
     private void openCreateClassDialog() {
-        InputGroup nameInput = new InputGroup("Tên lớp", false);
-        SelectGroup<Faculty> facultySelect = new SelectGroup<>("Khoa", AppContext.getFacultyService().getAllFaculties());
+        TextInput nameInput = new TextInput("Tên lớp", false);
+        SelectInput<Major> majorSelect = new SelectInput<>("Ngành", AppContext.getMajorService().getAllMajors());
 
         JPanel form = new JPanel(new GridLayout(2, 1, 0, 12));
         form.setOpaque(false);
         form.add(nameInput);
-        form.add(facultySelect);
+        form.add(majorSelect);
 
         openSimpleDialog("Tạo mới lớp", form, () -> {
             Class classEntity = new Class();
             classEntity.setClassName(nameInput.getValue().trim());
-            classEntity.setFaculty(facultySelect.getSelectedValue());
+            classEntity.setMajor(majorSelect.getSelectedValue());
             AppContext.getClassController().createClass(classEntity);
             classManagementPage.onEnter();
         });
     }
 
+    // dialog tạo mới môn học
     private void openCreateCourseDialog() {
-        InputGroup codeInput = new InputGroup("Mã môn", false);
-        InputGroup nameInput = new InputGroup("Tên môn", false);
-        InputGroup creditInput = new InputGroup("Số tín chỉ", false);
+        TextInput codeInput = new TextInput("Mã môn", false);
+        TextInput nameInput = new TextInput("Tên môn", false);
+        TextInput creditInput = new TextInput("Số tín chỉ", false);
 
         JPanel form = new JPanel(new GridLayout(3, 1, 0, 12));
         form.setOpaque(false);
@@ -201,6 +224,7 @@ public class DataManagementPage extends JPanel implements Refreshable {
         });
     }
 
+    // hàm dựng dialog chung cho mấy cái create đơn giản
     private void openSimpleDialog(String title, JComponent form, Runnable onSave) {
         Window owner = SwingUtilities.getWindowAncestor(this);
         JDialog dialog = new JDialog(owner, title, Dialog.ModalityType.APPLICATION_MODAL);
@@ -213,7 +237,7 @@ public class DataManagementPage extends JPanel implements Refreshable {
 
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         actions.setOpaque(false);
-        PrimaryButton saveButton = new PrimaryButton("Lưu");
+        Button saveButton = new Button("Lưu");
         saveButton.setPreferredSize(new Dimension(120, 40));
         saveButton.addActionListener(e -> {
             onSave.run();

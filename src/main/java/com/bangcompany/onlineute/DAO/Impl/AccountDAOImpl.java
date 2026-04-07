@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -17,8 +18,10 @@ public class AccountDAOImpl implements AccountDAO {
         try {
             em.getTransaction().begin();
             if (account.getId() == null) {
+                // Tạo mới nếu chưa có ID
                 em.persist(account);
             } else {
+                // Cập nhật nếu đã có ID
                 account = em.merge(account);
             }
             em.getTransaction().commit();
@@ -33,6 +36,7 @@ public class AccountDAOImpl implements AccountDAO {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             String normalizedCode = loginCode == null ? "" : loginCode.trim().toLowerCase();
+            // Tìm kiếm tài khoản thông qua username, mã sinh viên, mã giảng viên hoặc mã admin
             Account account = em.createQuery(
                             "SELECT a FROM Account a " +
                                     "WHERE LOWER(a.username) = :loginCode " +
@@ -46,6 +50,20 @@ public class AccountDAOImpl implements AccountDAO {
             return Optional.of(account);
         } catch (Exception e) {
             return Optional.empty();
+        } finally {
+            em.close();
+        }
+    }
+    //tìm kiếm theo account.id
+    @Override
+    public Optional<Account> findById(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            Account account = em.find(Account.class, id);
+            return Optional.ofNullable(account);
         } finally {
             em.close();
         }

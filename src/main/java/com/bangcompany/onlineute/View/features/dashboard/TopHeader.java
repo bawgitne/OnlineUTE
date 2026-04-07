@@ -1,13 +1,16 @@
+/**
+ * Thanh header trên cùng hiển thị tên trường
+ */
 package com.bangcompany.onlineute.View.features.dashboard;
+
+import com.bangcompany.onlineute.View.Components.theme.AppTheme;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class TopHeader extends JPanel {
     public TopHeader(String title) {
-        Color primaryBlue = new Color(0, 85, 141);
-
-        setBackground(primaryBlue);
+        setBackground(AppTheme.PRIMARY_BLUE);
         setPreferredSize(new Dimension(100, 47));
         setLayout(new BorderLayout());
 

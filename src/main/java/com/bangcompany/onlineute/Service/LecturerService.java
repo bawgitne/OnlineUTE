@@ -7,5 +7,8 @@ import com.bangcompany.onlineute.Model.Entity.Lecturer;
 public interface LecturerService {
     PagedResult<Lecturer> searchLecturers(String keyword, PageRequest pageRequest);
     PagedResult<Lecturer> searchLecturers(String keyword, int page, int pageSize);
+    Lecturer updateLecturer(Lecturer lecturer);
+    void deleteLecturer(Long id);
+    java.util.List<Lecturer> getAllLecturers();
     long countAllLecturers();
 }

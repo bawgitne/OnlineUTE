@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -14,8 +15,9 @@ public class ClassDAOImpl implements ClassDAO {
     public List<Class> findAll() {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Lấy danh sách tất cả các lớp kèm thông tin ngành và khoa
             return em.createQuery(
-                    "SELECT c FROM Class c JOIN FETCH c.faculty ORDER BY c.className",
+                    "SELECT c FROM Class c JOIN FETCH c.major m JOIN FETCH m.faculty ORDER BY c.className",
                     Class.class
             ).getResultList();
         } finally {
@@ -24,13 +26,14 @@ public class ClassDAOImpl implements ClassDAO {
     }
 
     @Override
-    public List<Class> findByFacultyId(Long facultyId) {
+    public List<Class> findByMajorId(Long majorId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tìm danh sách lớp theo ID của ngành
             return em.createQuery(
-                    "SELECT c FROM Class c JOIN FETCH c.faculty f WHERE f.id = :facultyId ORDER BY c.className",
+                    "SELECT c FROM Class c JOIN FETCH c.major m JOIN FETCH m.faculty f WHERE m.id = :majorId ORDER BY c.className",
                     Class.class
-            ).setParameter("facultyId", facultyId).getResultList();
+            ).setParameter("majorId", majorId).getResultList();
         } finally {
             em.close();
         }
@@ -41,9 +44,12 @@ public class ClassDAOImpl implements ClassDAO {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             String normalizedKeyword = "%" + keyword.toLowerCase() + "%";
+            // Tìm kiếm lớp theo tên lớp, tên ngành, mã ngành hoặc tên khoa
             List<Class> items = em.createQuery(
-                            "SELECT c FROM Class c JOIN FETCH c.faculty f " +
+                            "SELECT c FROM Class c JOIN FETCH c.major m JOIN FETCH m.faculty f " +
                                     "WHERE LOWER(c.className) LIKE :keyword " +
+                                    "OR LOWER(m.fullName) LIKE :keyword " +
+                                    "OR LOWER(m.majorCode) LIKE :keyword " +
                                     "OR LOWER(f.fullName) LIKE :keyword " +
                                     "OR LOWER(f.facultyCode) LIKE :keyword " +
                                     "ORDER BY c.className",
@@ -54,9 +60,12 @@ public class ClassDAOImpl implements ClassDAO {
                     .setMaxResults(pageRequest.getPageSize())
                     .getResultList();
 
+            // Đếm tổng số lượng kết quả tìm được
             Long totalItems = em.createQuery(
-                            "SELECT COUNT(c) FROM Class c JOIN c.faculty f " +
+                            "SELECT COUNT(c) FROM Class c JOIN c.major m JOIN m.faculty f " +
                                     "WHERE LOWER(c.className) LIKE :keyword " +
+                                    "OR LOWER(m.fullName) LIKE :keyword " +
+                                    "OR LOWER(m.majorCode) LIKE :keyword " +
                                     "OR LOWER(f.fullName) LIKE :keyword " +
                                     "OR LOWER(f.facultyCode) LIKE :keyword",
                             Long.class
@@ -75,7 +84,13 @@ public class ClassDAOImpl implements ClassDAO {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             em.getTransaction().begin();
-            em.persist(classEntity);
+            if (classEntity.getId() == null) {
+                // Thêm mới nếu chưa có ID
+                em.persist(classEntity);
+            } else {
+                // Cập nhật nếu đã có ID
+                classEntity = em.merge(classEntity);
+            }
             em.getTransaction().commit();
             return classEntity;
         } catch (Exception ex) {
@@ -83,6 +98,25 @@ public class ClassDAOImpl implements ClassDAO {
                 em.getTransaction().rollback();
             }
             throw ex;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        if (id == null) {
+            return;
+        }
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Class classEntity = em.find(Class.class, id);
+            if (classEntity != null) {
+                // Xóa lớp nếu tồn tại
+                em.remove(classEntity);
+            }
+            em.getTransaction().commit();
         } finally {
             em.close();
         }

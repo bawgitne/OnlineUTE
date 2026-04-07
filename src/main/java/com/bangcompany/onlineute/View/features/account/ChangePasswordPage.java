@@ -1,40 +1,34 @@
 package com.bangcompany.onlineute.View.features.account;
 
-import com.bangcompany.onlineute.View.Components.InputGroup;
-import com.bangcompany.onlineute.View.Components.PageTitleLabel;
-import com.bangcompany.onlineute.View.Components.PrimaryButton;
-import com.bangcompany.onlineute.View.navigation.Refreshable;
+import com.bangcompany.onlineute.Config.AppContext;
+import com.bangcompany.onlineute.Config.SessionManager;
+import com.bangcompany.onlineute.View.Components.ui.TextInput;
+import com.bangcompany.onlineute.View.Components.ui.Card;
+import com.bangcompany.onlineute.View.Components.ui.Button;
+import com.bangcompany.onlineute.View.shared.Refreshable;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class ChangePasswordPage extends JPanel implements Refreshable {
-    private final InputGroup oldPassInput;
-    private final InputGroup newPassInput;
-    private final InputGroup confirmPassInput;
+    private final TextInput oldPassInput;
+    private final TextInput newPassInput;
+    private final TextInput confirmPassInput;
 
+    /**
+     * Trang thay đổi mật khẩu
+     */
     public ChangePasswordPage() {
         setLayout(new BorderLayout(0, 20));
         setBackground(new Color(245, 245, 245));
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false);
-        topPanel.add(new PageTitleLabel("ĐỔI MẬT KHẨU"), BorderLayout.NORTH);
-        add(topPanel, BorderLayout.NORTH);
-
         JPanel centerPanel = new JPanel(new GridBagLayout());
-        centerPanel.setBackground(Color.WHITE);
-        centerPanel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
+        centerPanel.setOpaque(false);
 
-        JPanel form = new JPanel();
+        JPanel form = new Card(26, new Insets(40, 50, 40, 50));//layout
         form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
-        form.setBackground(Color.WHITE);
-        form.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(210, 215, 225), 1),
-                new EmptyBorder(40, 50, 40, 50)
-        ));
         form.setPreferredSize(new Dimension(500, 450));
         form.setMaximumSize(new Dimension(500, 450));
 
@@ -52,9 +46,9 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
 
         form.add(Box.createRigidArea(new Dimension(0, 25)));
 
-        oldPassInput = new InputGroup("Mật khẩu hiện tại", true);
-        newPassInput = new InputGroup("Mật khẩu mới", true);
-        confirmPassInput = new InputGroup("Xác nhận mật khẩu mới", true);
+        oldPassInput = new TextInput("Mật khẩu hiện tại", true);
+        newPassInput = new TextInput("Mật khẩu mới", true);
+        confirmPassInput = new TextInput("Xác nhận mật khẩu mới", true);
 
         oldPassInput.setAlignmentX(Component.LEFT_ALIGNMENT);
         newPassInput.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -67,15 +61,10 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
         form.add(confirmPassInput);
         form.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        PrimaryButton btnSave = new PrimaryButton("Cập nhật mật khẩu");
+        Button btnSave = new Button("Cập nhật mật khẩu");
         btnSave.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         btnSave.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnSave.addActionListener(e -> JOptionPane.showMessageDialog(
-                this,
-                "Chức năng đổi mật khẩu đang được phát triển.",
-                "Thông báo",
-                JOptionPane.INFORMATION_MESSAGE
-        ));
+        btnSave.addActionListener(e -> handleChangePassword());
         form.add(btnSave);
 
         centerPanel.add(form);
@@ -87,5 +76,40 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
         oldPassInput.setValue("");
         newPassInput.setValue("");
         confirmPassInput.setValue("");
+    }
+
+    private void handleChangePassword() {
+        if (SessionManager.getCurrentAccount() == null) {
+            JOptionPane.showMessageDialog(this, "Session is not ready.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String oldPass = oldPassInput.getValue().trim();
+        String newPass = newPassInput.getValue().trim();
+        String confirm = confirmPassInput.getValue().trim();
+
+        if (oldPass.isEmpty() || newPass.isEmpty() || confirm.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (!newPass.equals(confirm)) {
+            JOptionPane.showMessageDialog(this, "New password and confirm do not match.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        boolean ok = AppContext.getAccountController().changePassword(
+                SessionManager.getCurrentAccount().getId(),
+                oldPass,
+                newPass
+        );
+
+        if (!ok) {
+            JOptionPane.showMessageDialog(this, "Current password is incorrect.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this, "Password updated.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        onEnter();
     }
 }

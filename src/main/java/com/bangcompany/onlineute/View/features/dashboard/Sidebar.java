@@ -1,9 +1,14 @@
+/**
+ * Thanh sidebar bên trái chứa menu điều hướng và thông tin admin/sinh viên
+ */
 package com.bangcompany.onlineute.View.features.dashboard;
 
 import com.bangcompany.onlineute.Config.SessionManager;
-import com.bangcompany.onlineute.View.Components.leftbar.NavMenu;
-import com.bangcompany.onlineute.View.Components.leftbar.SidebarItem;
-import com.bangcompany.onlineute.View.Components.leftbar.UserProfileCard;
+import com.bangcompany.onlineute.View.Components.ui.Button;
+import com.bangcompany.onlineute.View.Components.theme.AppTheme;
+import com.bangcompany.onlineute.View.features.leftbar.NavMenu;
+import com.bangcompany.onlineute.View.features.leftbar.SidebarItem;
+import com.bangcompany.onlineute.View.features.leftbar.UserProfileCard;
 import com.bangcompany.onlineute.View.navigation.MainNavigator;
 
 import javax.swing.*;
@@ -23,7 +28,7 @@ public class Sidebar extends JPanel {
             List<SidebarItem> menuItems,
             Consumer<String> onNavigate
     ) {
-        setBackground(new Color(0, 85, 141));
+        setBackground(AppTheme.PRIMARY_BLUE);
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(0, 0, 0, 0));
 
@@ -36,7 +41,7 @@ public class Sidebar extends JPanel {
         menuScrollPane.setBorder(null);
         menuScrollPane.setOpaque(false);
         menuScrollPane.getViewport().setOpaque(false);
-        menuScrollPane.getViewport().setBackground(new Color(0, 85, 141));
+        menuScrollPane.getViewport().setBackground(AppTheme.PRIMARY_BLUE);
         menuScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         menuScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         menuScrollPane.setWheelScrollingEnabled(true);
@@ -72,16 +77,12 @@ public class Sidebar extends JPanel {
         add(menuScrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setBackground(new Color(0, 85, 141));
+        bottomPanel.setBackground(AppTheme.PRIMARY_BLUE);
         bottomPanel.setBorder(new EmptyBorder(10, 10, 20, 10));
 
-        JButton logoutButton = new JButton("ĐĂNG XUẤT");
-        logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        logoutButton.setForeground(Color.WHITE);
-        logoutButton.setBackground(new Color(220, 53, 69));
-        logoutButton.setFocusPainted(false);
+        Button logoutButton = new Button("ĐĂNG XUẤT", new Color(220, 53, 69), Color.WHITE);
         logoutButton.setBorder(BorderFactory.createEmptyBorder(12, 10, 12, 10));
-        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutButton.setPreferredSize(new Dimension(0, 44));
         logoutButton.addActionListener(e -> {
             SessionManager.logout();
             MainNavigator.showLogin();

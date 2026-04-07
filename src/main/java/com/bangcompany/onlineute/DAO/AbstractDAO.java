@@ -1,3 +1,6 @@
+/**
+ * Lớp trừu tượng cung cấp cơ chế thực thi các tác vụ database trong Transaction
+ */
 package com.bangcompany.onlineute.DAO;
 
 import com.bangcompany.onlineute.Config.JpaUtil;

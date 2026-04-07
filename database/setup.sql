@@ -71,8 +71,8 @@ CREATE TABLE registration_batch (
 CREATE TABLE `class` (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     class_name VARCHAR(100) NOT NULL UNIQUE,
-    faculty_id BIGINT NOT NULL,
-    CONSTRAINT fk_class_faculty FOREIGN KEY (faculty_id) REFERENCES faculty(id)
+    major_id BIGINT NOT NULL,
+    CONSTRAINT fk_class_major FOREIGN KEY (major_id) REFERENCES major(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE student (
@@ -222,7 +222,7 @@ INSERT INTO registration_batch (name, open_at, close_at, term_id, common_start_d
 INSERT INTO faculty (faculty_code, fullname) VALUES
 ('MFG', 'Khoa Cơ khí Chế tạo máy'),
 ('CHEM', 'Khoa Công nghệ Hóa học và Thực phẩm'),
-('FASHION', 'Khoa Thời trang và Du lịch'),
+('FASHION', 'Khoa Thời trang & Du lịch'),
 ('IT', 'Khoa Công nghệ Thông tin'),
 ('EEE', 'Khoa Điện - Điện tử'),
 ('ECON', 'Khoa Kinh tế'),
@@ -235,17 +235,72 @@ INSERT INTO faculty (faculty_code, fullname) VALUES
 ('AUTO', 'Khoa Cơ khí Động lực');
 
 INSERT INTO major (major_code, fullname, total_credit, faculty_id) VALUES
+('104', 'Kỹ thuật công nghiệp', 145, 1),
+('109', 'Công nghệ may', 145, 3),
 ('110', 'Công nghệ thông tin', 145, 4),
+('116', 'Công nghệ thực phẩm / Khoa học thực phẩm và Dinh dưỡng', 145, 2),
+('119', 'Công nghệ kỹ thuật máy tính', 145, 5),
+('123', 'Thiết kế thời trang', 145, 3),
+('124', 'Quản lý công nghiệp', 145, 6),
+('125', 'Kế toán', 145, 6),
+('126', 'Thương mại điện tử', 145, 6),
+('127', 'Kỹ thuật xây dựng công trình giao thông', 145, 7),
+('128', 'Công nghệ kỹ thuật hóa học', 145, 2),
+('129', 'Kỹ thuật y sinh (Điện tử y sinh)', 145, 5),
+('130', 'Công nghệ vật liệu', 145, 8),
+('131', 'Ngôn ngữ Anh', 145, 9),
+('132', 'Logistics & quản lý chuỗi cung ứng', 145, 6),
 ('133', 'Kỹ thuật dữ liệu', 145, 4),
-('162', 'An toàn thông tin', 145, 4),
+('134', 'Robot và trí tuệ nhân tạo', 145, 1),
+('135', 'Hệ thống kỹ thuật công trình xây dựng', 145, 7),
+('136', 'Kinh doanh quốc tế', 145, 6),
+('138', 'Kỹ nghệ gỗ và nội thất', 145, 1),
+('139', 'Hệ thống nhúng và IoT', 145, 5),
+('140', 'Kiến trúc nội thất', 145, 7),
 ('142', 'Công nghệ kỹ thuật điện, điện tử', 145, 5),
+('143', 'Công nghệ chế tạo máy', 145, 1),
+('144', 'Công nghệ kỹ thuật cơ khí', 145, 1),
+('145', 'Công nghệ kỹ thuật ô tô', 145, 13),
+('146', 'Công nghệ kỹ thuật cơ điện tử', 145, 1),
+('147', 'Công nghệ kỹ thuật nhiệt', 145, 13),
+('149', 'Công nghệ kỹ thuật công trình xây dựng', 145, 7),
+('150', 'Công nghệ kỹ thuật môi trường', 145, 2),
 ('151', 'Công nghệ kỹ thuật điều khiển và tự động hóa', 145, 5),
-('145', 'Công nghệ kỹ thuật ô tô', 145, 13);
+('154', 'Năng lượng tái tạo', 145, 13),
+('155', 'Quản lý xây dựng', 145, 7),
+('156', 'Thiết kế đồ họa', 145, 10),
+('157', 'Kiến trúc', 145, 7),
+('158', 'Công nghệ kỹ thuật in', 145, 10),
+('159', 'Quản trị nhà hàng & dịch vụ ăn uống', 145, 3),
+('160', 'Quản lý và vận hành hạ tầng', 145, 7),
+('161', 'Công nghệ kỹ thuật điện tử - viễn thông (có thiết kế vi mạch)', 145, 5),
+('162', 'An toàn thông tin', 145, 4),
+('163', 'Luật', 145, 6),
+('164', 'Tâm lý học giáo dục', 145, 11),
+('165', 'Công nghệ truyền thông', 145, 10),
+('166', 'Quản trị kinh doanh', 145, 6),
+('167', 'Công nghệ tài chính', 145, 6),
+('168', 'Vật lý kỹ thuật', 145, 8),
+('169', 'Môi trường và Phát triển bền vững', 145, 2),
+('950', 'Sư phạm tiếng Anh', 145, 9),
+('951', 'Sư phạm Công nghệ', 145, 12);
 
-INSERT INTO class (class_name, faculty_id) VALUES
-('241101A', 4), ('241101B', 4), ('241101C', 4),
-('241102A', 5), ('241102B', 5),
-('241103A', 6), ('241103B', 6);
+INSERT INTO class (class_name, major_id) VALUES
+  ('241101A', COALESCE((SELECT id FROM major WHERE major_code='110'), 1)),
+  ('241101B', COALESCE((SELECT id FROM major WHERE major_code='110'), 1)),
+  ('241101C', COALESCE((SELECT id FROM major WHERE major_code='110'), 1)),
+  ('241451A', COALESCE((SELECT id FROM major WHERE major_code='145'), 1)),
+  ('241451B', COALESCE((SELECT id FROM major WHERE major_code='145'), 1)),
+  ('241331A', COALESCE((SELECT id FROM major WHERE major_code='133'), 1)),
+  ('241621A', COALESCE((SELECT id FROM major WHERE major_code='162'), 1)),
+  ('241461A', COALESCE((SELECT id FROM major WHERE major_code='146'), 1)),
+  ('241251A', COALESCE((SELECT id FROM major WHERE major_code='125'), 1)),
+  ('241361A', COALESCE((SELECT id FROM major WHERE major_code='136'), 1)),
+  ('241311A', COALESCE((SELECT id FROM major WHERE major_code='131'), 1)),
+  ('241561A', COALESCE((SELECT id FROM major WHERE major_code='156'), 1)),
+  ('241571A', COALESCE((SELECT id FROM major WHERE major_code='157'), 1)),
+  ('241281A', COALESCE((SELECT id FROM major WHERE major_code='128'), 1)),
+  ('249511A', COALESCE((SELECT id FROM major WHERE major_code='951'), 1));
 
 -- 3) ACCOUNTS
 INSERT INTO account (username, password_hash, salt, role) VALUES
@@ -498,9 +553,36 @@ INSERT INTO lecturer (code, fullname, account_id) VALUES
 ('GV019', 'Vũ Anh Kiệt', 21),
 ('GV020', 'Cao Tiến Đạt', 22);
 
+-- 3) STUDENT DATA
 INSERT INTO student (code, fullname, birth_of_date, email, avatar_url, class_id, enrollment_year, account_id) 
-SELECT CONCAT('24110', LPAD(n, 3, '0')), 'Sinh viên OnlineUTE', '2004-01-01', CONCAT('st', LPAD(n, 3, '0'), '@student.hcmute.edu.vn'), '', MOD(n, 7)+1, 2024, n + 22 FROM 
-(WITH RECURSIVE seq AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM seq WHERE n < 200) SELECT n FROM seq) AS s;
+SELECT 
+    CONCAT('24110', LPAD(n, 3, '0')), 
+    CONCAT(
+        ELT(1 + MOD(n, 10), 'Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Phan', 'Vũ', 'Đặng', 'Bùi', 'Đỗ'),
+        ' ',
+        ELT(1 + MOD(n + 3, 10), 'Văn', 'Thanh', 'Minh', 'Thị', 'Anh', 'Hoàng', 'Quang', 'Hồng', 'Gia', 'Đức'),
+        ' ',
+        ELT(1 + MOD(n + 7, 10), 'Anh', 'Dũng', 'Hạnh', 'Cường', 'Trang', 'Sơn', 'Linh', 'Tuấn', 'Hương', 'Hải')
+    ),
+    DATE_ADD('2006-01-01', INTERVAL MOD(n * 13, 365) DAY),
+    CONCAT('st', LPAD(n, 3, '0'), '@student.hcmute.edu.vn'), 
+    '', 
+    MOD(n, 15)+1, 
+    2024, 
+    n + 22 
+FROM (WITH RECURSIVE seq AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM seq WHERE n < 200) SELECT n FROM seq) AS s;
+
+-- 4) USER PROFILES (FAKE DATA)
+INSERT INTO user_profile (account_id, profile_code, display_name, email, role_title)
+SELECT 
+    account_id, code, fullname, CONCAT('gv', LPAD(id, 3, '0'), '@hcmute.edu.vn'), 'Giảng viên'
+FROM lecturer;
+
+INSERT INTO user_profile (account_id, profile_code, display_name, email, role_title, class_name)
+SELECT 
+    s.account_id, s.code, s.fullname, s.email, 'Sinh viên', c.class_name
+FROM student s
+JOIN class c ON s.class_id = c.id;
 
 INSERT INTO course (course_code, fullname, credit) VALUES
 ('MATH1', 'Toán Cao Cấp 1', 3), ('IT1', 'Lập trình Java', 4), ('IT2', 'Cơ sở dữ liệu', 3), ('ENG1', 'Tiếng Anh 1', 2);
@@ -510,5 +592,49 @@ INSERT INTO course_section (section_code, course_id, term_id, lecturer_id, room,
 
 INSERT INTO announcement (title, content, target_type, sender_name) VALUES
 ('Chào mừng năm học mới', 'Chào mừng các bạn sinh viên đến với OnlineUTE.', 'ALL', 'Ban Giám Hiệu');
+
+-- 5) SPECIALIZED DATA FOR USER REQUEST (AD001, GV001, 24110155)
+
+-- Enrich Admin AD001 Profile
+INSERT INTO user_profile (account_id, profile_code, display_name, role_title, email, phone_number, current_address)
+VALUES (1, 'AD001', 'Hệ thống Quản trị', 'Quản trị viên', 'admin@hcmute.edu.vn', '0901234567', 'Số 1 Võ Văn Ngân, Thủ Đức, TP.HCM');
+
+-- Enrich Lecturer GV001 Profile
+UPDATE user_profile SET 
+    phone_number = '0912345678',
+    birth_date = '1980-05-15',
+    gender = 'Nam',
+    place_of_birth = 'Hà Nội',
+    current_address = 'Quận 9, TP.HCM',
+    permanent_address = 'Quận 9, TP.HCM',
+    faculty_name = 'Khoa Công nghệ Thông tin'
+WHERE profile_code = 'GV001';
+
+-- Enrich Student 24110155 Profile
+UPDATE user_profile SET 
+    phone_number = '0988776655',
+    birth_date = '2006-11-20',
+    gender = 'Nam',
+    place_of_birth = 'TP.HCM',
+    current_address = 'Ký túc xá khu A - ĐHQG TP.HCM',
+    permanent_address = 'Biên Hòa, Đồng Nai',
+    faculty_name = 'Khoa Công nghệ Thông tin',
+    major_name = 'Công nghệ Thông tin',
+    academic_year = '2024-2028',
+    expected_graduation_year = '2028',
+    father_name = 'Nguyễn Công Thành',
+    mother_name = 'Phạm Thị Tuyết'
+WHERE profile_code = '24110155';
+
+-- Add registrations for student 24110155
+SET @stu_id = (SELECT id FROM student WHERE code = '24110155');
+INSERT IGNORE INTO course_registration (student_id, section_id, status, reg_date) VALUES
+(@stu_id, 1, 'APPROVED', '2025-07-21'),
+(@stu_id, 2, 'APPROVED', '2025-07-21');
+
+-- Add marks for student 24110155
+INSERT IGNORE INTO mark (registration_id, process_score, test_score, final_score, grade_char, attendance) VALUES
+((SELECT id FROM course_registration WHERE student_id = @stu_id AND section_id = 1), 8.5, 9.0, 8.85, 'A', 'Vắng 0 buổi'),
+((SELECT id FROM course_registration WHERE student_id = @stu_id AND section_id = 2), 7.0, 8.5, 8.05, 'B', 'Vắng 1 buổi');
 
 SELECT 'Setup complete' AS status;

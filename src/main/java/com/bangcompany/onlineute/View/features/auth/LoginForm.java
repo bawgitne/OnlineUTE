@@ -1,7 +1,12 @@
+/**
+ * Form đăng nhập
+ */
 package com.bangcompany.onlineute.View.features.auth;
 
-import com.bangcompany.onlineute.View.Components.InputGroup;
-import com.bangcompany.onlineute.View.Components.PrimaryButton;
+import com.bangcompany.onlineute.View.Components.theme.AppTheme;
+import com.bangcompany.onlineute.View.Components.theme.RoundedBorders;
+import com.bangcompany.onlineute.View.Components.ui.TextInput;
+import com.bangcompany.onlineute.View.Components.ui.Button;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -12,18 +17,15 @@ import java.util.function.BiConsumer;
 
 public class LoginForm extends JPanel {
     private final BiConsumer<String, String> onSubmit;
-    private final InputGroup usernameGroup;
-    private final InputGroup passwordGroup;
+    private final TextInput usernameGroup;
+    private final TextInput passwordGroup;
 
     public LoginForm(BiConsumer<String, String> onSubmit) {
         this.onSubmit = onSubmit;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(Color.WHITE);
-        setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(210, 215, 225), 1),
-                new EmptyBorder(40, 50, 40, 50)
-        ));
+        setBackground(AppTheme.BACKGROUND_CARD);
+        setBorder(RoundedBorders.paddedOutline(AppTheme.RADIUS_CARD, new EmptyBorder(40, 50, 40, 50).getBorderInsets()));
         setPreferredSize(new Dimension(500, 450));
         setMaximumSize(new Dimension(500, 450));
 
@@ -34,15 +36,15 @@ public class LoginForm extends JPanel {
         add(loginTitle);
 
         JLabel subTitle = new JLabel("Cổng thông tin đào tạo");
-        subTitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        subTitle.setFont(AppTheme.FONT_BODY);
         subTitle.setForeground(Color.GRAY);
         subTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         add(subTitle);
 
         add(Box.createRigidArea(new Dimension(0, 25)));
 
-        usernameGroup = new InputGroup("Tên đăng nhập", false);
-        passwordGroup = new InputGroup("Mật khẩu", true);
+        usernameGroup = new TextInput("Tên đăng nhập", false);
+        passwordGroup = new TextInput("Mật khẩu", true);
         usernameGroup.setAlignmentX(Component.LEFT_ALIGNMENT);
         passwordGroup.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -51,7 +53,7 @@ public class LoginForm extends JPanel {
         add(passwordGroup);
         add(Box.createRigidArea(new Dimension(0, 15)));
 
-        PrimaryButton btnLogin = new PrimaryButton("Đăng nhập");
+        Button btnLogin = new Button("Đăng nhập");
         btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         btnLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnLogin.addActionListener(e -> {
@@ -77,7 +79,7 @@ public class LoginForm extends JPanel {
         forgotPassLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                forgotPassLabel.setForeground(new Color(0, 84, 140));
+                forgotPassLabel.setForeground(AppTheme.PRIMARY_BLUE);
             }
 
             @Override

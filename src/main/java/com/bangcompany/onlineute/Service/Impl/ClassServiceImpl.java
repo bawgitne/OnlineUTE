@@ -15,19 +15,22 @@ public class ClassServiceImpl implements ClassService {
         this.classDAO = classDAO;
     }
 
+    // lấy toàn bộ danh sách các lớp học
     @Override
     public List<Class> getAllClasses() {
         return classDAO.findAll();
     }
 
+    // tìm danh sách các lớp thuộc về một ngành học cụ thể
     @Override
-    public List<Class> getClassesByFaculty(Long facultyId) {
-        if (facultyId == null) {
+    public List<Class> getClassesByMajor(Long majorId) {
+        if (majorId == null) {
             return List.of();
         }
-        return classDAO.findByFacultyId(facultyId);
+        return classDAO.findByMajorId(majorId);
     }
 
+    // tìm kiếm lớp học (hỗ trợ phân trang)
     @Override
     public PagedResult<Class> searchClasses(String keyword, PageRequest pageRequest) {
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -36,16 +39,33 @@ public class ClassServiceImpl implements ClassService {
         return classDAO.search(keyword.trim(), pageRequest);
     }
 
+    // tìm kiếm lớp học (hỗ trợ thông tin trực tiếp về số trang và kích thước trang)
     @Override
     public PagedResult<Class> searchClasses(String keyword, int page, int pageSize) {
         return searchClasses(keyword, PaginationSupport.normalize(page, pageSize));
     }
 
+    // tạo một lớp mới
     @Override
     public Class createClass(Class classEntity) {
         if (classEntity == null) {
-            throw new IllegalArgumentException("Class is required.");
+            throw new IllegalArgumentException("Dữ liệu lớp học là bắt buộc.");
         }
         return classDAO.save(classEntity);
+    }
+
+    // cập nhật thông tin lớp học đã có
+    @Override
+    public Class updateClass(Class classEntity) {
+        if (classEntity == null) {
+            throw new IllegalArgumentException("Dữ liệu lớp học là bắt buộc.");
+        }
+        return classDAO.save(classEntity);
+    }
+
+    // xóa lớp học khỏi hệ thống
+    @Override
+    public void deleteClass(Long id) {
+        classDAO.deleteById(id);
     }
 }

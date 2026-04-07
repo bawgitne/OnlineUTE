@@ -19,16 +19,19 @@ public class UserProfileServiceImpl implements UserProfileService {
         this.userProfileDAO = userProfileDAO;
     }
 
+    // lưu thông tin hồ sơ người dùng
     @Override
     public UserProfile save(UserProfile userProfile) {
         return userProfileDAO.save(userProfile);
     }
 
+    // tìm hồ sơ theo ID tài khoản
     @Override
     public Optional<UserProfile> findByAccountId(Long accountId) {
         return userProfileDAO.findByAccountId(accountId);
     }
 
+    // lấy thông tin hồ sơ của người dùng hiện đang đăng nhập
     @Override
     public UserProfile getCurrentUserProfile() {
         Account currentAccount = SessionManager.getCurrentAccount();
@@ -36,10 +39,12 @@ public class UserProfileServiceImpl implements UserProfileService {
             return buildFallbackProfile(null);
         }
 
+        // Ưu tiên lấy từ DB, nếu không có thì sinh hồ sơ dự phòng từ Session
         return userProfileDAO.findByAccountId(currentAccount.getId())
                 .orElseGet(() -> buildFallbackProfile(currentAccount));
     }
 
+    // xây dựng hồ sơ dự phòng từ dữ liệu trong Session nêú DB chưa có Profile record
     private UserProfile buildFallbackProfile(Account account) {
         UserProfile profile = new UserProfile();
         profile.setAccount(account);
@@ -47,6 +52,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         profile.setProfileCode(SessionManager.getProfileCode());
         profile.setRoleTitle(resolveRoleTitle(account));
 
+        // Nếu là sinh viên, bổ sung thêm các thông tin về lớp và khoa
         Student student = SessionManager.getCurrentStudent();
         if (student != null) {
             profile.setEmail(student.getEmail());
@@ -54,13 +60,14 @@ public class UserProfileServiceImpl implements UserProfileService {
             profile.setAvatarUrl(student.getAvatarUrl());
             if (student.getClassEntity() != null) {
                 profile.setClassName(student.getClassEntity().getClassName());
-                if (student.getClassEntity().getFaculty() != null) {
-                    profile.setFacultyName(student.getClassEntity().getFaculty().getFullName());
+                if (student.getClassEntity().getMajor() != null && student.getClassEntity().getMajor().getFaculty() != null) {
+                    profile.setFacultyName(student.getClassEntity().getMajor().getFaculty().getFullName());
                 }
             }
             return profile;
         }
 
+        // Nếu là giảng viên
         Lecturer lecturer = SessionManager.getCurrentLecturer();
         if (lecturer != null) {
             profile.setDisplayName(lecturer.getFullName());
@@ -68,6 +75,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             return profile;
         }
 
+        // Nếu là quản trị viên
         Admin admin = SessionManager.getCurrentAdmin();
         if (admin != null) {
             profile.setDisplayName(admin.getFullName());
@@ -77,6 +85,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         return profile;
     }
 
+    // xác định tên hiển thị của vai trò người dùng
     private String resolveRoleTitle(Account account) {
         if (account == null || account.getRole() == null) {
             return "Người dùng";

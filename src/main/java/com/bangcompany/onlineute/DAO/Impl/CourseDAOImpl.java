@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -67,6 +68,7 @@ public class CourseDAOImpl implements CourseDAO {
     public List<Course> findAll() {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Lấy toàn bộ danh sách môn học sắp xếp theo mã môn học
             return em.createQuery("SELECT c FROM Course c ORDER BY c.courseCode", Course.class)
                     .getResultList();
         } finally {
@@ -79,6 +81,7 @@ public class CourseDAOImpl implements CourseDAO {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             String normalizedKeyword = "%" + keyword.toLowerCase() + "%";
+            // Tìm kiếm môn học theo mã môn học hoặc tên môn học
             List<Course> items = em.createQuery(
                             "SELECT c FROM Course c " +
                                     "WHERE LOWER(c.courseCode) LIKE :keyword " +
@@ -91,6 +94,7 @@ public class CourseDAOImpl implements CourseDAO {
                     .setMaxResults(pageRequest.getPageSize())
                     .getResultList();
 
+            // Đếm tổng số môn học tìm được
             Long totalItems = em.createQuery(
                             "SELECT COUNT(c) FROM Course c " +
                                     "WHERE LOWER(c.courseCode) LIKE :keyword " +

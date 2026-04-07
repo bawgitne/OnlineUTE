@@ -1,57 +1,59 @@
+/**
+ * Tạo đợt đăng ký môn
+ */
 package com.bangcompany.onlineute.View.features.registration;
 
+import com.bangcompany.onlineute.View.Components.ui.Card;
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.RegistrationBatch;
 import com.bangcompany.onlineute.Model.Entity.Term;
-import com.bangcompany.onlineute.View.Components.InputGroup;
-import com.bangcompany.onlineute.View.Components.PrimaryButton;
-import com.bangcompany.onlineute.View.Components.SelectGroup;
-import com.bangcompany.onlineute.View.Components.TableStyles;
-import com.bangcompany.onlineute.View.features.dashboard.PageScaffold;
-import com.bangcompany.onlineute.View.navigation.Refreshable;
+import com.bangcompany.onlineute.View.Components.ui.Button;
+import com.bangcompany.onlineute.View.Components.ui.Table;
+import com.bangcompany.onlineute.View.Components.ui.TextInput;
+import com.bangcompany.onlineute.View.Components.ui.SelectInput;
+import com.bangcompany.onlineute.View.shared.Refreshable;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    private final InputGroup batchNameInput = new InputGroup("Tên đợt đăng ký", false);
-    private final InputGroup openAtInput = new InputGroup("Mở đăng ký (yyyy-MM-dd HH:mm)", false);
-    private final InputGroup closeAtInput = new InputGroup("Đóng đăng ký (yyyy-MM-dd HH:mm)", false);
-    private final InputGroup commonStartDateInput = new InputGroup("Ngày bắt đầu học chung (yyyy-MM-dd)", false);
-    private final SelectGroup<Term> termSelect = new SelectGroup<>("Học kỳ áp dụng", AppContext.getTermService().getAllTerms());
-    private final DefaultTableModel tableModel = new DefaultTableModel(
-            new Object[]{"ID", "Tên đợt", "Học kỳ", "Mở đăng ký", "Đóng đăng ký", "Bắt đầu học"}, 0
-    ) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-    };
-    private final JTable batchTable = new JTable(tableModel);
-    private final JLabel selectedBatchLabel = new JLabel("Chọn một đợt đăng ký ở bảng bên trên để mở popup tạo lớp học phần.", SwingConstants.LEFT);
+    private final TextInput batchNameInput = new TextInput("Tên đợt đăng ký", false);
+    private final TextInput openAtInput = new TextInput("Mở đăng ký (yyyy-MM-dd HH:mm)", false);
+    private final TextInput closeAtInput = new TextInput("Đóng đăng ký (yyyy-MM-dd HH:mm)", false);
+    private final TextInput commonStartDateInput = new TextInput("Ngày bắt đầu học chung (yyyy-MM-dd)", false);
+    private final SelectInput<Term> termSelect = new SelectInput<>("Học kỳ áp dụng", AppContext.getTermService().getAllTerms());
+    private final Table batchTable;
+    private final JLabel selectedBatchLabel = new JLabel("Chọn một đợt đăng ký ở bảng bên dưới để mở popup tạo lớp học phần.", SwingConstants.LEFT);
 
+    private final List<RegistrationBatch> batchRows = new ArrayList<>();
     private RegistrationBatch selectedBatch;
 
+    // hàm tạo giao diện chính
     public CreateRegistrationBatchPage() {
-        setLayout(new BorderLayout());
-        setOpaque(false);
+        setLayout(new BorderLayout(0, 16));
+        setBackground(new Color(245, 245, 245));
+        setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
 
-        PageScaffold scaffold = new PageScaffold("TẠO ĐỢT ĐĂNG KÝ MÔN");
-        scaffold.setBody(createBody());
-        add(scaffold, BorderLayout.CENTER);
+        batchTable = new Table(new String[]{"ID", "Tên đợt", "Học kỳ", "Mở đăng ký", "Đóng đăng ký", "Bắt đầu học"}, 12, 44);
+        batchTable.setOnRowSelected(index -> {
+            selectBatchByIndex(index);
+            if (selectedBatch != null) {
+                openSectionDialog(); // chọn xong thì mở popup tạo lớp luôn
+            }
+        });
 
-        configureTable();
+        add(Card.titleCard("TẠO ĐỢT ĐĂNG KÝ MÔN"), BorderLayout.NORTH);
+        add(createBody(), BorderLayout.CENTER);
+
         fillDefaultValues();
         loadBatches();
     }
@@ -65,6 +67,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         return container;
     }
 
+    // form nhập thông tin đợt mới
     private JPanel createFormPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.WHITE);
@@ -78,7 +81,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 0, 14, 0);
 
-        JLabel hintLabel = new JLabel("<html>Admin khai báo tên đợt, thời gian mở đóng đăng ký, học kỳ và ngày bắt đầu học chung.<br>Sau đó chọn đợt đăng ký để mở popup quản lý lớp học phần.</html>");
+        JLabel hintLabel = new JLabel("<html>Admin khai báo tên đợt, thời gian mở/đóng đăng ký, học kỳ và ngày bắt đầu học chung.<br>Sau đó chọn đợt đăng ký để mở popup quản lý lớp học phần.</html>");
         hintLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         hintLabel.setForeground(new Color(100, 110, 120));
         panel.add(hintLabel, gbc);
@@ -109,7 +112,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(0, 0, 0, 0);
 
-        PrimaryButton createButton = new PrimaryButton("Tạo đợt đăng ký");
+        Button createButton = new Button("Tạo đợt đăng ký");
         createButton.setPreferredSize(new Dimension(180, 44));
         createButton.addActionListener(e -> createBatch());
         panel.add(createButton, gbc);
@@ -122,15 +125,10 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         panel.setBackground(Color.WHITE);
         panel.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        JLabel title = new JLabel("Danh sách đợt đăng ký đã tạo");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        title.setForeground(new Color(25, 35, 45));
+        Card title = Card.titleCard("Danh sách đợt đăng ký đã tạo");
         panel.add(title, BorderLayout.NORTH);
 
-        JScrollPane scrollPane = new JScrollPane(batchTable);
-        TableStyles.styleScrollPane(scrollPane);
-        panel.add(scrollPane, BorderLayout.CENTER);
-
+        panel.add(batchTable, BorderLayout.CENTER);
         return panel;
     }
 
@@ -142,7 +140,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         selectedBatchLabel.setForeground(new Color(25, 35, 45));
         panel.add(selectedBatchLabel, BorderLayout.WEST);
 
-        PrimaryButton openDialogButton = new PrimaryButton("Thêm lớp học phần");
+        Button openDialogButton = new Button("Thêm lớp học phần");
         openDialogButton.setPreferredSize(new Dimension(200, 44));
         openDialogButton.addActionListener(e -> openSectionDialog());
         panel.add(openDialogButton, BorderLayout.EAST);
@@ -150,30 +148,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         return panel;
     }
 
-    private void configureTable() {
-        batchTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        batchTable.setSelectionBackground(new Color(223, 236, 255));
-        batchTable.setSelectionForeground(new Color(30, 30, 30));
-        batchTable.setGridColor(new Color(230, 235, 240));
-        batchTable.setFillsViewportHeight(true);
-        batchTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        TableStyles.applyModernTable(batchTable);
-        TableStyles.centerColumns(batchTable, 0, 3, 4, 5);
-        batchTable.getSelectionModel().addListSelectionListener(this::onBatchTableSelectionChanged);
-        batchTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1) {
-                    SwingUtilities.invokeLater(() -> {
-                        if (selectedBatch != null) {
-                            openSectionDialog();
-                        }
-                    });
-                }
-            }
-        });
-    }
-
+    // lưu đợt mới vào db
     private void createBatch() {
         try {
             RegistrationBatch batch = new RegistrationBatch();
@@ -194,44 +169,39 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         }
     }
 
+    // load danh sách các đợt đã có
     private void loadBatches() {
-        tableModel.setRowCount(0);
+        batchTable.clearRows();
+        batchRows.clear();
+
         for (RegistrationBatch batch : AppContext.getRegistrationBatchController().getAllBatches()) {
-            tableModel.addRow(new Object[]{
+            batchRows.add(batch);
+            batchTable.addRow(
                     batch.getId(),
                     batch.getName(),
                     batch.getTerm() == null ? "" : batch.getTerm().toString(),
                     formatDateTime(batch.getOpenAt()),
                     formatDateTime(batch.getCloseAt()),
                     formatDate(batch.getCommonStartDate())
-            });
+            );
         }
-        if (tableModel.getRowCount() > 0 && batchTable.getSelectedRow() < 0) {
-            batchTable.setRowSelectionInterval(0, 0);
+
+        if (!batchRows.isEmpty()) {
+            selectBatchByIndex(0);
         }
     }
 
-    private void onBatchTableSelectionChanged(ListSelectionEvent event) {
-        if (event.getValueIsAdjusting()) {
-            return;
-        }
-
-        int selectedRow = batchTable.getSelectedRow();
-        if (selectedRow < 0) {
+    private void selectBatchByIndex(int index) {
+        if (index < 0 || index >= batchRows.size()) {
             selectedBatch = null;
-            selectedBatchLabel.setText("Chọn một đợt đăng ký ở bảng bên trên để mở popup tạo lớp học phần.");
+            selectedBatchLabel.setText("Chọn một đợt đăng ký ở bảng bên dưới để mở popup tạo lớp học phần.");
             return;
         }
-
-        Long batchId = ((Number) tableModel.getValueAt(selectedRow, 0)).longValue();
-        selectedBatch = AppContext.getRegistrationBatchController().getBatchById(batchId).orElse(null);
-        if (selectedBatch == null) {
-            selectedBatchLabel.setText("Chọn một đợt đăng ký ở bảng bên trên để mở popup tạo lớp học phần.");
-            return;
-        }
+        selectedBatch = batchRows.get(index);
         selectedBatchLabel.setText("Đã chọn: " + selectedBatch.getName() + " | " + selectedBatch.getTerm());
     }
 
+    // mở cái popup quản lý lớp học phần cho đợt được chọn
     private void openSectionDialog() {
         if (selectedBatch == null) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một đợt đăng ký trước.", "Thông báo", JOptionPane.WARNING_MESSAGE);
@@ -257,6 +227,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         commonStartDateInput.setValue("");
     }
 
+    // điền mồi mấy cái date để admin đỡ phải gõ nhiều
     private void fillDefaultValues() {
         if (openAtInput.getValue().isBlank()) {
             openAtInput.setValue(LocalDateTime.now().withMinute(0).format(DATE_TIME_FORMATTER));
@@ -274,7 +245,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         termSelect.setItems(AppContext.getTermService().getAllTerms());
         loadBatches();
         if (selectedBatch == null) {
-            selectedBatchLabel.setText("Chọn một đợt đăng ký ở bảng bên trên để mở popup tạo lớp học phần.");
+            selectedBatchLabel.setText("Chọn một đợt đăng ký ở bảng bên dưới để mở popup tạo lớp học phần.");
         }
     }
 }

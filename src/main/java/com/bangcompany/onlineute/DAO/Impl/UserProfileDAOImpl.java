@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -14,8 +15,10 @@ public class UserProfileDAOImpl implements UserProfileDAO {
         try {
             em.getTransaction().begin();
             if (userProfile.getId() == null) {
+                // Thêm mới hồ sơ người dùng
                 em.persist(userProfile);
             } else {
+                // Cập nhật hồ sơ người dùng
                 userProfile = em.merge(userProfile);
             }
             em.getTransaction().commit();
@@ -29,6 +32,7 @@ public class UserProfileDAOImpl implements UserProfileDAO {
     public Optional<UserProfile> findByAccountId(Long accountId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tìm hồ sơ người dùng dựa theo ID tài khoản
             UserProfile userProfile = em.createQuery(
                             "SELECT up FROM UserProfile up WHERE up.account.id = :accountId",
                             UserProfile.class

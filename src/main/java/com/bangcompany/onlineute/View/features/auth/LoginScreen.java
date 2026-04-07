@@ -2,25 +2,48 @@ package com.bangcompany.onlineute.View.features.auth;
 
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.View.navigation.MainNavigator;
-import com.bangcompany.onlineute.View.Components.AppLogoHeader;
+import com.bangcompany.onlineute.View.Components.theme.ImageUtil;
 
 import javax.swing.*;
 import java.awt.*;
 
 /**
- * màn hình đăng nhập
+ * Màn hình đăng nhập chính của ứng dụng.
  */
 public class LoginScreen extends JPanel {
     public LoginScreen() {
-        setLayout(new GridBagLayout());     // tự đôộng nằm giữa screen
+        setLayout(new GridBagLayout());     // tự động nằm giữa màn hình
         setBackground(new Color(230, 235, 240));
 
-        JPanel cardHolder = new JPanel();   //container đăng nhập
-        cardHolder.setLayout(new BoxLayout(cardHolder, BoxLayout.Y_AXIS));// xếp theo chều dọc
-        cardHolder.setOpaque(false); //tỏng suốt background
+        JPanel cardHolder = new JPanel();   // container chứa nội dung đăng nhập
+        cardHolder.setLayout(new BoxLayout(cardHolder, BoxLayout.Y_AXIS));// xếp theo chiều dọc
+        cardHolder.setOpaque(false); // trong suốt background
         add(cardHolder);
 
-        cardHolder.add(new AppLogoHeader());
+        JPanel logoPanel = new JPanel();
+        logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.Y_AXIS));
+        logoPanel.setOpaque(false);
+        logoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel logoLabel = ImageUtil.createImageLabel("public/ute_logo.png", 120, 120, null);
+
+        JLabel uniName1 = new JLabel("TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT");
+        uniName1.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        uniName1.setForeground(new Color(0, 40, 80));
+        uniName1.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel uniName2 = new JLabel("TP.HCM");
+        uniName2.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        uniName2.setForeground(new Color(0, 40, 80));
+        uniName2.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        logoPanel.add(logoLabel);
+        logoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        logoPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        logoPanel.add(uniName1);
+        logoPanel.add(uniName2);
+
+        cardHolder.add(logoPanel);
         cardHolder.add(Box.createRigidArea(new Dimension(0, 30)));
 
         LoginForm loginForm = new LoginForm(this::attemptLogin);

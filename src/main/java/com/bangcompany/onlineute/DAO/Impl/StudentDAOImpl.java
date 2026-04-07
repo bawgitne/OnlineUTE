@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -19,8 +20,10 @@ public class StudentDAOImpl implements StudentDAO {
         try {
             em.getTransaction().begin();
             if (student.getId() == null) {
+                // Thêm mới sinh viên
                 em.persist(student);
             } else {
+                // Cập nhật sinh viên
                 student = em.merge(student);
             }
             em.getTransaction().commit();
@@ -34,10 +37,12 @@ public class StudentDAOImpl implements StudentDAO {
     public Optional<Student> findById(Long id) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tìm sinh viên theo ID kèm thông tin lớp và khoa
             Student student = em.createQuery(
                             "SELECT s FROM Student s " +
                                     "LEFT JOIN FETCH s.classEntity c " +
-                                    "LEFT JOIN FETCH c.faculty " +
+                                    "LEFT JOIN FETCH c.major m " +
+                                    "LEFT JOIN FETCH m.faculty " +
                                     "WHERE s.id = :id",
                             Student.class
                     )
@@ -55,10 +60,12 @@ public class StudentDAOImpl implements StudentDAO {
     public Optional<Student> findByAccountId(Long accountId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tìm sinh viên theo ID tài khoản kèm thông tin lớp và khoa
             Student student = em.createQuery(
                             "SELECT s FROM Student s " +
                                     "LEFT JOIN FETCH s.classEntity c " +
-                                    "LEFT JOIN FETCH c.faculty " +
+                                    "LEFT JOIN FETCH c.major m " +
+                                    "LEFT JOIN FETCH m.faculty " +
                                     "WHERE s.account.id = :accountId",
                             Student.class
                     )
@@ -76,10 +83,12 @@ public class StudentDAOImpl implements StudentDAO {
     public List<Student> findAll() {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Lấy toàn bộ danh sách sinh viên kèm thông tin lớp và khoa
             return em.createQuery(
                             "SELECT s FROM Student s " +
                                     "LEFT JOIN FETCH s.classEntity c " +
-                                    "LEFT JOIN FETCH c.faculty " +
+                                    "LEFT JOIN FETCH c.major m " +
+                                    "LEFT JOIN FETCH m.faculty " +
                                     "ORDER BY s.fullName, s.code",
                             Student.class
                     )
@@ -94,14 +103,18 @@ public class StudentDAOImpl implements StudentDAO {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             String normalizedKeyword = "%" + keyword.toLowerCase() + "%";
+            // Tìm kiếm sinh viên theo mã, họ tên, email, tên lớp hoặc tên khoa (kèm phân trang)
             List<Student> items = em.createQuery(
                             "SELECT DISTINCT s FROM Student s " +
                                     "LEFT JOIN FETCH s.classEntity c " +
-                                    "LEFT JOIN FETCH c.faculty f " +
+                                    "LEFT JOIN FETCH c.major m " +
+                                    "LEFT JOIN FETCH m.faculty f " +
                                     "WHERE LOWER(s.code) LIKE :keyword " +
                                     "OR LOWER(s.fullName) LIKE :keyword " +
                                     "OR LOWER(s.email) LIKE :keyword " +
                                     "OR LOWER(c.className) LIKE :keyword " +
+                                    "OR LOWER(m.fullName) LIKE :keyword " +
+                                    "OR LOWER(m.majorCode) LIKE :keyword " +
                                     "OR LOWER(f.fullName) LIKE :keyword " +
                                     "ORDER BY s.fullName, s.code",
                             Student.class
@@ -111,14 +124,18 @@ public class StudentDAOImpl implements StudentDAO {
                     .setMaxResults(pageRequest.getPageSize())
                     .getResultList();
 
+            // Đếm tổng số lượng sinh viên tìm được
             Long totalItems = em.createQuery(
                             "SELECT COUNT(DISTINCT s.id) FROM Student s " +
                                     "LEFT JOIN s.classEntity c " +
-                                    "LEFT JOIN c.faculty f " +
+                                    "LEFT JOIN c.major m " +
+                                    "LEFT JOIN m.faculty f " +
                                     "WHERE LOWER(s.code) LIKE :keyword " +
                                     "OR LOWER(s.fullName) LIKE :keyword " +
                                     "OR LOWER(s.email) LIKE :keyword " +
                                     "OR LOWER(c.className) LIKE :keyword " +
+                                    "OR LOWER(m.fullName) LIKE :keyword " +
+                                    "OR LOWER(m.majorCode) LIKE :keyword " +
                                     "OR LOWER(f.fullName) LIKE :keyword",
                             Long.class
                     )
@@ -135,8 +152,28 @@ public class StudentDAOImpl implements StudentDAO {
     public long countAll() {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tổng số lượng sinh viên trong hệ thống
             return em.createQuery("SELECT COUNT(s) FROM Student s", Long.class)
                     .getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        if (id == null) {
+            return;
+        }
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Student student = em.find(Student.class, id);
+            if (student != null) {
+                // Xóa sinh viên nếu tồn tại
+                em.remove(student);
+            }
+            em.getTransaction().commit();
         } finally {
             em.close();
         }
@@ -146,6 +183,7 @@ public class StudentDAOImpl implements StudentDAO {
     public long countByCodePrefix(String codePrefix) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Đếm số sinh viên có mã bắt đầu bằng chuỗi cụ thể (dùng để sinh mã tự động)
             return em.createQuery(
                             "SELECT COUNT(s) FROM Student s WHERE s.code LIKE :codePrefix",
                             Long.class

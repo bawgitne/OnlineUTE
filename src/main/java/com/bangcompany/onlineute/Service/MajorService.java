@@ -8,4 +8,6 @@ public interface MajorService {
     List<Major> getAllMajors();
     List<Major> getMajorsByFaculty(Long facultyId);
     Major createMajor(Major major);
+    Major updateMajor(Major major);
+    void deleteMajor(Long id);
 }

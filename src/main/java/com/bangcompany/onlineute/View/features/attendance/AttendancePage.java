@@ -1,65 +1,43 @@
+/**
+ * Xem điểm chuyên cần
+ */
 package com.bangcompany.onlineute.View.features.attendance;
 
+import com.bangcompany.onlineute.View.Components.ui.Card;
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.CourseRegistration;
 import com.bangcompany.onlineute.Model.Entity.Mark;
 import com.bangcompany.onlineute.Model.Entity.Student;
-import com.bangcompany.onlineute.View.Components.TableStyles;
-import com.bangcompany.onlineute.View.features.dashboard.PageScaffold;
-import com.bangcompany.onlineute.View.navigation.Refreshable;
+import com.bangcompany.onlineute.View.Components.ui.Table;
+import com.bangcompany.onlineute.View.shared.Refreshable;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
 public class AttendancePage extends JPanel implements Refreshable {
-    private final DefaultTableModel tableModel;
+    private final Table table;
 
     public AttendancePage() {
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(0, 16));
+        setBackground(new Color(245, 245, 245));
+        setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
 
-        String[] cols = new String[18];
-        cols[0] = "STT";
-        cols[1] = "Mã môn học";
-        cols[2] = "Tên môn học";
+        // tạo cột cho 15 tuần học
+        String[] cols = new String[16];
+        cols[0] = "Tên môn học";
         for (int i = 1; i <= 15; i++) {
-            cols[i + 2] = "B " + i;
+            cols[i] = "" + i;
         }
 
-        tableModel = new DefaultTableModel(cols, 0) {
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                return (columnIndex >= 3 && columnIndex <= 17) ? Boolean.class : String.class;
-            }
+        table = new Table(cols, 12, 44);
 
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        JTable table = new JTable(tableModel);
-        TableStyles.applyModernTable(table);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        TableStyles.centerColumns(table, 0, 1);
-
-        table.getColumnModel().getColumn(0).setPreferredWidth(40);
-        table.getColumnModel().getColumn(1).setPreferredWidth(100);
-        table.getColumnModel().getColumn(2).setPreferredWidth(250);
-        for (int i = 3; i <= 17; i++) {
-            table.getColumnModel().getColumn(i).setPreferredWidth(45);
-        }
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        TableStyles.styleScrollPane(scrollPane);
-
-        PageScaffold scaffold = new PageScaffold("Bảng chuyên cần");
-        scaffold.setBody(scrollPane);
-        add(scaffold, BorderLayout.CENTER);
+        add(Card.titleCard("BẢNG CHUYÊN CẦN"), BorderLayout.NORTH);
+        add(table, BorderLayout.CENTER);
     }
 
+    // hhiện data lên
     @Override
     public void onEnter() {
         Student student = SessionManager.getCurrentStudent();
@@ -67,28 +45,25 @@ public class AttendancePage extends JPanel implements Refreshable {
             return;
         }
 
-        tableModel.setRowCount(0);
+        table.clearRows();
         List<CourseRegistration> registrations = AppContext.getCourseRegistrationService().getRegistrationsByStudent(student.getId());
 
-        int stt = 1;
         for (CourseRegistration registration : registrations) {
-            Object[] row = new Object[18];
-            row[0] = String.valueOf(stt++);
-            row[1] = registration.getCourseSection() != null && registration.getCourseSection().getCourse() != null
-                    ? "M" + registration.getCourseSection().getCourse().getId() : "";
-            row[2] = registration.getCourseSection() != null && registration.getCourseSection().getCourse() != null
+            Object[] row = new Object[16];
+            row[0] = registration.getCourseSection() != null && registration.getCourseSection().getCourse() != null
                     ? registration.getCourseSection().getCourse().getFullName() : "";
 
             Mark mark = registration.getMark();
+            // lưu 15 buổi luuuw bằng 0 1 cho gọn
             String attendance = (mark != null && mark.getAttendance() != null) ? mark.getAttendance() : "000000000000000";
             while (attendance.length() < 15) {
                 attendance += "0";
             }
 
             for (int i = 0; i < 15; i++) {
-                row[i + 3] = attendance.charAt(i) == '1';
+                row[i + 1] = attendance.charAt(i) == '1' ? "x" : ""; // x là đi học
             }
-            tableModel.addRow(row);
+            table.addRow(row);
         }
     }
 }

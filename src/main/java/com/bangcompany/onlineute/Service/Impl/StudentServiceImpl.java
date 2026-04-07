@@ -17,17 +17,35 @@ public class StudentServiceImpl implements StudentService {
         this.studentDAO = studentDAO;
     }
 
+    // tạo mới một sinh viên và gán tài khoản cho sinh viên đó
     @Override
     public void createStudent(Student student, Account account) {
         student.setAccount(account);
         studentDAO.save(student);
     }
 
+    // cập nhật thông tin cho sinh viên
+    @Override
+    public Student updateStudent(Student student) {
+        if (student == null) {
+            throw new IllegalArgumentException("Dữ liệu sinh viên không được để trống.");
+        }
+        return studentDAO.save(student);
+    }
+
+    // xóa sinh viên ra khỏi hệ thống dựa theo ID
+    @Override
+    public void deleteStudent(Long id) {
+        studentDAO.deleteById(id);
+    }
+
+    // lấy toàn bộ danh sách sinh viên
     @Override
     public List<Student> getAllStudents() {
         return studentDAO.findAll();
     }
 
+    // tìm kiếm sinh viên theo từ khóa (có phân trang)
     @Override
     public PagedResult<Student> searchStudents(String keyword, PageRequest pageRequest) {
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -36,16 +54,19 @@ public class StudentServiceImpl implements StudentService {
         return studentDAO.search(keyword.trim(), pageRequest);
     }
 
+    // tìm kiếm sinh viên (hỗ trợ trực tiếp thông số trang)
     @Override
     public PagedResult<Student> searchStudents(String keyword, int page, int pageSize) {
         return searchStudents(keyword, PaginationSupport.normalize(page, pageSize));
     }
 
+    // đếm tổng số lượng sinh viên trong hệ thống
     @Override
     public long countAllStudents() {
         return studentDAO.countAll();
     }
 
+    // đếm số lượng sinh viên theo tiền tố mã (dùng cho việc sinh mã tự động)
     @Override
     public long countStudentsByCodePrefix(String codePrefix) {
         return studentDAO.countByCodePrefix(codePrefix);

@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -14,8 +15,10 @@ public class MarkDAOImpl implements MarkDAO {
         try {
             em.getTransaction().begin();
             if (mark.getId() == null) {
+                // Thêm mới bảng điểm
                 em.persist(mark);
             } else {
+                // Cập nhật thông tin điểm
                 mark = em.merge(mark);
             }
             em.getTransaction().commit();
@@ -38,6 +41,7 @@ public class MarkDAOImpl implements MarkDAO {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             em.getTransaction().begin();
+            // Cần merge vào persistence context trước khi xóa
             mark = em.merge(mark);
             em.remove(mark);
             em.getTransaction().commit();
@@ -63,6 +67,7 @@ public class MarkDAOImpl implements MarkDAO {
     public Optional<Mark> findByRegistrationId(Long registrationId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tìm điểm số tương ứng với một lượt đăng ký môn học
             return em.createQuery("SELECT m FROM Mark m WHERE m.courseRegistration.id = :registrationId", Mark.class)
                     .setParameter("registrationId", registrationId)
                     .getResultStream()

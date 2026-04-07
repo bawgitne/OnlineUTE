@@ -1,3 +1,6 @@
+/**
+ * quản lí tab
+ */
 package com.bangcompany.onlineute.View;
 
 import javax.swing.*;
@@ -7,39 +10,36 @@ public final class WindowManager extends JFrame {
     private static WindowManager instance;
     private static JPanel container;
 
-    /**
-     * Khởi tạo cửa sổ window chính
-     */
     private WindowManager() {
         setTitle("OnlineUTE");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //tắt chương trình khi cửa sổ ắt
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
-        setResizable(true); // có thể tùy chỉnh kích thước
+        setResizable(true);
         setLocationRelativeTo(null);
-      //  setUndecorated(true);   //xóa viền của window
-        container = new JPanel(new BorderLayout()); // tạo container làm nội dung
+        container = new JPanel(new BorderLayout());
         add(container);
     }
 
     private static void init() {
         if (instance == null) {
-            instance = new WindowManager(); // khởi tạo cửa số khi bắt đầu
+            instance = new WindowManager();
         }
     }
 
+    // xóa tab khác dduaw tab kia vào 1 lần 1 tab
     public static void show(JPanel panel) {
         init();
-        container.removeAll();  // xóa hết các phần tử bên trong
-        container.add(panel, BorderLayout.CENTER);  //thêm 1 panel mới
-        container.revalidate(); //kiểm tra lại
-        container.repaint();    // vẽ lại
+        container.removeAll();
+        container.add(panel, BorderLayout.CENTER);
+        container.revalidate();
+        container.repaint();
 
-        if (!instance.isVisible()) {    //kiểm tra nếu chưa hiện thì hiện lại cửa sổ
+        if (!instance.isVisible()) {
             instance.setVisible(true);
         }
     }
 
-    public static void exit() {// khi thoát
+    public static void exit() {
         if (instance != null) {
             instance.dispose();
         }

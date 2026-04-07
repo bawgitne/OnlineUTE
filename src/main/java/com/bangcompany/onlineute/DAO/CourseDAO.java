@@ -1,3 +1,6 @@
+/**
+ * Giao diện định nghĩa các thao tác dữ liệu cho môn học
+ */
 package com.bangcompany.onlineute.DAO;
 
 import com.bangcompany.onlineute.Model.DTO.PageRequest;

@@ -1774,7 +1774,7 @@ public class LoginForm extends JPanel {
 
 - `com.bangcompany.onlineute.Config.AppContext`
 - `com.bangcompany.onlineute.Model.Entity.Announcement`
-- `com.bangcompany.onlineute.View.Components.TableStyles`
+- `com.bangcompany.onlineute.View.Components.theme.TableStyles`
 - `javax.swing`
 - `javax.swing.border.EmptyBorder`
 - `javax.swing.table.DefaultTableModel`
@@ -1787,7 +1787,7 @@ package com.bangcompany.onlineute.View.features.announcement;
 
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.Announcement;
-import com.bangcompany.onlineute.View.Components.TableStyles;
+import com.bangcompany.onlineute.View.Components.theme.TableStyles;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -1856,7 +1856,7 @@ public class AnnouncementTable extends JPanel {
 - `com.bangcompany.onlineute.Model.Entity.CourseRegistration`
 - `com.bangcompany.onlineute.Model.Entity.Mark`
 - `com.bangcompany.onlineute.Model.Entity.Student`
-- `com.bangcompany.onlineute.View.Components.TableStyles`
+- `com.bangcompany.onlineute.View.Components.theme.TableStyles`
 - `com.bangcompany.onlineute.View.features.dashboard.PageScaffold`
 - `com.bangcompany.onlineute.View.navigation.Refreshable`
 - `javax.swing`
@@ -1872,7 +1872,7 @@ import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.CourseRegistration;
 import com.bangcompany.onlineute.Model.Entity.Mark;
 import com.bangcompany.onlineute.Model.Entity.Student;
-import com.bangcompany.onlineute.View.Components.TableStyles;
+import com.bangcompany.onlineute.View.Components.theme.TableStyles;
 import com.bangcompany.onlineute.View.features.dashboard.PageScaffold;
 import com.bangcompany.onlineute.View.navigation.Refreshable;
 
@@ -1908,7 +1908,7 @@ public class AttendancePage extends JPanel implements Refreshable {
         };
 
         JTable table = new JTable(tableModel);
-        TableStyles.applyModernTable(table);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.applyModernTable(table);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         TableStyles.centerColumns(table, 0, 1);
 
@@ -2927,7 +2927,7 @@ public class DashboardLayout extends JPanel {
 
 ### Dependencies
 
-- `com.bangcompany.onlineute.View.Components.SearchActionTopbar`
+- `com.bangcompany.onlineute.View.Components.container.SearchActionTopbar`
 - `com.bangcompany.onlineute.View.navigation.Refreshable`
 - `javax.swing`
 - `javax.swing.border.EmptyBorder`
@@ -2936,7 +2936,7 @@ public class DashboardLayout extends JPanel {
 ```java
 package com.bangcompany.onlineute.View.features.data;
 
-import com.bangcompany.onlineute.View.Components.SearchActionTopbar;
+import com.bangcompany.onlineute.View.Components.container.SearchActionTopbar;
 import com.bangcompany.onlineute.View.navigation.Refreshable;
 
 import javax.swing.*;
@@ -3494,6 +3494,7 @@ public class DataManagementPage extends JPanel implements Refreshable {
 ```java
 package com.bangcompany.onlineute.View.features.data;
 
+import com.bangcompany.onlineute.View.Components.theme.TableStyles;
 import com.bangcompany.onlineute.View.navigation.Refreshable;
 
 import javax.swing.*;
@@ -3533,10 +3534,10 @@ public class EntityTablePanel<T> extends JPanel implements Refreshable {
         };
 
         JTable table = new JTable(tableModel);
-        com.bangcompany.onlineute.View.Components.TableStyles.applyModernTable(table);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.applyModernTable(table);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        com.bangcompany.onlineute.View.Components.TableStyles.styleScrollPane(scrollPane);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.styleScrollPane(scrollPane);
 
         add(resultLabel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
@@ -3849,7 +3850,7 @@ public class SimpleManagementDashboard extends JPanel {
 - `com.bangcompany.onlineute.Model.Entity.Mark`
 - `com.bangcompany.onlineute.View.Components.PageTitleLabel`
 - `com.bangcompany.onlineute.View.Components.PrimaryButton`
-- `com.bangcompany.onlineute.View.Components.TableStyles`
+- `com.bangcompany.onlineute.View.Components.theme.TableStyles`
 - `com.bangcompany.onlineute.View.navigation.Refreshable`
 - `javax.swing`
 - `javax.swing.border.EmptyBorder`
@@ -3871,7 +3872,7 @@ import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import com.bangcompany.onlineute.Model.Entity.Mark;
 import com.bangcompany.onlineute.View.Components.PageTitleLabel;
 import com.bangcompany.onlineute.View.Components.PrimaryButton;
-import com.bangcompany.onlineute.View.Components.TableStyles;
+import com.bangcompany.onlineute.View.Components.theme.TableStyles;
 import com.bangcompany.onlineute.View.navigation.Refreshable;
 
 import javax.swing.*;
@@ -4019,7 +4020,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         table.getColumnModel().getColumn(19).setCellRenderer(centerRender);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        TableStyles.styleScrollPane(scrollPane);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.styleScrollPane(scrollPane);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -4101,7 +4102,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
 - `com.bangcompany.onlineute.Model.Entity.RegistrationBatch`
 - `com.bangcompany.onlineute.Model.Entity.Student`
 - `com.bangcompany.onlineute.View.Components.PrimaryButton`
-- `com.bangcompany.onlineute.View.Components.TableStyles`
+- `com.bangcompany.onlineute.View.Components.theme.TableStyles`
 - `com.bangcompany.onlineute.View.features.dashboard.PageScaffold`
 - `com.bangcompany.onlineute.View.navigation.Refreshable`
 - `javax.swing`
@@ -4126,7 +4127,6 @@ import com.bangcompany.onlineute.Model.Entity.CourseSection;
 import com.bangcompany.onlineute.Model.Entity.RegistrationBatch;
 import com.bangcompany.onlineute.Model.Entity.Student;
 import com.bangcompany.onlineute.View.Components.PrimaryButton;
-import com.bangcompany.onlineute.View.Components.TableStyles;
 import com.bangcompany.onlineute.View.features.dashboard.PageScaffold;
 import com.bangcompany.onlineute.View.navigation.Refreshable;
 
@@ -4135,7 +4135,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -4226,7 +4225,7 @@ public class CourseRegistrationPage extends JPanel implements Refreshable {
         panel.add(batchInfoLabel, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(sectionTable);
-        TableStyles.styleScrollPane(scrollPane);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.styleScrollPane(scrollPane);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -4271,8 +4270,8 @@ public class CourseRegistrationPage extends JPanel implements Refreshable {
         sectionTable.setSelectionForeground(new Color(30, 30, 30));
         sectionTable.setGridColor(new Color(230, 235, 240));
         sectionTable.setFillsViewportHeight(true);
-        TableStyles.applyModernTable(sectionTable);
-        TableStyles.centerColumns(sectionTable, 0, 1, 4, 5, 6, 7, 8);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.applyModernTable(sectionTable);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.centerColumns(sectionTable, 0, 1, 4, 5, 6, 7, 8);
     }
 
     private void onBatchSelected(ListSelectionEvent event) {
@@ -4490,7 +4489,7 @@ public class LecturerManagementDashboard extends JPanel {
 
 - `com.bangcompany.onlineute.Config.AppContext`
 - `com.bangcompany.onlineute.Model.Entity.UserProfile`
-- `com.bangcompany.onlineute.View.Components.TagChip`
+- `com.bangcompany.onlineute.View.Components.ui.TagChip`
 - `com.bangcompany.onlineute.View.features.dashboard.PageScaffold`
 - `com.bangcompany.onlineute.View.navigation.Refreshable`
 - `javax.swing`
@@ -4506,7 +4505,7 @@ package com.bangcompany.onlineute.View.features.profile;
 
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.UserProfile;
-import com.bangcompany.onlineute.View.Components.TagChip;
+import com.bangcompany.onlineute.View.Components.ui.TagChip;
 import com.bangcompany.onlineute.View.features.dashboard.PageScaffold;
 import com.bangcompany.onlineute.View.navigation.Refreshable;
 
@@ -4801,7 +4800,7 @@ public class LecturerManagementPage extends ManagementShellPage {
 - `com.bangcompany.onlineute.Model.Entity.CourseRegistration`
 - `com.bangcompany.onlineute.Model.Entity.Mark`
 - `com.bangcompany.onlineute.Model.Entity.Student`
-- `com.bangcompany.onlineute.View.Components.TableStyles`
+- `com.bangcompany.onlineute.View.Components.theme.TableStyles`
 - `com.bangcompany.onlineute.View.features.dashboard.PageScaffold`
 - `com.bangcompany.onlineute.View.navigation.Refreshable`
 - `javax.swing`
@@ -4822,7 +4821,7 @@ import com.bangcompany.onlineute.Model.Entity.Course;
 import com.bangcompany.onlineute.Model.Entity.CourseRegistration;
 import com.bangcompany.onlineute.Model.Entity.Mark;
 import com.bangcompany.onlineute.Model.Entity.Student;
-import com.bangcompany.onlineute.View.Components.TableStyles;
+import com.bangcompany.onlineute.View.Components.theme.TableStyles;
 import com.bangcompany.onlineute.View.features.dashboard.PageScaffold;
 import com.bangcompany.onlineute.View.navigation.Refreshable;
 
@@ -4851,7 +4850,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
 
         JTable table = new JTable(tableModel);
         TableStyles.applyModernTable(table);
-        TableStyles.centerColumns(table, 0, 1, 3, 4, 5, 6, 7);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.centerColumns(table, 0, 1, 3, 4, 5, 6, 7);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(40);
         table.getColumnModel().getColumn(1).setPreferredWidth(100);
@@ -4950,7 +4949,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
 
 ### Dependencies
 
-- `com.bangcompany.onlineute.View.Components.LabelValuePanel`
+- `com.bangcompany.onlineute.View.Components.ui.LabelValuePanel`
 - `javax.swing`
 - `javax.swing.border.CompoundBorder`
 - `javax.swing.border.EmptyBorder`
@@ -4960,7 +4959,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
 ```java
 package com.bangcompany.onlineute.View.features.profile;
 
-import com.bangcompany.onlineute.View.Components.LabelValuePanel;
+import com.bangcompany.onlineute.View.Components.ui.LabelValuePanel;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -5010,7 +5009,7 @@ public class ProfileSectionCard extends JPanel {
 - `com.bangcompany.onlineute.View.Components.InputGroup`
 - `com.bangcompany.onlineute.View.Components.PrimaryButton`
 - `com.bangcompany.onlineute.View.Components.SelectGroup`
-- `com.bangcompany.onlineute.View.Components.TableStyles`
+- `com.bangcompany.onlineute.View.Components.theme.TableStyles`
 - `javax.swing`
 - `javax.swing.border.EmptyBorder`
 - `javax.swing.table.DefaultTableModel`
@@ -5028,7 +5027,7 @@ import com.bangcompany.onlineute.Model.Entity.RegistrationBatch;
 import com.bangcompany.onlineute.View.Components.InputGroup;
 import com.bangcompany.onlineute.View.Components.PrimaryButton;
 import com.bangcompany.onlineute.View.Components.SelectGroup;
-import com.bangcompany.onlineute.View.Components.TableStyles;
+import com.bangcompany.onlineute.View.Components.theme.TableStyles;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -5200,8 +5199,8 @@ public class CourseSectionDialog extends JDialog {
         sectionTable.setSelectionForeground(new Color(30, 30, 30));
         sectionTable.setGridColor(new Color(230, 235, 240));
         sectionTable.setFillsViewportHeight(true);
-        TableStyles.applyModernTable(sectionTable);
-        TableStyles.centerColumns(sectionTable, 0, 1, 4, 5, 6, 7, 8);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.applyModernTable(sectionTable);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.centerColumns(sectionTable, 0, 1, 4, 5, 6, 7, 8);
     }
 
     private void createCourseSection() {
@@ -5304,7 +5303,7 @@ public class CourseSectionDialog extends JDialog {
 - `com.bangcompany.onlineute.Model.DTO.PagedResult`
 - `com.bangcompany.onlineute.Model.Entity.Lecturer`
 - `com.bangcompany.onlineute.View.Components.PaginationPanel`
-- `com.bangcompany.onlineute.View.Components.TableStyles`
+- `com.bangcompany.onlineute.View.Components.theme.TableStyles`
 - `javax.swing`
 - `javax.swing.border.EmptyBorder`
 - `javax.swing.table.DefaultTableModel`
@@ -5317,7 +5316,7 @@ package com.bangcompany.onlineute.View.features.lecturer;
 import com.bangcompany.onlineute.Model.DTO.PagedResult;
 import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import com.bangcompany.onlineute.View.Components.PaginationPanel;
-import com.bangcompany.onlineute.View.Components.TableStyles;
+import com.bangcompany.onlineute.View.Components.theme.TableStyles;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -5361,7 +5360,7 @@ public class LecturerSearchResultPanel extends JPanel {
         TableStyles.centerColumns(table, 0);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        TableStyles.styleScrollPane(scrollPane);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.styleScrollPane(scrollPane);
 
         paginationPanel = new PaginationPanel(
                 () -> {
@@ -5409,7 +5408,7 @@ public class LecturerSearchResultPanel extends JPanel {
 - `com.bangcompany.onlineute.Model.DTO.PagedResult`
 - `com.bangcompany.onlineute.Model.Entity.Student`
 - `com.bangcompany.onlineute.View.Components.PaginationPanel`
-- `com.bangcompany.onlineute.View.Components.TableStyles`
+- `com.bangcompany.onlineute.View.Components.theme.TableStyles`
 - `javax.swing`
 - `javax.swing.border.EmptyBorder`
 - `javax.swing.table.DefaultTableModel`
@@ -5422,7 +5421,7 @@ package com.bangcompany.onlineute.View.features.student;
 import com.bangcompany.onlineute.Model.DTO.PagedResult;
 import com.bangcompany.onlineute.Model.Entity.Student;
 import com.bangcompany.onlineute.View.Components.PaginationPanel;
-import com.bangcompany.onlineute.View.Components.TableStyles;
+import com.bangcompany.onlineute.View.Components.theme.TableStyles;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -5526,7 +5525,7 @@ public class StudentSearchResultPanel extends JPanel {
 - `com.bangcompany.onlineute.View.Components.InputGroup`
 - `com.bangcompany.onlineute.View.Components.PrimaryButton`
 - `com.bangcompany.onlineute.View.Components.SelectGroup`
-- `com.bangcompany.onlineute.View.Components.TableStyles`
+- `com.bangcompany.onlineute.View.Components.theme.TableStyles`
 - `com.bangcompany.onlineute.View.features.dashboard.PageScaffold`
 - `com.bangcompany.onlineute.View.navigation.Refreshable`
 - `javax.swing`
@@ -5549,7 +5548,6 @@ import com.bangcompany.onlineute.Model.Entity.Term;
 import com.bangcompany.onlineute.View.Components.InputGroup;
 import com.bangcompany.onlineute.View.Components.PrimaryButton;
 import com.bangcompany.onlineute.View.Components.SelectGroup;
-import com.bangcompany.onlineute.View.Components.TableStyles;
 import com.bangcompany.onlineute.View.features.dashboard.PageScaffold;
 import com.bangcompany.onlineute.View.navigation.Refreshable;
 
@@ -5671,7 +5669,7 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         panel.add(title, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(batchTable);
-        TableStyles.styleScrollPane(scrollPane);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.styleScrollPane(scrollPane);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
@@ -5700,8 +5698,8 @@ public class CreateRegistrationBatchPage extends JPanel implements Refreshable {
         batchTable.setGridColor(new Color(230, 235, 240));
         batchTable.setFillsViewportHeight(true);
         batchTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        TableStyles.applyModernTable(batchTable);
-        TableStyles.centerColumns(batchTable, 0, 3, 4, 5);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.applyModernTable(batchTable);
+        com.bangcompany.onlineute.View.Components.theme.TableStyles.centerColumns(batchTable, 0, 3, 4, 5);
         batchTable.getSelectionModel().addListSelectionListener(this::onBatchTableSelectionChanged);
         batchTable.addMouseListener(new MouseAdapter() {
             @Override

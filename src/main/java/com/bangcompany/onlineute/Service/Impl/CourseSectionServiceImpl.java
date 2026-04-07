@@ -21,15 +21,18 @@ public class CourseSectionServiceImpl implements CourseSectionService {
         this.scheduleService = scheduleService;
     }
 
+    // tạo mới lớp học phần và tự động sinh lịch học chi tiết cho từng tuần
     @Override
     public CourseSection createSection(CourseSection section) {
         validateSection(section);
         applyDerivedDates(section);
         CourseSection savedSection = courseSectionDAO.save(section);
+        // Sau khi lưu lớp học phần, tiến hành sinh lịch học cho các tuần
         scheduleService.regenerateSectionSchedules(savedSection.getId(), buildSchedules(savedSection));
         return savedSection;
     }
 
+    // tạo lớp học phần thuộc về một đợt đăng ký cụ thể
     @Override
     public CourseSection createSectionForBatch(RegistrationBatch registrationBatch, CourseSection section) {
         if (registrationBatch == null) {
@@ -40,15 +43,18 @@ public class CourseSectionServiceImpl implements CourseSectionService {
         return createSection(section);
     }
 
+    // cập nhật thông tin lớp học phần và cập nhật lại toàn bộ lịch học liên quan
     @Override
     public CourseSection updateSection(CourseSection section) {
         validateSection(section);
         applyDerivedDates(section);
         CourseSection savedSection = courseSectionDAO.update(section);
+        // Cập nhật lại lịch học tuần vì thời gian hoặc phòng học có thể đã thay đổi
         scheduleService.regenerateSectionSchedules(savedSection.getId(), buildSchedules(savedSection));
         return savedSection;
     }
 
+    // xóa lớp học phần cùng toàn bộ lịch học của nó
     @Override
     public void deleteSection(CourseSection section) {
         if (section != null && section.getId() != null) {
@@ -57,26 +63,31 @@ public class CourseSectionServiceImpl implements CourseSectionService {
         courseSectionDAO.delete(section);
     }
 
+    // lấy thông tin lớp học phần theo ID
     @Override
     public Optional<CourseSection> getSectionById(Long id) {
         return courseSectionDAO.findById(id);
     }
 
+    // lấy danh sách các lớp học phần trong một học kỳ cụ thể
     @Override
     public List<CourseSection> getSectionsByTerm(Long termId) {
         return courseSectionDAO.findByTermId(termId);
     }
 
+    // lấy danh sách các lớp học phần thuộc một đợt đăng ký
     @Override
     public List<CourseSection> getSectionsByBatch(Long registrationBatchId) {
         return courseSectionDAO.findByRegistrationBatchId(registrationBatchId);
     }
 
+    // lấy toàn bộ danh sách lớp học phần trong hệ thống
     @Override
     public List<CourseSection> getAllSections() {
         return courseSectionDAO.findAll();
     }
 
+    // kiểm tra tính hợp lệ của dữ liệu lớp học phần
     private void validateSection(CourseSection section) {
         if (section == null) {
             throw new IllegalArgumentException("Lớp học phần không được để trống.");
@@ -111,9 +122,11 @@ public class CourseSectionServiceImpl implements CourseSectionService {
         if (section.getCurrentCapacity() == null) {
             section.setCurrentCapacity(0);
         }
+        // Kiểm tra xem giảng viên hoặc phòng có bị trùng lịch với lớp khác không
         validateScheduleConflicts(section);
     }
 
+    // kiểm tra các xung đột lịch học (trùng giảng viên hoặc trùng phòng học)
     private void validateScheduleConflicts(CourseSection section) {
         List<CourseSection> conflictingSections = courseSectionDAO.findConflictingSections(
                 section.getTerm().getId(),
@@ -123,6 +136,7 @@ public class CourseSectionServiceImpl implements CourseSectionService {
         );
 
         for (CourseSection conflictingSection : conflictingSections) {
+            // Bỏ qua nếu chính là lớp học phần đang xét
             if (section.getId() != null && section.getId().equals(conflictingSection.getId())) {
                 continue;
             }
@@ -137,6 +151,7 @@ public class CourseSectionServiceImpl implements CourseSectionService {
         }
     }
 
+    // kiểm tra hai lớp học phần có chung giảng viên không
     private boolean hasSameLecturer(CourseSection left, CourseSection right) {
         return left.getLecturer() != null
                 && right.getLecturer() != null
@@ -144,12 +159,14 @@ public class CourseSectionServiceImpl implements CourseSectionService {
                 && left.getLecturer().getId().equals(right.getLecturer().getId());
     }
 
+    // kiểm tra hai lớp học phần có dùng chung phòng không
     private boolean hasSameRoom(CourseSection left, CourseSection right) {
         return left.getRoom() != null
                 && right.getRoom() != null
                 && left.getRoom().equalsIgnoreCase(right.getRoom());
     }
 
+    // tính ngày bắt đầu kết thúc bằng tuần học và ngày bắt đầu của đợt đăng ký
     private void applyDerivedDates(CourseSection section) {
         LocalDate commonStartDate = section.getRegistrationBatch().getCommonStartDate();
         LocalDate firstStudyDate = calculateFirstStudyDate(commonStartDate, section.getDayOfWeek());
@@ -158,6 +175,7 @@ public class CourseSectionServiceImpl implements CourseSectionService {
         section.setLastStudyDate(lastStudyDate);
     }
 
+    // xây dựng danh sách các buổi học chi tiết cho từng tuần dựa trên các thông tin của lớp học phần
     private List<Schedule> buildSchedules(CourseSection section) {
         List<Schedule> schedules = new ArrayList<>();
         LocalDate firstStudyDate = section.getFirstStudyDate();
@@ -177,9 +195,11 @@ public class CourseSectionServiceImpl implements CourseSectionService {
         return schedules;
     }
 
+    // tính toán ngày học đầu tiên dựa trên ngày bắt đầu chung của kỳ và thứ trong tuần mà lớp học đó diễn ra
     private LocalDate calculateFirstStudyDate(LocalDate commonStartDate, int targetDayOfWeek) {
         int currentDay = commonStartDate.getDayOfWeek().getValue();
         int offset = targetDayOfWeek - currentDay;
+        // Nếu ngày học trong tuần nằm trước ngày bắt đầu chung, lịch sẽ lùi sang tuần kế tiếp
         if (offset < 0) {
             offset += 7;
         }

@@ -1,3 +1,6 @@
+/**
+ * Giao diện định nghĩa các thao tác dữ liệu cho giảng viên
+ */
 package com.bangcompany.onlineute.DAO;
 
 import com.bangcompany.onlineute.Model.DTO.PageRequest;
@@ -12,5 +15,6 @@ public interface LecturerDAO {
     List<Lecturer> findAll();
     Optional<Lecturer> findByAccountId(Long accountId);
     PagedResult<Lecturer> search(String keyword, PageRequest pageRequest);
+    void deleteById(Long id);
     long countAll();
 }

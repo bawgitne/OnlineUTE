@@ -13,6 +13,7 @@ public interface StudentDAO {
     Optional<Student> findByAccountId(Long accountId);
     List<Student> findAll();
     PagedResult<Student> search(String keyword, PageRequest pageRequest);
+    void deleteById(Long id);
     long countAll();
     long countByCodePrefix(String codePrefix);
 }

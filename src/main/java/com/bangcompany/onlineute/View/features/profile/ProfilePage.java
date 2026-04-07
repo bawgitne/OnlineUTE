@@ -1,15 +1,18 @@
+/**
+ * Xem thông tin cá nhân
+ */
 package com.bangcompany.onlineute.View.features.profile;
 
+import com.bangcompany.onlineute.View.Components.ui.Card;
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.UserProfile;
-import com.bangcompany.onlineute.View.Components.TagChip;
-import com.bangcompany.onlineute.View.features.dashboard.PageScaffold;
-import com.bangcompany.onlineute.View.navigation.Refreshable;
+import com.bangcompany.onlineute.View.Components.theme.AppTheme;
+import com.bangcompany.onlineute.View.Components.theme.RoundedBorders;
+import com.bangcompany.onlineute.View.Components.theme.SwingUtils;
+import com.bangcompany.onlineute.View.Components.ui.TagChip;
+import com.bangcompany.onlineute.View.shared.Refreshable;
 
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,31 +20,30 @@ import java.time.format.DateTimeFormatter;
 public class ProfilePage extends JPanel implements Refreshable {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final PageScaffold scaffold;
+    private final JPanel bodyPanel = new JPanel(new BorderLayout());
 
     public ProfilePage() {
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(0, 16));
+        setBackground(new Color(245, 245, 245));
+        setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
 
-        scaffold = new PageScaffold("Thông tin cá nhân");
-        scaffold.setBody(createLoadingState());
-        add(scaffold, BorderLayout.CENTER);
+        bodyPanel.setOpaque(false);
+
+        add(Card.titleCard("THÔNG TIN CÁ NHÂN"), BorderLayout.NORTH);
+        add(bodyPanel, BorderLayout.CENTER);
     }
 
+    // lấy data
     @Override
     public void onEnter() {
         UserProfile profile = AppContext.getUserProfileController().getCurrentUserProfile();
-        scaffold.setBody(createProfileContent(profile));
+        bodyPanel.removeAll();
+        bodyPanel.add(createProfileContent(profile), BorderLayout.CENTER);
         revalidate();
         repaint();
     }
 
-    private JComponent createLoadingState() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-        panel.add(new JLabel("Đang tải", SwingConstants.CENTER), BorderLayout.CENTER);
-        return panel;
-    }
-
+    // chia thành các section nhỏ: cá nhân, học thuật, liên hệ
     private JComponent createProfileContent(UserProfile profile) {
         JPanel content = new JPanel();
         content.setOpaque(false);
@@ -55,45 +57,24 @@ public class ProfilePage extends JPanel implements Refreshable {
         content.add(Box.createRigidArea(new Dimension(0, 18)));
         content.add(createContactSection(profile));
 
-        JScrollPane scrollPane = new JScrollPane(content);
-        scrollPane.setBorder(null);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setOpaque(false);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        return scrollPane;
+        return SwingUtils.hiddenScrollPane(content);
     }
 
+    // cái card to đầu tiên chứa avatar và tên
     private JPanel createSummaryCard(UserProfile profile) {
         JPanel card = new JPanel(new BorderLayout(20, 0));
-        card.setBackground(Color.WHITE);
-        card.setBorder(new CompoundBorder(
-                new LineBorder(new Color(224, 229, 236), 1, true),
-                new EmptyBorder(24, 24, 24, 24)
-        ));
+        card.setBackground(AppTheme.BACKGROUND_CARD);
+        card.setBorder(RoundedBorders.paddedOutline(AppTheme.RADIUS_CARD, new Insets(24, 24, 24, 24)));
         card.setAlignmentX(Component.LEFT_ALIGNMENT);
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
 
-        card.add(createAvatarPanel(profile), BorderLayout.WEST);
+
         card.add(createSummaryInfo(profile), BorderLayout.CENTER);
         return card;
     }
 
-    private JComponent createAvatarPanel(UserProfile profile) {
-        JPanel wrapper = new JPanel(new GridBagLayout());
-        wrapper.setOpaque(false);
-        wrapper.setPreferredSize(new Dimension(130, 130));
 
-        JLabel avatar = new JLabel(initialsOf(profile.getDisplayName()), SwingConstants.CENTER);
-        avatar.setPreferredSize(new Dimension(96, 96));
-        avatar.setOpaque(true);
-        avatar.setBackground(new Color(24, 70, 121));
-        avatar.setForeground(Color.WHITE);
-        avatar.setFont(new Font("Segoe UI", Font.BOLD, 30));
-        avatar.setBorder(BorderFactory.createLineBorder(new Color(209, 220, 235), 4, true));
-        wrapper.add(avatar);
-        return wrapper;
-    }
-
+    // thông tin tóm tắt bên cạnh avatar
     private JComponent createSummaryInfo(UserProfile profile) {
         JPanel info = new JPanel();
         info.setOpaque(false);
@@ -121,6 +102,7 @@ public class ProfilePage extends JPanel implements Refreshable {
         return info;
     }
 
+    // các field chi tiết của cá nhân
     private ProfileSectionCard createPersonalSection(UserProfile profile) {
         ProfileSectionCard card = new ProfileSectionCard("Thông tin cá nhân");
         card.addField("Họ và tên", valueOf(profile.getDisplayName()));
@@ -140,6 +122,7 @@ public class ProfilePage extends JPanel implements Refreshable {
         return card;
     }
 
+    // các field chi tiết về học tập
     private ProfileSectionCard createAcademicSection(UserProfile profile) {
         ProfileSectionCard card = new ProfileSectionCard("Thông tin học tập");
         card.addField("Vai trò", valueOf(profile.getRoleTitle()));
@@ -151,6 +134,7 @@ public class ProfilePage extends JPanel implements Refreshable {
         return card;
     }
 
+    // các field chi tiết về gia đình/liên hệ
     private ProfileSectionCard createContactSection(UserProfile profile) {
         ProfileSectionCard card = new ProfileSectionCard("Thông tin liên hệ");
         card.addField("Người liên hệ", valueOf(profile.getContactName()));
@@ -163,6 +147,7 @@ public class ProfilePage extends JPanel implements Refreshable {
         return card;
     }
 
+    // kiểm tra null để hiện "Chưa cập nhật"
     private String valueOf(String value) {
         return value == null || value.isBlank() ? "Chưa cập nhật" : value;
     }
@@ -171,6 +156,7 @@ public class ProfilePage extends JPanel implements Refreshable {
         return date == null ? "Chưa cập nhật" : date.format(DATE_FORMATTER);
     }
 
+    // lấy kí tự đầu tên để làm avatar
     private String initialsOf(String value) {
         if (value == null || value.isBlank()) {
             return "?";
@@ -186,4 +172,3 @@ public class ProfilePage extends JPanel implements Refreshable {
         return (first + last).toUpperCase();
     }
 }
-

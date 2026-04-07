@@ -1,15 +1,18 @@
+/**
+ * Nhập điểm cho sinh viên
+ */
 package com.bangcompany.onlineute.View.features.grade;
 
+import com.bangcompany.onlineute.View.Components.ui.Card;
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.CourseRegistration;
 import com.bangcompany.onlineute.Model.Entity.CourseSection;
 import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import com.bangcompany.onlineute.Model.Entity.Mark;
-import com.bangcompany.onlineute.View.Components.PageTitleLabel;
-import com.bangcompany.onlineute.View.Components.PrimaryButton;
-import com.bangcompany.onlineute.View.Components.TableStyles;
-import com.bangcompany.onlineute.View.navigation.Refreshable;
+import com.bangcompany.onlineute.View.Components.ui.Button;
+import com.bangcompany.onlineute.View.Components.theme.TableStyles;
+import com.bangcompany.onlineute.View.shared.Refreshable;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -22,37 +25,43 @@ import java.util.stream.Collectors;
 
 public class InputGradesPage extends JPanel implements Refreshable {
     private final JTabbedPane tabbedPane;
-    private final JPanel noDataPanel;
+    private final JPanel noDataPanel = new JPanel(new BorderLayout());
 
     public InputGradesPage() {
-        setLayout(new BorderLayout(0, 20));
-        setBackground(Color.WHITE);
-        setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false);
-        topPanel.add(new PageTitleLabel("QUẢN LÝ SINH VIÊN - ĐIỂM DANH VÀ NHẬP ĐIỂM"), BorderLayout.NORTH);
-        add(topPanel, BorderLayout.NORTH);
+        setLayout(new BorderLayout(0, 16));
+        setBackground(new Color(245, 245, 245));
+        setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
 
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        noDataPanel = new JPanel(new BorderLayout());
+        // giáo viên ko có lớp thì hiện ra
+        JLabel emptyLabel = new JLabel("Không có lớp học phần nào", SwingConstants.CENTER);
+        emptyLabel.setFont(new Font("Segoe UI", Font.ITALIC, 16));
+        emptyLabel.setForeground(Color.GRAY);
+        noDataPanel.setOpaque(true);
         noDataPanel.setBackground(Color.WHITE);
-        JLabel noDataLabel = new JLabel("Không có lớp học phần nào", SwingConstants.CENTER);
-        noDataLabel.setFont(new Font("Segoe UI", Font.ITALIC, 16));
-        noDataLabel.setForeground(Color.GRAY);
-        noDataPanel.add(noDataLabel, BorderLayout.CENTER);
+        noDataPanel.add(emptyLabel, BorderLayout.CENTER);
 
-        add(tabbedPane, BorderLayout.CENTER);
+        add(Card.titleCard("QUẢN LÝ SINH VIÊN - ĐIỂM DANH VÀ NHẬP ĐIỂM"), BorderLayout.NORTH);
+        add(createBody(), BorderLayout.CENTER);
     }
 
+    private JComponent createBody() {
+        JPanel container = new JPanel(new BorderLayout(0, 16));
+        container.setOpaque(false);
+        container.add(tabbedPane, BorderLayout.CENTER);
+        return container;
+    }
+
+    // render thôi
     @Override
     public void onEnter() {
         loadTabs();
     }
 
+    // ô các lớp để quản lí
     private void loadTabs() {
         tabbedPane.removeAll();
         Lecturer currentLecturer = SessionManager.getCurrentLecturer();
@@ -78,6 +87,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         repaint();
     }
 
+    // tạo bảng điểm và điểm danh cho từng lớp
     private JPanel createSectionPanel(CourseSection section) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
@@ -98,14 +108,14 @@ public class InputGradesPage extends JPanel implements Refreshable {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex >= 3 && columnIndex <= 17) {
-                    return Boolean.class;
+                    return Boolean.class; // cột điểm danh là checkbox
                 }
                 return String.class;
             }
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column >= 3 && column <= 19;
+                return column >= 3 && column <= 19; // chỉ cho sửa điểm/điểm danh
             }
         };
 
@@ -138,7 +148,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         TableStyles.applyModernTable(table);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        table.getColumnModel().removeColumn(table.getColumnModel().getColumn(0));
+        table.getColumnModel().removeColumn(table.getColumnModel().getColumn(0)); // giấu ID đăng ký đi
         table.getColumnModel().getColumn(0).setPreferredWidth(100);
         table.getColumnModel().getColumn(1).setPreferredWidth(150);
         for (int i = 2; i <= 16; i++) {
@@ -161,7 +171,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.setBackground(Color.WHITE);
-        PrimaryButton btnSave = new PrimaryButton("Lưu bảng điểm");
+        Button btnSave = new Button("Lưu bảng điểm");
         btnSave.setPreferredSize(new Dimension(150, 40));
         btnSave.addActionListener(e -> saveGrades(table, model, registrations));
         bottomPanel.add(btnSave);
@@ -170,6 +180,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         return panel;
     }
 
+    // duyệt table để lưu điểm/điểm danh vào mảng dữ liệu sv
     private void saveGrades(JTable table, DefaultTableModel model, List<CourseRegistration> registrations) {
         if (table.isEditing()) {
             table.getCellEditor().stopCellEditing();
@@ -209,6 +220,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         }
     }
 
+    // ép kiểu và validate điểm
     private BigDecimal parseScore(Object val) {
         if (val == null) {
             return null;

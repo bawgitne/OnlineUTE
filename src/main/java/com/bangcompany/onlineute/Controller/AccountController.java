@@ -24,4 +24,8 @@ public class AccountController {
     public Account createAdminAccount(Account account, Admin admin) {
         return accountService.createAdminAccount(account, admin);
     }
+
+    public boolean changePassword(Long accountId, String oldPassword, String newPassword) {
+        return accountService.changePassword(accountId, oldPassword, newPassword);
+    }
 }

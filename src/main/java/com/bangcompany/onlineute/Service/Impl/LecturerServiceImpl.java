@@ -14,6 +14,7 @@ public class LecturerServiceImpl implements LecturerService {
         this.lecturerDAO = lecturerDAO;
     }
 
+    // tìm kiếm giảng viên theo từ khóa (có phân trang)
     @Override
     public PagedResult<Lecturer> searchLecturers(String keyword, PageRequest pageRequest) {
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -22,11 +23,34 @@ public class LecturerServiceImpl implements LecturerService {
         return lecturerDAO.search(keyword.trim(), pageRequest);
     }
 
+    // tìm kiếm giảng viên (hỗ trợ trực tiếp thông số trang)
     @Override
     public PagedResult<Lecturer> searchLecturers(String keyword, int page, int pageSize) {
         return searchLecturers(keyword, PaginationSupport.normalize(page, pageSize));
     }
 
+    // cập nhật thông tin giảng viên
+    @Override
+    public Lecturer updateLecturer(Lecturer lecturer) {
+        if (lecturer == null) {
+            throw new IllegalArgumentException("Dữ liệu giảng viên không được để trống.");
+        }
+        return lecturerDAO.save(lecturer);
+    }
+
+    // xóa giảng viên ra khỏi hệ thống theo ID
+    @Override
+    public void deleteLecturer(Long id) {
+        lecturerDAO.deleteById(id);
+    }
+
+    // lấy toàn bộ danh sách giảng viên
+    @Override
+    public java.util.List<Lecturer> getAllLecturers() {
+        return lecturerDAO.findAll();
+    }
+
+    // đếm tổng số lượng giảng viên trong hệ thống
     @Override
     public long countAllLecturers() {
         return lecturerDAO.countAll();

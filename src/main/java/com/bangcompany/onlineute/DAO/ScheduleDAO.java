@@ -11,4 +11,5 @@ public interface ScheduleDAO {
     List<Schedule> findByCourseSectionId(Long courseSectionId);
     List<Schedule> findByStudentId(Long studentId);
     List<Schedule> findByStudentIdAndDateRange(Long studentId, LocalDate startDate, LocalDate endDate);
+    List<Schedule> findByLecturerIdAndDateRange(Long lecturerId, LocalDate startDate, LocalDate endDate);
 }

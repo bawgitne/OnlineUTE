@@ -23,4 +23,12 @@ public class MajorController {
     public Major createMajor(Major major) {
         return majorService.createMajor(major);
     }
+
+    public Major updateMajor(Major major) {
+        return majorService.updateMajor(major);
+    }
+
+    public void deleteMajor(Long id) {
+        majorService.deleteMajor(id);
+    }
 }

@@ -1,52 +1,54 @@
+/**
+ * Tạo lớp học phần
+ */
 package com.bangcompany.onlineute.View.features.registration;
 
+import com.bangcompany.onlineute.View.Components.ui.Card;
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.Course;
 import com.bangcompany.onlineute.Model.Entity.CourseSection;
 import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import com.bangcompany.onlineute.Model.Entity.RegistrationBatch;
-import com.bangcompany.onlineute.View.Components.InputGroup;
-import com.bangcompany.onlineute.View.Components.PrimaryButton;
-import com.bangcompany.onlineute.View.Components.SelectGroup;
-import com.bangcompany.onlineute.View.Components.TableStyles;
+import com.bangcompany.onlineute.View.Components.ui.Button;
+import com.bangcompany.onlineute.View.Components.ui.Table;
+import com.bangcompany.onlineute.View.Components.ui.TextInput;
+import com.bangcompany.onlineute.View.Components.ui.SelectInput;
+import com.bangcompany.onlineute.View.Components.ui.FormRow;
+import com.bangcompany.onlineute.View.Components.theme.DateUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
 public class CourseSectionDialog extends JDialog {
     private final RegistrationBatch selectedBatch;
 
-    private final InputGroup sectionCodeInput = new InputGroup("Mã lớp học phần", false);
-    private final SelectGroup<Course> courseSelect = new SelectGroup<>("Môn học", AppContext.getCourseService().getAllCourses());
-    private final SelectGroup<Lecturer> lecturerSelect = new SelectGroup<>("Giảng viên", AppContext.getLecturerDAO().findAll());
-    private final InputGroup roomInput = new InputGroup("Phòng học", false);
-    private final InputGroup maxCapacityInput = new InputGroup("Số lượng tối đa", false);
-    private final SelectGroup<DayOption> daySelect = new SelectGroup<>("Thứ học", List.of(
-            new DayOption(1, "Thứ 2"),
-            new DayOption(2, "Thứ 3"),
-            new DayOption(3, "Thứ 4"),
-            new DayOption(4, "Thứ 5"),
-            new DayOption(5, "Thứ 6"),
-            new DayOption(6, "Thứ 7"),
-            new DayOption(7, "Chủ nhật")
+    private final TextInput sectionCodeInput = new TextInput("Mã lớp học phần", false);
+    private final SelectInput<Course> courseSelect = new SelectInput<>("Môn học", AppContext.getCourseService().getAllCourses());
+    private final SelectInput<Lecturer> lecturerSelect = new SelectInput<>("Giảng viên", AppContext.getLecturerDAO().findAll());
+    private final TextInput roomInput = new TextInput("Phòng học", false);
+    private final TextInput maxCapacityInput = new TextInput("Số lượng tối đa", false);
+    private final SelectInput<DayOption> daySelect = new SelectInput<>("Thứ học", List.of(
+            new DayOption(1, DateUtils.formatDay(1)),
+            new DayOption(2, DateUtils.formatDay(2)),
+            new DayOption(3, DateUtils.formatDay(3)),
+            new DayOption(4, DateUtils.formatDay(4)),
+            new DayOption(5, DateUtils.formatDay(5)),
+            new DayOption(6, DateUtils.formatDay(6)),
+            new DayOption(7, DateUtils.formatDay(7))
     ));
-    private final InputGroup startSlotInput = new InputGroup("Tiết bắt đầu", false);
-    private final InputGroup endSlotInput = new InputGroup("Tiết kết thúc", false);
-    private final InputGroup totalWeeksInput = new InputGroup("Số tuần học", false);
+    private final TextInput startSlotInput = new TextInput("Tiết bắt đầu", false);
+    private final TextInput endSlotInput = new TextInput("Tiết kết thúc", false);
+    private final TextInput totalWeeksInput = new TextInput("Số tuần học", false);
 
-    private final DefaultTableModel sectionTableModel = new DefaultTableModel(
-            new Object[]{"ID", "Mã lớp", "Môn học", "Giảng viên", "Phòng", "Thứ", "Tiết", "Số tuần", "Sĩ số"}, 0
-    ) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-    };
-    private final JTable sectionTable = new JTable(sectionTableModel);
+    private final Table sectionTable = new Table(
+            new String[]{"ID", "Mã lớp", "Môn học", "Giảng viên", "Phòng", "Thứ", "Tiết", "Số tuần", "Sĩ số"},
+            12,
+            44
+    );
 
+    // hàm tạo dialog quản lí lớp học phần
     public CourseSectionDialog(Window owner, RegistrationBatch selectedBatch) {
         super(owner, "Quản lý lớp học phần", ModalityType.APPLICATION_MODAL);
         this.selectedBatch = selectedBatch;
@@ -57,7 +59,6 @@ public class CourseSectionDialog extends JDialog {
         setContentPane(createContent());
 
         fillDefaultValues();
-        configureSectionTable();
         loadSectionsIntoTable();
     }
 
@@ -66,11 +67,10 @@ public class CourseSectionDialog extends JDialog {
         container.setBackground(new Color(245, 245, 245));
         container.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        JLabel title = new JLabel("Tạo lớp học phần cho đợt: " + selectedBatch.getName() + " | " + selectedBatch.getTerm());
-        title.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        title.setForeground(new Color(25, 35, 45));
+        Card title = Card.titleCard("Tạo lớp học phần cho đợt: " + selectedBatch.getName() + " | " + selectedBatch.getTerm());
         container.add(title, BorderLayout.NORTH);
 
+        // chia 2 nửa: bên trái nhập form, bên phải xem list
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createFormPanel(), createTablePanel());
         splitPane.setBorder(BorderFactory.createEmptyBorder());
         splitPane.setResizeWeight(0.42);
@@ -83,76 +83,41 @@ public class CourseSectionDialog extends JDialog {
         return container;
     }
 
+    // cái form dài loằng ngoằng để nhập thông tin lớp
     private JPanel createFormPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(Color.WHITE);
         panel.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(0, 0, 14, 0);
-
-        JLabel hint = new JLabel("<html>Khai báo môn học, giảng viên, phòng, thứ học, tiết học và số tuần.<br>Hệ thống sẽ tự động tính ngày học đầu tiên và sinh lịch học theo tuần.</html>");
+        JLabel hint = new JLabel("<html>Khai báo môn học, giảng viên, phòng, thứ học, tiết học và số tuần.<br>Hệ thống sẽ tự động tính ngày học đầu tiên và sinh lịch theo tuần.</html>");
         hint.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         hint.setForeground(new Color(100, 110, 120));
-        panel.add(hint, gbc);
+        panel.add(hint);
+        panel.add(Box.createVerticalStrut(14));
 
-        gbc.gridy++;
-        panel.add(sectionCodeInput, gbc);
-
-        gbc.gridy++;
-        panel.add(courseSelect, gbc);
-
-        gbc.gridy++;
-        panel.add(lecturerSelect, gbc);
-
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(0, 0, 14, 10);
-        panel.add(roomInput, gbc);
-
-        gbc.gridx = 1;
-        gbc.insets = new Insets(0, 10, 14, 0);
-        panel.add(maxCapacityInput, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.insets = new Insets(0, 0, 14, 10);
-        panel.add(daySelect, gbc);
-
-        gbc.gridx = 1;
-        gbc.insets = new Insets(0, 10, 14, 0);
-        panel.add(totalWeeksInput, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.insets = new Insets(0, 0, 18, 10);
-        panel.add(startSlotInput, gbc);
-
-        gbc.gridx = 1;
-        gbc.insets = new Insets(0, 10, 18, 0);
-        panel.add(endSlotInput, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(0, 0, 0, 0);
+        panel.add(sectionCodeInput);
+        panel.add(Box.createVerticalStrut(12));
+        panel.add(courseSelect);
+        panel.add(Box.createVerticalStrut(12));
+        panel.add(lecturerSelect);
+        panel.add(Box.createVerticalStrut(12));
+        panel.add(FormRow.two(roomInput, maxCapacityInput));
+        panel.add(Box.createVerticalStrut(12));
+        panel.add(FormRow.two(daySelect, totalWeeksInput));
+        panel.add(Box.createVerticalStrut(12));
+        panel.add(FormRow.two(startSlotInput, endSlotInput));
+        panel.add(Box.createVerticalStrut(18));
 
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         actions.setOpaque(false);
 
-        PrimaryButton createSectionButton = new PrimaryButton("Tạo lớp học phần");
+        Button createSectionButton = new Button("Tạo lớp học phần");
         createSectionButton.setPreferredSize(new Dimension(180, 40));
         createSectionButton.addActionListener(e -> createCourseSection());
 
         actions.add(createSectionButton);
-        panel.add(actions, gbc);
+        panel.add(actions);
 
         return panel;
     }
@@ -162,28 +127,14 @@ public class CourseSectionDialog extends JDialog {
         panel.setBackground(Color.WHITE);
         panel.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        JLabel title = new JLabel("Danh sách lớp học phần của đợt");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        title.setForeground(new Color(25, 35, 45));
+        Card title = Card.titleCard("Danh sách lớp học phần của đợt");
         panel.add(title, BorderLayout.NORTH);
 
-        JScrollPane scrollPane = new JScrollPane(sectionTable);
-        TableStyles.styleScrollPane(scrollPane);
-        panel.add(scrollPane, BorderLayout.CENTER);
-
+        panel.add(sectionTable, BorderLayout.CENTER);
         return panel;
     }
 
-    private void configureSectionTable() {
-        sectionTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        sectionTable.setSelectionBackground(new Color(223, 236, 255));
-        sectionTable.setSelectionForeground(new Color(30, 30, 30));
-        sectionTable.setGridColor(new Color(230, 235, 240));
-        sectionTable.setFillsViewportHeight(true);
-        TableStyles.applyModernTable(sectionTable);
-        TableStyles.centerColumns(sectionTable, 0, 1, 4, 5, 6, 7, 8);
-    }
-
+    // lưu lớp học phần và tự động sinh lịch học kèm theo
     private void createCourseSection() {
         try {
             CourseSection section = new CourseSection();
@@ -208,21 +159,22 @@ public class CourseSectionDialog extends JDialog {
         }
     }
 
+    // load list lớp con của đợt vào table
     private void loadSectionsIntoTable() {
-        sectionTableModel.setRowCount(0);
+        sectionTable.clearRows();
         List<CourseSection> sections = AppContext.getCourseSectionController().getSectionsByBatch(selectedBatch.getId());
         for (CourseSection section : sections) {
-            sectionTableModel.addRow(new Object[]{
+            sectionTable.addRow(
                     section.getId(),
                     section.getSectionCode(),
                     section.getCourse() == null ? "" : section.getCourse().getFullName(),
                     section.getLecturer() == null ? "" : section.getLecturer().getFullName(),
                     section.getRoom(),
-                    formatDay(section.getDayOfWeek()),
+                    DateUtils.formatDay(section.getDayOfWeek()),
                     formatSlots(section.getStartSlot(), section.getEndSlot()),
                     section.getTotalWeeks(),
                     (section.getCurrentCapacity() == null ? 0 : section.getCurrentCapacity()) + "/" + (section.getMaxCapacity() == null ? 0 : section.getMaxCapacity())
-            });
+            );
         }
     }
 
@@ -244,22 +196,6 @@ public class CourseSectionDialog extends JDialog {
         }
     }
 
-    private String formatDay(Integer value) {
-        if (value == null) {
-            return "";
-        }
-        return switch (value) {
-            case 1 -> "Thứ 2";
-            case 2 -> "Thứ 3";
-            case 3 -> "Thứ 4";
-            case 4 -> "Thứ 5";
-            case 5 -> "Thứ 6";
-            case 6 -> "Thứ 7";
-            case 7 -> "Chủ nhật";
-            default -> "Không rõ";
-        };
-    }
-
     private String formatSlots(Integer startSlot, Integer endSlot) {
         if (startSlot == null || endSlot == null) {
             return "";
@@ -267,6 +203,7 @@ public class CourseSectionDialog extends JDialog {
         return startSlot + " - " + endSlot;
     }
 
+    // model bọc thứ học để hiện text trong comboBox
     private record DayOption(int value, String label) {
         @Override
         public String toString() {

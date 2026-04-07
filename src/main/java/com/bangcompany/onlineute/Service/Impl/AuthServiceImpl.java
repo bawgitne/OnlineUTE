@@ -25,27 +25,45 @@ public class AuthServiceImpl implements AuthService {
         this.adminDAO = adminDAO;
     }
 
+    // xử lý đăng nhập người dùng
     @Override
     public Optional<Account> login(String loginCode, String password) {
+        // Tìm tài khoản theo mã đăng nhập (username, mã SV, mã GV,...)
         Optional<Account> accountOpt = accountDAO.findByLoginCode(loginCode);
         if (accountOpt.isEmpty()) {
             return Optional.empty();
         }
-        password = PasswordUtil.hashPassword(password, accountOpt.get().getSalt());
         Account account = accountOpt.get();
-        if (!password.equals(account.getPasswordHash())) {
+        byte[] salt = account.getSalt();
+
+        // Kiểm tra mật khẩu (hỗ trợ cả mật khẩu chưa băm cũ và mật khẩu đã băm mới có muối)
+        if (salt == null || salt.length == 0) {
+            if (!password.equals(account.getPasswordHash())) {
+                return Optional.empty();
+            }
+        } else {
+            String hashed = PasswordUtil.hashPassword(password, salt);
+            if (!hashed.equals(account.getPasswordHash())) {
+                return Optional.empty();
+            }
+        }
+
+        if (account.getPasswordHash() == null) {
             return Optional.empty();
         }
 
+        // Tải thông tin phiên làm việc nếu đăng nhập thành công
         loadSession(account);
         return Optional.of(account);
     }
 
+    // đăng xuất ra khỏi hệ thống
     @Override
     public void logout() {
         SessionManager.logout();
     }
 
+    // tải dữ liệu người dùng vào SessionManager dựa trên vai trò
     private void loadSession(Account account) {
         SessionManager.login(account);
 

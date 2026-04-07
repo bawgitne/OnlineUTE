@@ -7,4 +7,6 @@ import java.util.List;
 public interface FacultyService {
     List<Faculty> getAllFaculties();
     Faculty createFaculty(Faculty faculty);
+    Faculty updateFaculty(Faculty faculty);
+    void deleteFaculty(Long id);
 }

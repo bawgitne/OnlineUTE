@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -7,15 +8,17 @@ import jakarta.persistence.EntityManager;
 import java.util.Optional;
 
 public class AdminDAOImpl implements AdminDAO {
-
+    //hàm lưu
     @Override
     public Admin save(Admin admin) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
             em.getTransaction().begin();
             if (admin.getId() == null) {
+                // Tạo mới nếu chưa có ID
                 em.persist(admin);
             } else {
+                // Cập nhật nếu đã có ID
                 admin = em.merge(admin);
             }
             em.getTransaction().commit();
@@ -24,7 +27,7 @@ public class AdminDAOImpl implements AdminDAO {
             em.close();
         }
     }
-
+    // Tìm thông tin Admin dựa trên ID tài khoản
     @Override
     public Optional<Admin> findByAccountId(Long accountId) {
         EntityManager em = JpaUtil.getEntityManager();

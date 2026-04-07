@@ -21,8 +21,6 @@ public class Faculty {
     @OneToMany(mappedBy = "faculty", fetch = FetchType.LAZY)
     private List<Major> majors = new ArrayList<>();
 
-    @OneToMany(mappedBy = "faculty", fetch = FetchType.LAZY)
-    private List<Class> classes = new ArrayList<>();
 
     public Faculty() {
     }
@@ -65,13 +63,6 @@ public class Faculty {
         this.majors = majors;
     }
 
-    public List<Class> getClasses() {
-        return classes;
-    }
-
-    public void setClasses(List<Class> classes) {
-        this.classes = classes;
-    }
 
     @Override
     public String toString() {

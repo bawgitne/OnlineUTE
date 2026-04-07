@@ -1,3 +1,4 @@
+
 package com.bangcompany.onlineute.DAO.Impl;
 
 import com.bangcompany.onlineute.Config.JpaUtil;
@@ -15,8 +16,10 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
         try {
             em.getTransaction().begin();
             if (courseSection.getId() == null) {
+                // Thêm mới lớp học phần
                 em.persist(courseSection);
             } else {
+                // Cập nhật thông tin lớp học phần
                 courseSection = em.merge(courseSection);
             }
             em.getTransaction().commit();
@@ -54,6 +57,7 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
     public Optional<CourseSection> findById(Long id) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tìm lớp học phần kèm theo thông tin môn học, giảng viên và đợt đăng ký
             List<CourseSection> result = em.createQuery(
                             "SELECT cs FROM CourseSection cs " +
                                     "JOIN FETCH cs.course " +
@@ -75,6 +79,7 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
     public List<CourseSection> findByTermId(Long termId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tìm các lớp học phần theo học kỳ
             return em.createQuery("SELECT cs FROM CourseSection cs WHERE cs.term.id = :termId", CourseSection.class)
                     .setParameter("termId", termId)
                     .getResultList();
@@ -87,6 +92,7 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
     public List<CourseSection> findByRegistrationBatchId(Long registrationBatchId) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Danh sách các lớp học phần thuộc một đợt đăng ký cụ thể
             return em.createQuery(
                             "SELECT cs FROM CourseSection cs " +
                                     "JOIN FETCH cs.course " +
@@ -105,6 +111,7 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
     public List<CourseSection> findConflictingSections(Long termId, Integer dayOfWeek, Integer startSlot, Integer endSlot) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Tìm các lớp học phần bị trùng lịch học (cùng học kỳ, cùng thứ, và thời gian tiết học giao nhau)
             return em.createQuery(
                             "SELECT cs FROM CourseSection cs " +
                                     "JOIN FETCH cs.course " +
@@ -129,6 +136,7 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
     public List<CourseSection> findAll() {
         EntityManager em = JpaUtil.getEntityManager();
         try {
+            // Lấy toàn bộ danh sách lớp học phần kèm thông tin môn học và giảng viên
             return em.createQuery("SELECT cs FROM CourseSection cs JOIN FETCH cs.course LEFT JOIN FETCH cs.lecturer", CourseSection.class).getResultList();
         } finally {
             em.close();
