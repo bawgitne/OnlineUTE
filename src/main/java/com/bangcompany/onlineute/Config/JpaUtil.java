@@ -10,6 +10,11 @@ import java.util.function.Supplier;
  * Modeled after the Example project's manual database management.
  */
 public final class JpaUtil {
+    static {
+        // Tắt log khởi động loằng ngoằng của Hibernate cho sạch console
+        java.util.logging.Logger.getLogger("org.hibernate").setLevel(java.util.logging.Level.SEVERE);
+    }
+
     private static final EntityManagerFactory EMF =
             Persistence.createEntityManagerFactory("OnlineUtePU");
     private static final ThreadLocal<EntityManager> CONTEXT_EM = new ThreadLocal<>();
