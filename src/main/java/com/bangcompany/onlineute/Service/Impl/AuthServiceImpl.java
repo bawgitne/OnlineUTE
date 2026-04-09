@@ -25,10 +25,10 @@ public class AuthServiceImpl implements AuthService {
         this.adminDAO = adminDAO;
     }
 
-    // xử lý đăng nhập người dùng
+    // check login, so khớp pass có salt hoặc ko salt
     @Override
     public Optional<Account> login(String loginCode, String password) {
-        // Tìm tài khoản theo mã đăng nhập (username, mã SV, mã GV,...)
+        // tìm account bằng username, mã sv/gv
         Optional<Account> accountOpt = accountDAO.findByLoginCode(loginCode);
         if (accountOpt.isEmpty()) {
             return Optional.empty();
@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
         Account account = accountOpt.get();
         byte[] salt = account.getSalt();
 
-        // Kiểm tra mật khẩu (hỗ trợ cả mật khẩu chưa băm cũ và mật khẩu đã băm mới có muối)
+        // check pass cũ và pass mới có hash+salt
         if (salt == null || salt.length == 0) {
             if (!password.equals(account.getPasswordHash())) {
                 return Optional.empty();
@@ -52,18 +52,18 @@ public class AuthServiceImpl implements AuthService {
             return Optional.empty();
         }
 
-        // Tải thông tin phiên làm việc nếu đăng nhập thành công
+        // nạp data vào session nếu login ngon
         loadSession(account);
         return Optional.of(account);
     }
 
-    // đăng xuất ra khỏi hệ thống
+    // xóa session để logout
     @Override
     public void logout() {
         SessionManager.logout();
     }
 
-    // tải dữ liệu người dùng vào SessionManager dựa trên vai trò
+    // nạp đối tượng sv/gv/admin vào session tương ứng
     private void loadSession(Account account) {
         SessionManager.login(account);
 

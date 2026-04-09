@@ -24,8 +24,20 @@ public class CourseRegistrationController {
         registrationService.cancelRegistration(registration);
     }
 
+    public void cancel(Long studentId, Long sectionId) {
+        registrationService.cancelRegistration(studentId, sectionId);
+    }
+
     public List<CourseRegistration> getStudentRegistrations(Long studentId) {
         return registrationService.getRegistrationsByStudent(studentId);
+    }
+
+    public List<CourseRegistration> getRegistrationsBySection(Long sectionId) {
+        return registrationService.getRegistrationsBySection(sectionId);
+    }
+
+    public Optional<CourseRegistration> getRegistrationById(Long id) {
+        return registrationService.getRegistrationById(id);
     }
 
     public boolean isStudentInCourse(Long studentId, Long sectionId) {

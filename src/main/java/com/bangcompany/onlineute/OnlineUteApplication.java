@@ -2,8 +2,10 @@ package com.bangcompany.onlineute;
 
 import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.JpaUtil;
+import com.bangcompany.onlineute.View.shared.ExceptionHandler;
 import com.bangcompany.onlineute.View.navigation.MainNavigator;
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * OnlineUteApplication - Main entry point.
@@ -15,28 +17,44 @@ public class OnlineUteApplication {
         // 1. Initialize Database
         try {
             System.out.println("Connecting to Database...");
-            JpaUtil.getEntityManager().close(); 
+            JpaUtil.getEntityManager().close();
             System.out.println("OnlineUTE Database connected.");
         } catch (Exception e) {
             System.err.println("Database Startup Error: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, 
-                "Không thể kết nối Database!", 
-                "Lỗi khởi động", 
+            JOptionPane.showMessageDialog(null,
+                "Khong the ket noi Database!",
+                "Loi khoi dong",
                 JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
 
-        // 2. Initialize AppContext
-        AppContext.init();
+        // 2. Initialize AppContext (instance)
+        AppContext appContext = AppContext.init();
+        MainNavigator.init(appContext);
+
+        // Global exception handler for UI safety
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) ->
+            SwingUtilities.invokeLater(() ->
+                ExceptionHandler.showError(null, throwable, "Da xay ra loi.")
+            )
+        );
+        Toolkit.getDefaultToolkit().getSystemEventQueue().push(new EventQueue() {
+            @Override
+            protected void dispatchEvent(AWTEvent event) {
+                try {
+                    super.dispatchEvent(event);
+                } catch (Throwable throwable) {
+                    ExceptionHandler.showError(null, throwable, "Da xay ra loi.");
+                }
+            }
+        });
 
         // 3. Launch Interface using WindowManager (Centralized)
         SwingUtilities.invokeLater(() -> {
             try {
-                // Start from the new view architecture entrypoint
                 MainNavigator.checkSession();
-                
             } catch (Exception ex) {
-                ex.printStackTrace();
+                ExceptionHandler.showError(null, ex, "Da xay ra loi.");
             }
         });
 

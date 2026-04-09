@@ -29,11 +29,19 @@ public class CourseController {
         return courseService.findById(id);
     }
 
+    public java.util.List<Course> getAllCourses() {
+        return courseService.getAllCourses();
+    }
+
     public PagedResult<Course> searchCourses(String keyword, PageRequest pageRequest) {
         return courseService.searchCourses(keyword, pageRequest);
     }
 
     public PagedResult<Course> searchCourses(String keyword, int page, int pageSize) {
         return courseService.searchCourses(keyword, page, pageSize);
+    }
+
+    public long countAllCourses() {
+        return courseService.countAllCourses();
     }
 }

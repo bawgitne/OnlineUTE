@@ -1,17 +1,18 @@
 package com.bangcompany.onlineute.View.features.account;
 
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.View.Components.ui.TextInput;
 import com.bangcompany.onlineute.View.Components.ui.Card;
 import com.bangcompany.onlineute.View.Components.ui.Button;
 import com.bangcompany.onlineute.View.shared.Refreshable;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class ChangePasswordPage extends JPanel implements Refreshable {
+    private final ViewContext viewContext;
     private final TextInput oldPassInput;
     private final TextInput newPassInput;
     private final TextInput confirmPassInput;
@@ -19,7 +20,8 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
     /**
      * Trang thay đổi mật khẩu
      */
-    public ChangePasswordPage() {
+    public ChangePasswordPage(ViewContext viewContext) {
+        this.viewContext = viewContext;
         setLayout(new BorderLayout(0, 20));
         setBackground(new Color(245, 245, 245));
         setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -80,7 +82,7 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
 
     private void handleChangePassword() {
         if (SessionManager.getCurrentAccount() == null) {
-            JOptionPane.showMessageDialog(this, "Session is not ready.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Phiên đăng nhập không khả dụng.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -89,27 +91,27 @@ public class ChangePasswordPage extends JPanel implements Refreshable {
         String confirm = confirmPassInput.getValue().trim();
 
         if (oldPass.isEmpty() || newPass.isEmpty() || confirm.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ các trường.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (!newPass.equals(confirm)) {
-            JOptionPane.showMessageDialog(this, "New password and confirm do not match.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Mật khẩu mới và mật khẩu xác nhận không khớp.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        boolean ok = AppContext.getAccountController().changePassword(
+        boolean ok = viewContext.getAccountController().changePassword(
                 SessionManager.getCurrentAccount().getId(),
                 oldPass,
                 newPass
         );
 
         if (!ok) {
-            JOptionPane.showMessageDialog(this, "Current password is incorrect.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Mật khẩu hiện tại không đúng.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        JOptionPane.showMessageDialog(this, "Password updated.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Mật khẩu đã được cập nhật.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
         onEnter();
     }
 }

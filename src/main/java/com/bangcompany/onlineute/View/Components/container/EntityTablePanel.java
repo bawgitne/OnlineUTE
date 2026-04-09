@@ -69,7 +69,7 @@ public class EntityTablePanel<T> extends JPanel implements Refreshable {
 
     @Override
     public void onEnter() {
-        showItems(items, "");
+        showItems(items, items == null ? 0 : items.size(), "");
     }
 
     public void showItems(List<T> loadedItems, String keyword) {
@@ -79,6 +79,15 @@ public class EntityTablePanel<T> extends JPanel implements Refreshable {
             table.addRow(rowMapper.apply(item));
         }
         updateResultLabel(items.size(), keyword);
+    }
+
+    public void showItems(List<T> loadedItems, long totalItems, String keyword) {
+        items = loadedItems == null ? new ArrayList<>() : new ArrayList<>(loadedItems);
+        table.clearRows();
+        for (T item : items) {
+            table.addRow(rowMapper.apply(item));
+        }
+        updateResultLabel(totalItems, keyword);
     }
 
     public List<T> filter(List<T> sourceItems, String keyword) {
@@ -129,10 +138,11 @@ public class EntityTablePanel<T> extends JPanel implements Refreshable {
     }
 
     public void updateResultLabel(long totalItems, String keyword) {
-        if (keyword == null || keyword.isBlank()) {
+        String safeKeyword = keyword == null ? "" : keyword.trim();
+        if (safeKeyword.isBlank() || "all".equalsIgnoreCase(safeKeyword)) {
             resultLabel.setText(totalItems + " ban ghi");
             return;
         }
-        resultLabel.setText(totalItems + " ket qua cho: " + keyword.trim());
+        resultLabel.setText(totalItems + " ket qua cho: " + safeKeyword);
     }
 }

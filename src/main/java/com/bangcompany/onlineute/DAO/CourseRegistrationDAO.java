@@ -19,6 +19,10 @@ public interface CourseRegistrationDAO {
     List<CourseRegistration> findByStudentId(Long studentId);
     
     List<CourseRegistration> findByCourseSectionId(Long sectionId);
+
+    Optional<CourseRegistration> findByStudentAndSection(Long studentId, Long sectionId);
     
+    void deleteByStudentAndSection(Long studentId, Long sectionId);
+
     boolean isRegistered(Long studentId, Long sectionId);
 }

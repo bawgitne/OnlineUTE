@@ -1,3 +1,6 @@
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
 USE online_ute;
 
 -- 1) SCHEMA DDL
@@ -197,3 +200,5 @@ CREATE TABLE announcement (
     sender_name VARCHAR(150) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
+SET FOREIGN_KEY_CHECKS = 1;

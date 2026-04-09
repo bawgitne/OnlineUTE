@@ -1,5 +1,7 @@
 package com.bangcompany.onlineute.Controller;
 
+import com.bangcompany.onlineute.Model.DTO.PageRequest;
+import com.bangcompany.onlineute.Model.DTO.PagedResult;
 import com.bangcompany.onlineute.Model.Entity.Major;
 import com.bangcompany.onlineute.Service.MajorService;
 
@@ -18,6 +20,18 @@ public class MajorController {
 
     public List<Major> getMajorsByFaculty(Long facultyId) {
         return majorService.getMajorsByFaculty(facultyId);
+    }
+
+    public PagedResult<Major> searchMajors(String keyword, PageRequest pageRequest) {
+        return majorService.searchMajors(keyword, pageRequest);
+    }
+
+    public PagedResult<Major> searchMajors(String keyword, int page, int pageSize) {
+        return majorService.searchMajors(keyword, page, pageSize);
+    }
+
+    public long countAllMajors() {
+        return majorService.countAllMajors();
     }
 
     public Major createMajor(Major major) {

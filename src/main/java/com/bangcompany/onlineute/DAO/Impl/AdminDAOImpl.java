@@ -1,45 +1,30 @@
-
 package com.bangcompany.onlineute.DAO.Impl;
 
-import com.bangcompany.onlineute.Config.JpaUtil;
+import com.bangcompany.onlineute.DAO.AbstractDAO;
 import com.bangcompany.onlineute.DAO.AdminDAO;
 import com.bangcompany.onlineute.Model.Entity.Admin;
-import jakarta.persistence.EntityManager;
 import java.util.Optional;
 
-public class AdminDAOImpl implements AdminDAO {
-    //hàm lưu
+public class AdminDAOImpl extends AbstractDAO<Admin> implements AdminDAO {
+    public AdminDAOImpl() {
+        super(Admin.class);
+    }
+
     @Override
     public Admin save(Admin admin) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            if (admin.getId() == null) {
-                // Tạo mới nếu chưa có ID
-                em.persist(admin);
-            } else {
-                // Cập nhật nếu đã có ID
-                admin = em.merge(admin);
-            }
-            em.getTransaction().commit();
-            return admin;
-        } finally {
-            em.close();
-        }
+        return saveEntity(admin);
     }
-    // Tìm thông tin Admin dựa trên ID tài khoản
+
     @Override
     public Optional<Admin> findByAccountId(Long accountId) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
+        return executeRead(em -> {
             Admin admin = em.createQuery("SELECT a FROM Admin a WHERE a.account.id = :accountId", Admin.class)
                     .setParameter("accountId", accountId)
-                    .getSingleResult();
-            return Optional.of(admin);
-        } catch (Exception e) {
-            return Optional.empty();
-        } finally {
-            em.close();
-        }
+                    .getResultList()
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+            return Optional.ofNullable(admin);
+        });
     }
 }

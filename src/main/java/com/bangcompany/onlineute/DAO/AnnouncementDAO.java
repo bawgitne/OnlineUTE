@@ -13,5 +13,6 @@ public interface AnnouncementDAO {
     List<Announcement> findAll();
     PagedResult<Announcement> search(String keyword, PageRequest pageRequest);
     List<Announcement> findAnnouncementsForStudent(Long studentId);
+    List<Announcement> findAnnouncementsForLecturer(Long lecturerId);
     List<Announcement> findByTargetType(String targetType);
 }

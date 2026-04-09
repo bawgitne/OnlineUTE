@@ -1,5 +1,5 @@
 /**
- * thẻ thôi,
+ * khung panel có bo góc và đổ bóng nhẹ
  */
 package com.bangcompany.onlineute.View.Components.ui;
 
@@ -14,12 +14,12 @@ import java.awt.*;
 public class Card extends JPanel {
     private final int arc;
 
-    // tạo mặc định
+    // khởi tạo mặc định theo theme
     public Card() {
         this(AppTheme.RADIUS_CARD, new Insets(18, 18, 18, 18));
     }
 
-    // độ round và padding
+    // tạo card có chỉnh bo góc và khoảng cách lề nội dung
     public Card(int arc, Insets padding) {
         this.arc = arc;
         setLayout(new BorderLayout());
@@ -31,7 +31,7 @@ public class Card extends JPanel {
         setOpaque(false);
     }
 
-    // mục tiêu đề từng tab
+    // tạo thanh tiêu đề màu xanh đầu mỗi trang
     public static Card titleCard(String text) {
         Card card = new Card(AppTheme.RADIUS_PANEL, new Insets(6, 12, 6, 12));
         JLabel label = new JLabel(text == null ? "" : text.toUpperCase());
@@ -43,7 +43,7 @@ public class Card extends JPanel {
         return card;
     }
 
-    // bo góc
+    // vẽ nền bo góc cho panel
     @Override
     protected void paintComponent(Graphics g) {
         RoundedPaint.fillRoundBackground(g, this, getBackground(), arc);

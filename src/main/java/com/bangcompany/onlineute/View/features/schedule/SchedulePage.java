@@ -1,9 +1,9 @@
 /**
- * Xem thời khóa biểu
+ * xem thời khóa biểu
  */
 package com.bangcompany.onlineute.View.features.schedule;
 
-import com.bangcompany.onlineute.Config.AppContext;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.Schedule;
 import com.bangcompany.onlineute.View.Components.theme.AppTheme;
@@ -20,25 +20,29 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class SchedulePage extends JPanel implements Refreshable {
+    private final ViewContext viewContext;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final JLabel weekLabel = new JLabel("", SwingConstants.LEFT);
     private final ScheduleTablePanel tablePanel = new ScheduleTablePanel();
     private LocalDate selectedWeekStart;
 
-    public SchedulePage() {
+    // khởi tạo lịch học, mặc định tuần này
+    public SchedulePage(ViewContext viewContext) {
+        this.viewContext = viewContext;
         setLayout(new BorderLayout(0, 16));
         setBackground(new Color(245, 245, 245));
-        setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
         add(Card.titleCard("THỜI KHÓA BIỂU"), BorderLayout.NORTH);
         add(createBody(), BorderLayout.CENTER);
 
-        // xem tuần hiện tại
+        // mốc là thứ 2 tuần này
         selectedWeekStart = getWeekStart(LocalDate.now());
         onEnter();
     }
 
+    // vùng nút bấm và bảng lịch
     private JComponent createBody() {
         JPanel contentWrapper = new JPanel(new BorderLayout());
         contentWrapper.setBackground(AppTheme.BACKGROUND_CARD);
@@ -48,7 +52,7 @@ public class SchedulePage extends JPanel implements Refreshable {
         return contentWrapper;
     }
 
-    // thaanh giao diện ở trên có nút đổi tuần
+    // cụm nút chuyển tuần
     private JPanel createFilterPanel() {
         JPanel filterPanel = new JPanel(new BorderLayout());
         filterPanel.setOpaque(false);
@@ -57,7 +61,7 @@ public class SchedulePage extends JPanel implements Refreshable {
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
         leftPanel.setOpaque(false);
 
-        JLabel currentScheduleLabel = new JLabel("Chuyển tuần để xem môn học sẽ học/dạy");
+        JLabel currentScheduleLabel = new JLabel("Chuyển tuần để xem môn học");
         currentScheduleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         currentScheduleLabel.setForeground(AppTheme.PRIMARY_BLUE);
         leftPanel.add(currentScheduleLabel);
@@ -104,22 +108,22 @@ public class SchedulePage extends JPanel implements Refreshable {
         refreshScheduleGrid();
     }
 
-    // vẽ table
+    // vẽ lại bảng theo tuần chọn
     private void refreshScheduleGrid() {
         LocalDate weekEnd = selectedWeekStart.plusDays(6);
         weekLabel.setText("Tuần: " + DATE_FORMATTER.format(selectedWeekStart) + " - " + DATE_FORMATTER.format(weekEnd));
         tablePanel.renderWeek(selectedWeekStart, loadSchedulesForCurrentWeek());
     }
 
-    // kiểm tra role để load data lịch tương ứng
+    // lấy lịch từ db theo role gv/sv
     private List<Schedule> loadSchedulesForCurrentWeek() {
-        if (AppContext.getScheduleService() == null) {
+        if (viewContext.getScheduleController() == null) {
             return List.of();
         }
 
         var student = SessionManager.getCurrentStudent();
         if (student != null) {
-            return AppContext.getScheduleService().getStudentScheduleByWeek(
+            return viewContext.getScheduleController().getStudentScheduleByWeek(
                     student.getId(),
                     selectedWeekStart,
                     selectedWeekStart.plusDays(6)
@@ -128,7 +132,7 @@ public class SchedulePage extends JPanel implements Refreshable {
 
         var lecturer = SessionManager.getCurrentLecturer();
         if (lecturer != null) {
-            return AppContext.getScheduleService().getLecturerScheduleByWeek(
+            return viewContext.getScheduleController().getLecturerScheduleByWeek(
                     lecturer.getId(),
                     selectedWeekStart,
                     selectedWeekStart.plusDays(6)
@@ -138,7 +142,7 @@ public class SchedulePage extends JPanel implements Refreshable {
         return List.of();
     }
 
-    // đặt thứ 2 làm mốc
+    // tính ngày thứ 2 đầu tuần
     private LocalDate getWeekStart(LocalDate date) {
         int offset = date.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue();
         if (offset < 0) {

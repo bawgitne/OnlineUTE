@@ -1,5 +1,6 @@
 package com.bangcompany.onlineute.Service.Impl;
 
+
 import com.bangcompany.onlineute.DAO.ClassDAO;
 import com.bangcompany.onlineute.Model.DTO.PageRequest;
 import com.bangcompany.onlineute.Model.DTO.PagedResult;
@@ -15,13 +16,13 @@ public class ClassServiceImpl implements ClassService {
         this.classDAO = classDAO;
     }
 
-    // lấy toàn bộ danh sách các lớp học
+    // lấy hết list lớp
     @Override
     public List<Class> getAllClasses() {
         return classDAO.findAll();
     }
 
-    // tìm danh sách các lớp thuộc về một ngành học cụ thể
+    // lấy các lớp của 1 ngành học
     @Override
     public List<Class> getClassesByMajor(Long majorId) {
         if (majorId == null) {
@@ -30,22 +31,29 @@ public class ClassServiceImpl implements ClassService {
         return classDAO.findByMajorId(majorId);
     }
 
-    // tìm kiếm lớp học (hỗ trợ phân trang)
+    // tìm lớp có phân trang
     @Override
     public PagedResult<Class> searchClasses(String keyword, PageRequest pageRequest) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return PaginationSupport.empty(pageRequest);
         }
-        return classDAO.search(keyword.trim(), pageRequest);
+        String trimmedKeyword = keyword.trim();
+        String effectiveKeyword = "all".equalsIgnoreCase(trimmedKeyword) ? "" : trimmedKeyword;
+        return classDAO.search(effectiveKeyword, pageRequest);
     }
 
-    // tìm kiếm lớp học (hỗ trợ thông tin trực tiếp về số trang và kích thước trang)
+    // tìm lớp hỗ trợ truyền số trang trực tiếp
     @Override
     public PagedResult<Class> searchClasses(String keyword, int page, int pageSize) {
         return searchClasses(keyword, PaginationSupport.normalize(page, pageSize));
     }
 
-    // tạo một lớp mới
+    @Override
+    public long countAllClasses() {
+        return classDAO.countAll();
+    }
+
+    // tạo lớp mới
     @Override
     public Class createClass(Class classEntity) {
         if (classEntity == null) {
@@ -54,7 +62,7 @@ public class ClassServiceImpl implements ClassService {
         return classDAO.save(classEntity);
     }
 
-    // cập nhật thông tin lớp học đã có
+    // lưu thay đổi cho lớp
     @Override
     public Class updateClass(Class classEntity) {
         if (classEntity == null) {
@@ -63,7 +71,7 @@ public class ClassServiceImpl implements ClassService {
         return classDAO.save(classEntity);
     }
 
-    // xóa lớp học khỏi hệ thống
+    // xóa lớp khỏi db theo id
     @Override
     public void deleteClass(Long id) {
         classDAO.deleteById(id);

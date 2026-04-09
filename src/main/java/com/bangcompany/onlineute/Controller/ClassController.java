@@ -30,6 +30,10 @@ public class ClassController {
         return classService.searchClasses(keyword, page, pageSize);
     }
 
+    public long countAllClasses() {
+        return classService.countAllClasses();
+    }
+
     public Class createClass(Class classEntity) {
         return classService.createClass(classEntity);
     }

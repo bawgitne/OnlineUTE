@@ -1,6 +1,5 @@
 package com.bangcompany.onlineute.View.features.account;
 
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.Account;
 import com.bangcompany.onlineute.Model.Entity.Class;
 import com.bangcompany.onlineute.Model.Entity.Faculty;
@@ -17,6 +16,7 @@ import com.bangcompany.onlineute.View.Components.ui.SelectInput;
 import com.bangcompany.onlineute.View.Components.theme.SwingUtils;
 import com.bangcompany.onlineute.View.Components.ui.TextAreaInput;
 import com.bangcompany.onlineute.View.shared.Refreshable;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class CreateAccountPage extends JPanel implements Refreshable {
+    private final ViewContext viewContext;
     private TextInput codeInput;
     private TextInput nameInput;
     private TextInput emailInput;
@@ -60,11 +61,12 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     private final String initialRole;
     private final boolean studentMode;
 
-    public CreateAccountPage() {
-        this("Sinh viên");
+    public CreateAccountPage(ViewContext viewContext) {
+        this(viewContext, "Sinh viên");
     }
 
-    public CreateAccountPage(String initialRole) {
+    public CreateAccountPage(ViewContext viewContext, String initialRole) {
+        this.viewContext = viewContext;
         this.initialRole = initialRole == null || initialRole.isBlank() ? "Sinh viên" : initialRole;
         this.studentMode = isStudentRole(this.initialRole);
 
@@ -90,7 +92,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         genderSelect = new SelectInput<>("Giới tính", List.of("Nam", "Nữ", "Khác"));
         placeOfBirthInput = new TextInput("Nơi sinh", false);
         nationalityInput = new TextInput("Quốc tịch", false);
-        facultySelect = new SelectInput<>("Khoa *", AppContext.getFacultyService().getAllFaculties());
+        facultySelect = new SelectInput<>("Khoa *", viewContext.getFacultyController().getAllFaculties());
         majorSelect = new SelectInput<>("Ngành *", List.of());
         enrollmentYearInput = new TextInput("Năm nhập học *", false);
         expectedGraduationYearInput = new TextInput("Năm tốt nghiệp dự kiến", false);
@@ -195,7 +197,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 0, 20, 0);
 
-        JLabel helpLabel = new JLabel("<html>Mỗi dòng 6 cột, cách nhau bởi dấu |<br>Họ tên|Email|Ngày sinh (YYYY-MM-DD)|Mã khoa|Mã ngành|Năm nhập học<br>Hệ thống sắp xếp theo tên trước khi sinh 3 số cuối.</html>");
+        JLabel helpLabel = new JLabel("<html>Mỗi dòng 6 cột, cách nhau bởi dấu |<br>Họ tên|Email|Ngày sinh (YYYY-MM-DD)|Mã khoa|Mã ngành|Năm nhập học<br>Hệ thống sẽ tự sắp xếp theo tên trước khi sinh 3 số cuối.</html>");
         helpLabel.setFont(new Font("Segoe UI", Font.ITALIC, 13));
         helpLabel.setForeground(new Color(110, 110, 110));
         panel.add(helpLabel, gbc);
@@ -280,7 +282,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         student.setEnrollmentYear(Integer.parseInt(enrollmentYearText));
 
         Account account = new Account("123456", Role.STUDENT);
-        Account savedAccount = AppContext.getAccountController().createStudentAccount(account, student);
+        Account savedAccount = viewContext.getAccountController().createStudentAccount(account, student);
         saveUserProfile(buildStudentProfile(savedAccount, student, selectedFaculty, selectedMajor));
     }
 
@@ -295,7 +297,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         lecturer.setFullName(fullName);
 
         Account account = new Account("123456", Role.LECTURER);
-        Account savedAccount = AppContext.getAccountController().createLecturerAccount(account, lecturer);
+        Account savedAccount = viewContext.getAccountController().createLecturerAccount(account, lecturer);
         saveUserProfile(buildLecturerProfile(savedAccount, lecturer));
     }
 
@@ -316,7 +318,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             String prefix = buildStudentPrefix(row.enrollmentYear(), row.major().getMajorCode());
             int nextStep = nextSequenceByPrefix.compute(prefix, (key, value) -> {
                 if (value == null) {
-                    return (int) AppContext.getStudentService().countStudentsByCodePrefix(prefix) + 1;
+                    return (int) viewContext.getStudentController().countStudentsByCodePrefix(prefix) + 1;
                 }
                 return value + 1;
             });
@@ -327,7 +329,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             student.setEnrollmentYear(row.enrollmentYear());
 
             Account account = new Account("123456", Role.STUDENT);
-            Account savedAccount = AppContext.getAccountController().createStudentAccount(account, student);
+            Account savedAccount = viewContext.getAccountController().createStudentAccount(account, student);
             saveUserProfile(buildStudentProfile(savedAccount, student, row.faculty(), row.major()));
             created++;
         }
@@ -377,12 +379,12 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     }
 
     private void saveUserProfile(UserProfile userProfile) {
-        AppContext.getUserProfileController().save(userProfile);
+        viewContext.getUserProfileController().save(userProfile);
     }
 
     private List<BulkStudentRow> parseBulkRows(String rawData) {
         Map<String, Faculty> facultyByCode = new HashMap<>();
-        for (Faculty faculty : AppContext.getFacultyService().getAllFaculties()) {
+        for (Faculty faculty : viewContext.getFacultyController().getAllFaculties()) {
             facultyByCode.put(faculty.getFacultyCode().toUpperCase(Locale.ROOT), faculty);
         }
 
@@ -417,7 +419,6 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             }
 
             Class classEntity = resolveClassByMajorAndYear(faculty, major, String.valueOf(enrollmentYear));
-
             rows.add(new BulkStudentRow(fullName, email, birthDate, faculty, major, classEntity, enrollmentYear));
         }
 
@@ -425,7 +426,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
     }
 
     private Major findMajorByFacultyAndCode(Long facultyId, String majorCode) {
-        return AppContext.getMajorService().getMajorsByFaculty(facultyId).stream()
+        return viewContext.getMajorController().getMajorsByFaculty(facultyId).stream()
                 .filter(major -> major.getMajorCode().equalsIgnoreCase(majorCode))
                 .findFirst()
                 .orElse(null);
@@ -441,7 +442,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
         }
         String majorCode = major.getMajorCode() == null ? "" : major.getMajorCode().trim();
         String yearPart = yearPrefix;
-        List<Class> classes = AppContext.getClassService().getClassesByMajor(major.getId());
+        List<Class> classes = viewContext.getClassController().getClassesByMajor(major.getId());
         for (Class classEntity : classes) {
             String name = classEntity.getClassName() == null ? "" : classEntity.getClassName();
             if (!majorCode.isEmpty() && !name.contains(majorCode)) {
@@ -462,7 +463,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
 
         Faculty selectedFaculty = facultySelect.getSelectedValue();
         if (majorSelect != null) {
-            majorSelect.setItems(selectedFaculty == null ? List.of() : AppContext.getMajorService().getMajorsByFaculty(selectedFaculty.getId()));
+            majorSelect.setItems(selectedFaculty == null ? List.of() : viewContext.getMajorController().getMajorsByFaculty(selectedFaculty.getId()));
         }
     }
 
@@ -488,7 +489,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
 
     private String generateNextStudentCode(int enrollmentYear, String majorCode, int step) {
         String prefix = buildStudentPrefix(enrollmentYear, majorCode);
-        long existing = AppContext.getStudentService().countStudentsByCodePrefix(prefix);
+        long existing = viewContext.getStudentController().countStudentsByCodePrefix(prefix);
         return prefix + String.format("%03d", existing + step);
     }
 
@@ -552,7 +553,7 @@ public class CreateAccountPage extends JPanel implements Refreshable {
             if (enrollmentYearInput != null) enrollmentYearInput.setValue(String.valueOf(Year.now().getValue()));
             if (expectedGraduationYearInput != null) expectedGraduationYearInput.setValue(String.valueOf(Year.now().getValue() + 4));
             if (nationalityInput != null) nationalityInput.setValue("Việt Nam");
-            if (facultySelect != null) facultySelect.setItems(AppContext.getFacultyService().getAllFaculties());
+            if (facultySelect != null) facultySelect.setItems(viewContext.getFacultyController().getAllFaculties());
             refreshAcademicOptions();
             refreshGeneratedStudentCode();
         } else if (codeInput != null) {

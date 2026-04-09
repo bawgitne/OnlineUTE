@@ -1,5 +1,5 @@
 /**
- * Layout chính của Dashboard
+ * giao diện chính sau khi login
  */
 package com.bangcompany.onlineute.View.features.dashboard;
 
@@ -13,12 +13,12 @@ import com.bangcompany.onlineute.View.features.attendance.AttendancePage;
 import com.bangcompany.onlineute.View.features.data.DataManagementPage;
 import com.bangcompany.onlineute.View.features.grade.InputGradesPage;
 import com.bangcompany.onlineute.View.features.grade.ViewGradesPage;
-import com.bangcompany.onlineute.View.features.lecturer.LecturerManagementPage;
 import com.bangcompany.onlineute.View.features.profile.ProfilePage;
 import com.bangcompany.onlineute.View.features.registration.CourseRegistrationPage;
+import com.bangcompany.onlineute.View.features.registration.CourseManagementPage;
 import com.bangcompany.onlineute.View.features.registration.CreateRegistrationBatchPage;
 import com.bangcompany.onlineute.View.features.schedule.SchedulePage;
-import com.bangcompany.onlineute.View.features.student.StudentManagementPage;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,13 +29,17 @@ public class DashboardLayout extends JPanel {
     private final MainContent mainContent = new MainContent();
     private final List<SidebarItem> tabs = new ArrayList<>();
     private final Sidebar sidebar;
+    private final ViewContext viewContext;
 
-    public DashboardLayout() {
+    // khởi tạo menu theo quyền
+    public DashboardLayout(ViewContext viewContext) {
         setLayout(new BorderLayout());
 
         String userName = SessionManager.getProfileFullName();
         String userCode = SessionManager.getProfileCode();
         String roleDisplayName = SessionManager.getRoleDisplayName();
+
+        this.viewContext = viewContext;
 
         buildTabs(SessionManager.getRole());
         registerPages();
@@ -48,6 +52,7 @@ public class DashboardLayout extends JPanel {
         showFirstTab();
     }
 
+    // tạo vùng nội dung bên phải
     private JPanel createMainArea() {
         JPanel mainArea = new JPanel(new BorderLayout());
         mainArea.setBackground(new Color(245, 248, 252));
@@ -61,6 +66,7 @@ public class DashboardLayout extends JPanel {
         return mainArea;
     }
 
+    // check role để nạp tab
     private void buildTabs(String role) {
         tabs.clear();
         if ("ADMIN".equals(role)) {
@@ -74,17 +80,19 @@ public class DashboardLayout extends JPanel {
         buildStudentTabs();
     }
 
+    // menu cho admin
     private void buildAdminTabs() {
         addTitle("TRANG CÁ NHÂN");
         addTab("PROFILE", "Thông tin cá nhân", "thongTinCaNhan.png");
         addTab("ANNOUNCEMENT", "Thông báo", "trangCuaBan.png");
         addTitle("QUẢN LÝ");
         addTab("MANAGE_DATA", "Quản lý dữ liệu", "trangCuaBan.png");
-        addTab("CREATE_REGISTRATION_BATCH", "Tạo đợt đăng ký môn", "chuongTrinhDaoTao.png");
+        addTab("CREATE_REGISTRATION_BATCH", "Quản lý đăng ký môn", "chuongTrinhDaoTao.png");
         addTab("COMPOSE_ANNOUNCEMENT", "Gửi thông báo", "trangCuaBan.png");
         addTab("CHANGE_PASSWORD", "Đổi mật khẩu", "thongTinCaNhan.png");
     }
 
+    // menu cho giảng viên
     private void buildLecturerTabs() {
         addTitle("TRANG CÁ NHÂN");
         addTab("PROFILE", "Thông tin cá nhân", "thongTinCaNhan.png");
@@ -97,26 +105,31 @@ public class DashboardLayout extends JPanel {
         addTab("CHANGE_PASSWORD", "Đổi mật khẩu", "thongTinCaNhan.png");
     }
 
+    // menu cho sinh viên
     private void buildStudentTabs() {
         addTitle("TRANG CÁ NHÂN");
         addTab("PROFILE", "Thông tin cá nhân", "thongTinCaNhan.png");
         addTab("ANNOUNCEMENT", "Thông báo", "trangCuaBan.png");
         addTitle("TRA CỨU THÔNG TIN");
         addTab("REGISTER_COURSES", "Đăng ký môn học", "chuongTrinhDaoTao.png");
+        addTab("MANAGE_COURSES", "Quản lý môn học", "chuongTrinhDaoTao.png");
         addTab("MY_SCHEDULE", "Thời khóa biểu", "lich.png");
         addTab("MY_GRADES", "Xem điểm", "xemDiem.png");
         addTab("ATTENDANCE", "Xem điểm chuyên cần", "lich.png");
         addTab("CHANGE_PASSWORD", "Đổi mật khẩu", "thongTinCaNhan.png");
     }
 
+    // Thêm một tiêu đề mục vào menu trái
     private void addTitle(String label) {
         tabs.add(SidebarItem.title(label));
     }
 
+    // Thêm một mục (tab) có thể click vào menu trái
     private void addTab(String key, String label, String icon) {
         tabs.add(SidebarItem.tab(key, label, icon));
     }
 
+    // Đăng ký tất cả các trang vào Container để có thể switch qua lại
     private void registerPages() {
         for (SidebarItem item : tabs) {
             if (item.isTitle()) {
@@ -126,26 +139,29 @@ public class DashboardLayout extends JPanel {
         }
     }
 
+    // gọi trang theo key
     private JPanel createPage(String pageKey) {
         return switch (pageKey) {
-            case "ANNOUNCEMENT" -> new AnnouncementPage();
-            case "COMPOSE_ANNOUNCEMENT" -> new CreateAnnouncementPage();
-            case "CREATE_ACCOUNTS" -> new CreateAccountPage();
-            case "CREATE_REGISTRATION_BATCH" -> new CreateRegistrationBatchPage();
-            case "REGISTER_COURSES" -> new CourseRegistrationPage();
-            case "MANAGE_STUDENT" -> new StudentManagementPage();
-            case "MANAGE_LECTURER" -> new LecturerManagementPage();
-            case "MANAGE_DATA" -> new DataManagementPage();
-            case "CHANGE_PASSWORD" -> new ChangePasswordPage();
-            case "PROFILE" -> new ProfilePage();
-            case "MY_SCHEDULE" -> new SchedulePage();
-            case "INPUT_GRADES" -> new InputGradesPage();
-            case "MY_GRADES" -> new ViewGradesPage();
-            case "ATTENDANCE" -> new AttendancePage();
+            case "ANNOUNCEMENT" -> new AnnouncementPage(viewContext);
+            case "COMPOSE_ANNOUNCEMENT" -> new CreateAnnouncementPage(viewContext);
+            case "CREATE_ACCOUNTS" -> new CreateAccountPage(viewContext);
+            case "CREATE_REGISTRATION_BATCH" -> new CreateRegistrationBatchPage(viewContext);
+            case "REGISTER_COURSES" -> new CourseRegistrationPage(viewContext);
+            case "MANAGE_COURSES" -> new CourseManagementPage(viewContext);
+            case "MANAGE_STUDENT" -> new DataManagementPage(viewContext);
+            case "MANAGE_LECTURER" -> new DataManagementPage(viewContext);
+            case "MANAGE_DATA" -> new DataManagementPage(viewContext);
+            case "CHANGE_PASSWORD" -> new ChangePasswordPage(viewContext);
+            case "PROFILE" -> new ProfilePage(viewContext);
+            case "MY_SCHEDULE" -> new SchedulePage(viewContext);
+            case "INPUT_GRADES" -> new InputGradesPage(viewContext);
+            case "MY_GRADES" -> new ViewGradesPage(viewContext);
+            case "ATTENDANCE" -> new AttendancePage(viewContext);
             default -> createPlaceholder(pageKey);
         };
     }
 
+    // panel hiện chữ cho mấy trang chưa code
     private JPanel createPlaceholder(String title) {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel label = new JLabel(title.toUpperCase(), SwingConstants.CENTER);
@@ -154,6 +170,7 @@ public class DashboardLayout extends JPanel {
         return panel;
     }
 
+    // hiện trang đầu khi mới vào
     private void showFirstTab() {
         for (SidebarItem item : tabs) {
             if (!item.isTitle()) {
@@ -163,6 +180,7 @@ public class DashboardLayout extends JPanel {
         }
     }
 
+    // nhảy trang mới
     private void showPage(String pageKey) {
         mainContent.showPage(pageKey);
         sidebar.setActiveTab(pageKey);

@@ -19,4 +19,5 @@ public interface CourseDAO {
 
     List<Course> findAll();
     PagedResult<Course> search(String keyword, PageRequest pageRequest);
+    long countAll();
 }

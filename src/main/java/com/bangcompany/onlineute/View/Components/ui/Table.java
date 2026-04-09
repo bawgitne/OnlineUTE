@@ -1,5 +1,5 @@
 /**
- * cái bảng
+ * cái bảng để hiện data
  */
 package com.bangcompany.onlineute.View.Components.ui;
 
@@ -30,12 +30,12 @@ public class Table extends JPanel {
     private final List<JPanel> dataRows = new ArrayList<>();
     private int selectedIndex = -1;
 
-    //chèn mấy cái field vào
+    // nạp tiêu đề cột
     public Table(String[] titles) {
         this(titles, AppTheme.RADIUS_TABLE, 44);
     }
 
-    // có thêm độ bo góc và chiều cao hàng
+    // chỉnh thêm thông số cho bảng
     public Table(String[] titles, int arc, int rowHeight) {
         this.titles = titles == null ? new String[0] : titles;
         this.arc = arc;
@@ -66,7 +66,7 @@ public class Table extends JPanel {
         buildPager();
     }
 
-    // Xóa toàn bộ dữ liệu 
+    // xóa sạch dữ liệu trong bảng
     public void clearRows() {
         listPanel.removeAll();
         dataRows.clear();
@@ -74,13 +74,13 @@ public class Table extends JPanel {
         refresh();
     }
 
-    // Thêm hàng mới
+    // thêm 1 hàng text
     public void addRow(String... values) {
         addRowComponent(createDataRow(values));
         refresh();
     }
 
-    // ép string cho nhiều kiểu dtaaa
+    // tự đổi data sang string để hiện hàng
     public void addRow(Object... values) {
         String[] row = null;
         if (values != null) {
@@ -94,7 +94,7 @@ public class Table extends JPanel {
         refresh();
     }
 
-    // Thêm nhiều cái
+    // thêm nhiều hàng 1 lúc
     public void addRows(List<String[]> rows) {
         if (rows == null) {
             return;
@@ -139,7 +139,7 @@ public class Table extends JPanel {
         nextButton.setEnabled(currentPage < safeTotal);
     }
 
-    // tạo 2 cái bo góc ở trên
+    // vẽ tiêu đề bảng màu xanh, bo góc
     private JPanel createHeaderPanel() {
         int headerHeight = 44;
         JPanel header = new JPanel() {
@@ -206,7 +206,7 @@ public class Table extends JPanel {
 
 
 
-    // Tạo nút
+    // tạo nút chuyển trang
     private Button createPagerButton(String text) {
         Button button = new Button(text, new Color(245, 247, 250), new Color(60, 80, 110));
       button.setPreferredSize(new Dimension(36, 28));
@@ -249,7 +249,7 @@ public class Table extends JPanel {
         return row;
     }
 
-    // cập nahajt thôi
+    // vẽ lại giao diện
     private void refresh() {
         revalidate();
         repaint();
@@ -263,7 +263,7 @@ public class Table extends JPanel {
         return label;
     }
 
-    // tạo ô textx cho từng row
+    // tạo nội dung cho từng ô
     private JLabel createBodyLabel(String text) {
         JLabel label = new JLabel(text == null ? "" : text, SwingConstants.CENTER);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -272,7 +272,7 @@ public class Table extends JPanel {
         return label;
     }
 
-    // chọn nó đổi màu xanh
+    // click vào hàng thì đổi sang màu xanh nhạt
     private void setSelectedRow(int index) {
         if (index < 0 || index >= dataRows.size()) {
             return;

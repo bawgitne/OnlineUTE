@@ -36,4 +36,12 @@ public class CourseSectionController {
     public CourseSection createSectionForBatch(RegistrationBatch registrationBatch, CourseSection section) {
         return sectionService.createSectionForBatch(registrationBatch, section);
     }
+
+    public CourseSection updateSection(CourseSection section) {
+        return sectionService.updateSection(section);
+    }
+
+    public void deleteSection(CourseSection section) {
+        sectionService.deleteSection(section);
+    }
 }

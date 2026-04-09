@@ -1,49 +1,34 @@
-
 package com.bangcompany.onlineute.DAO.Impl;
 
-import com.bangcompany.onlineute.Config.JpaUtil;
+import com.bangcompany.onlineute.DAO.AbstractDAO;
 import com.bangcompany.onlineute.DAO.UserProfileDAO;
 import com.bangcompany.onlineute.Model.Entity.UserProfile;
-import jakarta.persistence.EntityManager;
 
 import java.util.Optional;
 
-public class UserProfileDAOImpl implements UserProfileDAO {
+public class UserProfileDAOImpl extends AbstractDAO<UserProfile> implements UserProfileDAO {
+    public UserProfileDAOImpl() {
+        super(UserProfile.class);
+    }
+
     @Override
     public UserProfile save(UserProfile userProfile) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            if (userProfile.getId() == null) {
-                // Thêm mới hồ sơ người dùng
-                em.persist(userProfile);
-            } else {
-                // Cập nhật hồ sơ người dùng
-                userProfile = em.merge(userProfile);
-            }
-            em.getTransaction().commit();
-            return userProfile;
-        } finally {
-            em.close();
-        }
+        return saveEntity(userProfile);
     }
 
     @Override
     public Optional<UserProfile> findByAccountId(Long accountId) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Tìm hồ sơ người dùng dựa theo ID tài khoản
+        return executeRead(em -> {
             UserProfile userProfile = em.createQuery(
                             "SELECT up FROM UserProfile up WHERE up.account.id = :accountId",
                             UserProfile.class
                     )
                     .setParameter("accountId", accountId)
-                    .getSingleResult();
-            return Optional.of(userProfile);
-        } catch (Exception e) {
-            return Optional.empty();
-        } finally {
-            em.close();
-        }
+                    .getResultList()
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+            return Optional.ofNullable(userProfile);
+        });
     }
 }

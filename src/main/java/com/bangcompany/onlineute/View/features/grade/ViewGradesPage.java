@@ -4,7 +4,6 @@
 package com.bangcompany.onlineute.View.features.grade;
 
 import com.bangcompany.onlineute.View.Components.ui.Card;
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.Course;
 import com.bangcompany.onlineute.Model.Entity.CourseRegistration;
@@ -12,6 +11,7 @@ import com.bangcompany.onlineute.Model.Entity.Mark;
 import com.bangcompany.onlineute.Model.Entity.Student;
 import com.bangcompany.onlineute.View.Components.ui.Table;
 import com.bangcompany.onlineute.View.shared.Refreshable;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,8 +23,10 @@ import java.util.Set;
 
 public class ViewGradesPage extends JPanel implements Refreshable {
     private final Table table;
+    private final ViewContext viewContext;
 
-    public ViewGradesPage() {
+    public ViewGradesPage(ViewContext viewContext) {
+        this.viewContext = viewContext;
         setLayout(new BorderLayout(0, 16));
         setBackground(new Color(245, 245, 245));
         setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
@@ -36,7 +38,7 @@ public class ViewGradesPage extends JPanel implements Refreshable {
         add(table, BorderLayout.CENTER);
     }
 
-    // load dât cho nó
+    // load data cho nó
     @Override
     public void onEnter() {
         Student student = SessionManager.getCurrentStudent();
@@ -45,15 +47,15 @@ public class ViewGradesPage extends JPanel implements Refreshable {
         }
 
         table.clearRows();
-        List<CourseRegistration> registrations = AppContext.getCourseRegistrationService().getRegistrationsByStudent(student.getId());
-        List<Course> allCourses = AppContext.getCourseService().getAllCourses();
+        List<CourseRegistration> registrations = viewContext.getCourseRegistrationController().getStudentRegistrations(student.getId());
+        List<Course> allCourses = viewContext.getCourseController().getAllCourses();
         if (allCourses == null) {
             allCourses = new ArrayList<>();
         }
 
         Set<Long> studiedCourseIds = new HashSet<>();
 
-        addHeaderRow("--- CÁC MÔN ĐÀ VÀ ĐANG HỌC ---");
+        addHeaderRow("--- CÁC MÔN ĐÃ VÀ ĐANG HỌC ---");
         int stt = 1;
         for (CourseRegistration registration : registrations) {
             Course course = registration.getCourseSection() != null ? registration.getCourseSection().getCourse() : null;

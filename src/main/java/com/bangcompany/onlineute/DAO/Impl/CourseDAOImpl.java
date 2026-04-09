@@ -1,87 +1,53 @@
-
 package com.bangcompany.onlineute.DAO.Impl;
 
-import com.bangcompany.onlineute.Config.JpaUtil;
+import com.bangcompany.onlineute.DAO.AbstractDAO;
 import com.bangcompany.onlineute.DAO.CourseDAO;
 import com.bangcompany.onlineute.Model.DTO.PageRequest;
 import com.bangcompany.onlineute.Model.DTO.PagedResult;
 import com.bangcompany.onlineute.Model.DTO.PaginationSupport;
 import com.bangcompany.onlineute.Model.Entity.Course;
-import jakarta.persistence.EntityManager;
 
 import java.util.List;
-import java.util.Optional;
 
-public class CourseDAOImpl implements CourseDAO {
-    @Override
-    public Course save(Course course) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            em.persist(course);
-            em.getTransaction().commit();
-            return course;
-        } finally {
-            em.close();
-        }
+public class CourseDAOImpl extends AbstractDAO<Course> implements CourseDAO {
+    public CourseDAOImpl() {
+        super(Course.class);
     }
 
+    @Override
+    public Course save(Course course) {
+        return saveEntity(course);
+    }
 
     @Override
     public Course update(Course course) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            em.merge(course);
-            em.getTransaction().commit();
-            return course;
-        } finally {
-            em.close();
-        }
+        return saveEntity(course);
     }
-
 
     @Override
     public Course delete(Course course) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            em.remove(course);
-            em.getTransaction().commit();
-            return course;
-        } finally {
-            em.close();
+        if (course == null) {
+            return null;
         }
+        deleteEntityById(course.getId());
+        return course;
     }
 
     @Override
     public Course findById(Long id) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            return Optional.ofNullable(em.find(Course.class, id)).orElse(null);
-        } finally {
-            em.close();
-        }
+        return findEntityById(id);
     }
 
     @Override
     public List<Course> findAll() {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Lấy toàn bộ danh sách môn học sắp xếp theo mã môn học
-            return em.createQuery("SELECT c FROM Course c ORDER BY c.courseCode", Course.class)
-                    .getResultList();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery("SELECT c FROM Course c ORDER BY c.courseCode", Course.class)
+                .getResultList());
     }
 
     @Override
     public PagedResult<Course> search(String keyword, PageRequest pageRequest) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
+        return executeRead(em -> {
             String normalizedKeyword = "%" + keyword.toLowerCase() + "%";
-            // Tìm kiếm môn học theo mã môn học hoặc tên môn học
             List<Course> items = em.createQuery(
                             "SELECT c FROM Course c " +
                                     "WHERE LOWER(c.courseCode) LIKE :keyword " +
@@ -94,7 +60,6 @@ public class CourseDAOImpl implements CourseDAO {
                     .setMaxResults(pageRequest.getPageSize())
                     .getResultList();
 
-            // Đếm tổng số môn học tìm được
             Long totalItems = em.createQuery(
                             "SELECT COUNT(c) FROM Course c " +
                                     "WHERE LOWER(c.courseCode) LIKE :keyword " +
@@ -105,8 +70,12 @@ public class CourseDAOImpl implements CourseDAO {
                     .getSingleResult();
 
             return PaginationSupport.of(items, pageRequest, totalItems);
-        } finally {
-            em.close();
-        }
+        });
+    }
+
+    @Override
+    public long countAll() {
+        return executeRead(em -> em.createQuery("SELECT COUNT(c) FROM Course c", Long.class)
+                .getSingleResult());
     }
 }

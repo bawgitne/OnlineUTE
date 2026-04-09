@@ -1,5 +1,6 @@
 package com.bangcompany.onlineute.Service.Impl;
 
+
 import com.bangcompany.onlineute.DAO.LecturerDAO;
 import com.bangcompany.onlineute.Model.DTO.PageRequest;
 import com.bangcompany.onlineute.Model.DTO.PagedResult;
@@ -20,7 +21,9 @@ public class LecturerServiceImpl implements LecturerService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return PaginationSupport.empty(pageRequest);
         }
-        return lecturerDAO.search(keyword.trim(), pageRequest);
+        String trimmedKeyword = keyword.trim();
+        String effectiveKeyword = "all".equalsIgnoreCase(trimmedKeyword) ? "" : trimmedKeyword;
+        return lecturerDAO.search(effectiveKeyword, pageRequest);
     }
 
     // tìm kiếm giảng viên (hỗ trợ trực tiếp thông số trang)
@@ -38,7 +41,7 @@ public class LecturerServiceImpl implements LecturerService {
         return lecturerDAO.save(lecturer);
     }
 
-    // xóa giảng viên ra khỏi hệ thống theo ID
+    // xóa giảng viên ra khọi hệ thống theo ID
     @Override
     public void deleteLecturer(Long id) {
         lecturerDAO.deleteById(id);

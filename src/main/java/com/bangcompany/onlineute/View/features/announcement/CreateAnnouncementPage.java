@@ -3,7 +3,6 @@
  */
 package com.bangcompany.onlineute.View.features.announcement;
 
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.CourseSection;
 import com.bangcompany.onlineute.View.Components.ui.TextInput;
@@ -13,6 +12,7 @@ import com.bangcompany.onlineute.View.Components.ui.SelectInput;
 import com.bangcompany.onlineute.View.Components.theme.SwingUtils;
 import com.bangcompany.onlineute.View.Components.ui.TextAreaInput;
 import com.bangcompany.onlineute.View.shared.Refreshable;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,6 +21,7 @@ import java.util.List;
 
 public class CreateAnnouncementPage extends JPanel implements Refreshable {
     private final JPanel mainPanel;
+    private final ViewContext viewContext;
     private TextInput titleInput;
     private TextAreaInput contentInput;
     private SelectInput<String> adminTargetSelect;
@@ -42,7 +43,8 @@ public class CreateAnnouncementPage extends JPanel implements Refreshable {
     }
 
     // hàm tạo giao diện chính
-    public CreateAnnouncementPage() {
+    public CreateAnnouncementPage(ViewContext viewContext) {
+        this.viewContext = viewContext;
         setLayout(new BorderLayout(0, 16));
         setBackground(new Color(245, 245, 245));
         setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -93,8 +95,8 @@ public class CreateAnnouncementPage extends JPanel implements Refreshable {
             // giảng viên chỉ gửi cho lớp mình dạy
             List<CourseSectionItem> myClasses = List.of();
             var lecturer = SessionManager.getCurrentLecturer();
-            if (lecturer != null && AppContext.getNotificationController() != null) {
-                myClasses = AppContext.getNotificationController()
+            if (lecturer != null && viewContext.getNotificationController() != null) {
+                myClasses = viewContext.getNotificationController()
                         .getCourseSectionsByLecturerId(lecturer.getId())
                         .stream()
                         .map(CourseSectionItem::new)
@@ -166,7 +168,7 @@ public class CreateAnnouncementPage extends JPanel implements Refreshable {
         }
 
         try {
-            AppContext.getNotificationController().createAnnouncement(title, content, targetType, targetClassId, senderName);
+            viewContext.getNotificationController().createAnnouncement(title, content, targetType, targetClassId, senderName);
             JOptionPane.showMessageDialog(this, "Gửi thông báo thành công.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             titleInput.setValue("");
             contentInput.setValue("");

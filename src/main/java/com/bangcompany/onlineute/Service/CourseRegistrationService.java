@@ -13,6 +13,8 @@ public interface CourseRegistrationService {
     
     // hủy đăng ký học phần
     void cancelRegistration(CourseRegistration registration);
+
+    void cancelRegistration(Long studentId, Long sectionId);
     
     // lấy đơn đăng ký theo ID
     Optional<CourseRegistration> getRegistrationById(Long id);

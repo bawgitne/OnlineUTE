@@ -1,42 +1,26 @@
-
 package com.bangcompany.onlineute.DAO.Impl;
 
-import com.bangcompany.onlineute.Config.JpaUtil;
+import com.bangcompany.onlineute.DAO.AbstractDAO;
 import com.bangcompany.onlineute.DAO.AccountDAO;
 import com.bangcompany.onlineute.Model.Entity.Account;
-import com.bangcompany.onlineute.Model.Entity.Admin;
-import com.bangcompany.onlineute.Model.Entity.Lecturer;
-import com.bangcompany.onlineute.Model.Entity.Student;
-import jakarta.persistence.EntityManager;
 import java.util.Optional;
 
-public class AccountDAOImpl implements AccountDAO {
-
-    @Override
-    public Account save(Account account) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            if (account.getId() == null) {
-                // Tạo mới nếu chưa có ID
-                em.persist(account);
-            } else {
-                // Cập nhật nếu đã có ID
-                account = em.merge(account);
-            }
-            em.getTransaction().commit();
-            return account;
-        } finally {
-            em.close();
-        }
+public class AccountDAOImpl extends AbstractDAO<Account> implements AccountDAO {
+    public AccountDAOImpl() {
+        super(Account.class);
     }
 
+    // lưu account (tạo mới hoặc update)
+    @Override
+    public Account save(Account account) {
+        return saveEntity(account);
+    }
+
+    // tìm account bằng username hoặc mã sv/gv/admin (không phân biệt hoa thường)
     @Override
     public Optional<Account> findByLoginCode(String loginCode) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
+        return executeRead(em -> {
             String normalizedCode = loginCode == null ? "" : loginCode.trim().toLowerCase();
-            // Tìm kiếm tài khoản thông qua username, mã sinh viên, mã giảng viên hoặc mã admin
             Account account = em.createQuery(
                             "SELECT a FROM Account a " +
                                     "WHERE LOWER(a.username) = :loginCode " +
@@ -46,26 +30,17 @@ public class AccountDAOImpl implements AccountDAO {
                             Account.class
                     )
                     .setParameter("loginCode", normalizedCode)
-                    .getSingleResult();
-            return Optional.of(account);
-        } catch (Exception e) {
-            return Optional.empty();
-        } finally {
-            em.close();
-        }
+                    .getResultList()
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+            return Optional.ofNullable(account);
+        });
     }
-    //tìm kiếm theo account.id
+
+    // tìm theo id chính của bảng account
     @Override
     public Optional<Account> findById(Long id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            Account account = em.find(Account.class, id);
-            return Optional.ofNullable(account);
-        } finally {
-            em.close();
-        }
+        return Optional.ofNullable(findEntityById(id));
     }
 }

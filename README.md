@@ -1,63 +1,66 @@
-# OnlineUTE - Hệ Thống Quản Lý Đăng Ký Học Phần
+# OnlineUTE - Hệ thống Quản lý Đăng ký Học phần Đại học
 
-OnlineUTE là một ứng dụng quản lý đào tạo và đăng ký học phần được phát triển dựa trên ngôn ngữ Java, sử dụng Java Swing làm giao diện người dùng và Hibernate/JPA để quản lý tầng dữ liệu.
+Ứng dụng desktop hỗ trợ toàn bộ quy trình đăng ký học phần, quản lý thời khóa biểu và nhập điểm cho sinh viên, giảng viên và quản trị viên.
 
-## Mô phỏng tương đối hệ thống quản lí nhân sự của trường HCMUTE
+---
 
-*   **Quản Lý Tài Khoản**: Đăng nhập phân quyền (Admin, Sinh viên, Giảng viên).
-*   **Quản Lý Sinh Viên**: Theo dõi thông tin sinh viên, lớp học, chương trình học.
-*   **Quản Lý Học Phần (Course)**: Quản lý danh sách môn học.
-*   **Quản Lý Học Kỳ (Term)**: Quản lý các kỳ học (Năm học, Học kỳ hiện tại).
-*   **Lớp Học Phần (CourseSection)**: Mở lớp học phần cho từng học kỳ.
-*   **Đăng Ký Học Phần**: Sinh viên đăng ký và hủy học phần trực tuyến.
-*   **Quản Lý Điểm Số (Mark)**: Tự động tính điểm tổng kết (30% QT + 70% Thi) và xếp loại học lực (A, B, C, D, F).
-*   **Lịch Học & Lịch Thi**: Theo dõi thời khóa biểu và lịch thi.
+## Tính năng chính
 
-## TechStack
+### Sinh viên
+- Xem thời khóa biểu theo tuần (có thể chuyển tuần trước/sau)
+- Đăng ký môn học theo các đợt mở đăng ký
+- Xem và hủy môn đã đăng ký
+- Xem kết quả học tập chi tiết (điểm hệ 10, hệ 4, điểm chữ, kết quả)
 
-*   **Ngôn ngữ**: Java 17+
-*   **Giao diện**: Java Swing (MVC Pattern)
-*   **ORM**: Hibernate / Jakarta Persistence (JPA)
-*   **Database**: MySQL 8.0
-*   **Quản lý phụ thuộc**: Maven
-*   **Manual DI**: Centralized `AppContext` container.
+### Giảng viên
+- Nhập điểm và điểm danh cho lớp học phần mình phụ trách
+- Xem thời khóa biểu giảng dạy theo tuần
+- Nhận thông báo từ hệ thống
 
-## Cách cài
+### Quản trị viên (Admin)
+- Quản lý các đợt đăng ký môn học
+- Tạo và quản lý lớp học phần
+- Quản lý tài khoản sinh viên, giảng viên, admin
+- Quản lý môn học, khoa, ngành, lớp, học kỳ
+- Gửi thông báo hệ thống
 
-### 1. Chuẩn bị Cơ sở dữ liệu
-*   Sử dụng MySQL (XAMPP hoặc MySQL Workbench).
-*   Tạo database tên là: `online_ute`.
-*   Đảm bảo user/password tương ứng với file cấu hình (Mặc định: `root`/`1234`).
+---
 
-### 2. Cấu hình Persistence (Nếu cần)
-Kiểm tra và chỉnh sửa file:
-`src/main/resources/META-INF/persistence.xml`
-```xml
-<property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/online_ute"/>
-<property name="jakarta.persistence.jdbc.user" value="root"/>
-<property name="jakarta.persistence.jdbc.password" value="1234"/>
-```
+## Công nghệ & Kiến trúc
 
-### 3. Xây dựng và Chạy ứng dụng
-Mở terminal tại thư mục gốc của dự án:
+- Ngôn ngữ: Java 17 + Swing
+- Cơ sở dữ liệu: MySQL + JPA/Hibernate
+- Kiến trúc: MVC thuần
+- Quản lý dependency: AppContext instance-based
+- Xử lý transaction: JpaUtil.doInTransaction
+- Xử lý lỗi: ExceptionHandler + BusinessException
 
-**Dùng Maven Wrapper:**
-```bash
-./mvnw clean install
-./mvnw exec:java -Dexec.mainClass="com.bangcompany.onlineute.OnlineUteApplication"
-```
+### Các cải tiến kỹ thuật đã áp dụng
+- Viết AbstractDAO generic để tránh lặp code CRUD ở tất cả các DAOImpl
+- Chuyển AppContext từ static sang instance để dependency rõ ràng và dễ test hơn
+- Tạo ViewContext làm lớp trung gian, giúp View không gọi trực tiếp AppContext
+- Triển khai ExceptionHandler thống nhất để hiển thị popup lỗi và thông báo thành công
+- Thêm BusinessException riêng để phân biệt lỗi nghiệp vụ với lỗi kỹ thuật
+- Tối ưu query bằng JOIN FETCH để giảm nguy cơ N+1
+- Thiết kế giao diện với Card, RoundedBorders, Tabs và AppTheme riêng biệt
 
-**Hoặc chạy trực tiếp từ IDE:**
-Chạy file `src/main/java/com/bangcompany.onlineute/OnlineUteApplication.java`.
+---
 
-## Folder Structure
+## Hướng dẫn cài đặt & chạy
 
-*   `Config/`: Cấu hình hệ thống (JpaUtil, AppContext).
-*   `DAO/`: Tầng giao tiếp dữ liệu (Data Access Objects).
-*   `Service/`: Tầng xử lý logic nghiệp vụ.
-*   `Controller/`: Tầng điều khiển kết nối giữa View và Service.
-*   `Model/Entity/`: Định nghĩa các thực thể (Database Mapping).
-*   `View/`: Giao diện Java Swing UI.
+### 1. Chuẩn bị Database
+Chạy lần lượt các file SQL trong thư mục `database/`:
+1. `01_create_database.sql`
+2. `02_create_tables.sql`
+3. `03_insert_sample_data.sql`
 
-##  Tác Giả
-Dự án được thực hiện bởi Team BangCompany.
+### 2. Thông tin tài khoản tạo sẵn
+#### 1. Role ADMIN:
+- Username: AD001
+- Password: admin123
+#### 2. Role GIANGVIEN:
+- Username: GV001 - GV011
+- Password: 
+#### 3. Role SINHVIEC:
+- Username: SV001
+- Password: 

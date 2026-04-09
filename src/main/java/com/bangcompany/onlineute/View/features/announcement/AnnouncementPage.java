@@ -1,13 +1,13 @@
 /**
- * Xem các thông báo
+ * danh sách thông báo
  */
 package com.bangcompany.onlineute.View.features.announcement;
 
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.Announcement;
 import com.bangcompany.onlineute.View.Components.ui.Table;
 import com.bangcompany.onlineute.View.Components.ui.Card;
 import com.bangcompany.onlineute.View.shared.Refreshable;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,16 +21,19 @@ public class AnnouncementPage extends JPanel implements Refreshable {
     private static final int PAGE_SIZE = 10;
 
     private final Table table;
+    private final ViewContext viewContext;
 
     private List<Announcement> cached = new ArrayList<>();
     private int currentPage = 1;
 
-    public AnnouncementPage() {
+    // khởi tạo giao diện bảng thông báo
+    public AnnouncementPage(ViewContext viewContext) {
+        this.viewContext = viewContext;
         setLayout(new BorderLayout(0, 16));
         setBackground(new Color(245, 245, 245));
         setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
 
-        // bảng list thông báo
+        // tạo table list tin
         table = new Table(COLUMN_NAMES, 12, 44);
 
         Card titleCard = Card.titleCard("THÔNG BÁO");
@@ -43,24 +46,24 @@ public class AnnouncementPage extends JPanel implements Refreshable {
         add(tableCard, BorderLayout.CENTER);
     }
 
-    // render lại
+    // load data khi vào trang
     @Override
     public void onEnter() {
         loadData();
         renderPage(1);
     }
 
-    // kéo data từ sv về
+    // lấy thông báo từ database
     private void loadData() {
-        if (AppContext.getNotificationController() == null) {
+        if (viewContext.getNotificationController() == null) {
             cached = new ArrayList<>();
             return;
         }
-        List<Announcement> list = AppContext.getNotificationController().getAnnouncementsForCurrentUser();
+        List<Announcement> list = viewContext.getNotificationController().getAnnouncementsForCurrentUser();
         cached = list == null ? new ArrayList<>() : new ArrayList<>(list);
     }
 
-    // phân trang và hiện lên table
+    // chia trang và đưa lên table
     private void renderPage(int page) {
         int totalPages = Math.max(1, (int) Math.ceil(cached.size() / (double) PAGE_SIZE));
         if (page < 1) page = 1;

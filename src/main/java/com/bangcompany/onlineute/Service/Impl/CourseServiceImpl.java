@@ -50,12 +50,19 @@ public class CourseServiceImpl implements CourseService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return PaginationSupport.empty(pageRequest);
         }
-        return courseDAO.search(keyword.trim(), pageRequest);
+        String trimmedKeyword = keyword.trim();
+        String effectiveKeyword = "all".equalsIgnoreCase(trimmedKeyword) ? "" : trimmedKeyword;
+        return courseDAO.search(effectiveKeyword, pageRequest);
     }
 
     // tìm kiếm môn học dựa trên từ khóa (số trang và kích thước trang)
     @Override
     public PagedResult<Course> searchCourses(String keyword, int page, int pageSize) {
         return searchCourses(keyword, PaginationSupport.normalize(page, pageSize));
+    }
+
+    @Override
+    public long countAllCourses() {
+        return courseDAO.countAll();
     }
 }

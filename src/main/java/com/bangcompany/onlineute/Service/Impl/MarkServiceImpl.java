@@ -14,49 +14,55 @@ public class MarkServiceImpl implements MarkService {
         this.markDAO = markDAO;
     }
 
-    // lưu thông tin điểm số sau khi đã tính toán điểm tổng kết
+    // tính điểm tổng kết rồi lưu vô db
     @Override
     public Mark saveMark(Mark mark) {
         calculateGrade(mark);
         return markDAO.save(mark);
     }
 
-    // xóa điểm số khỏi hệ thống
+    // xóa điểm
     @Override
     public void deleteMark(Mark mark) {
         markDAO.delete(mark);
     }
 
-    // lấy thông tin điểm theo ID
+    // tìm điểm theo id
     @Override
     public Optional<Mark> getMarkById(Long id) {
         return markDAO.findById(id);
     }
 
-    // lấy thông tin điểm dựa trên bản ghi đăng ký học phần
+    // tìm điểm theo mã đăng ký môn
     @Override
     public Optional<Mark> getMarkByRegistration(Long registrationId) {
         return markDAO.findByRegistrationId(registrationId);
     }
 
-    // thực hiện tính toán điểm tổng kết và quy đổi sang điểm chữ
+    // tính điểm hệ 10 và đổi sang điểm chữ A B C D F
     @Override
     public void calculateGrade(Mark mark) {
         BigDecimal process = mark.getProcessScore() != null ? mark.getProcessScore() : BigDecimal.ZERO;
         BigDecimal test = mark.getTestScore() != null ? mark.getTestScore() : BigDecimal.ZERO;
         
-        // Điểm tổng kết = 30% Điểm quá trình + 70% Điểm thi (Quy định chuẩn học thuật)
+        // tổng kết = 30% quá trình + 70% thi cuối kỳ
         BigDecimal finalScore = process.multiply(new BigDecimal("0.3"))
                 .add(test.multiply(new BigDecimal("0.7")))
                 .setScale(2, RoundingMode.HALF_UP);
         
         mark.setFinalScore(finalScore);
         
-        // Quy đổi điểm hệ 10 sang điểm chữ (A, B, C, D, F) theo chuẩn Việt Nam
-        if (finalScore.compareTo(new BigDecimal("8.5")) >= 0) mark.setGradeChar("A");
-        else if (finalScore.compareTo(new BigDecimal("7.0")) >= 0) mark.setGradeChar("B");
-        else if (finalScore.compareTo(new BigDecimal("5.5")) >= 0) mark.setGradeChar("C");
-        else if (finalScore.compareTo(new BigDecimal("4.0")) >= 0) mark.setGradeChar("D");
-        else mark.setGradeChar("F");
+        // thang điểm chữ vn
+        if (finalScore.compareTo(new BigDecimal("8.5")) >= 0) {
+            mark.setGradeChar("A");
+        } else if (finalScore.compareTo(new BigDecimal("7.0")) >= 0) {
+            mark.setGradeChar("B");
+        } else if (finalScore.compareTo(new BigDecimal("5.5")) >= 0) {
+            mark.setGradeChar("C");
+        } else if (finalScore.compareTo(new BigDecimal("4.0")) >= 0) {
+            mark.setGradeChar("D");
+        } else {
+            mark.setGradeChar("F");
+        }
     }
 }

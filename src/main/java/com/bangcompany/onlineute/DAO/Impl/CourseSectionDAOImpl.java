@@ -1,63 +1,41 @@
-
 package com.bangcompany.onlineute.DAO.Impl;
 
-import com.bangcompany.onlineute.Config.JpaUtil;
+import com.bangcompany.onlineute.DAO.AbstractDAO;
 import com.bangcompany.onlineute.DAO.CourseSectionDAO;
 import com.bangcompany.onlineute.Model.Entity.CourseSection;
-import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-public class CourseSectionDAOImpl implements CourseSectionDAO {
+public class CourseSectionDAOImpl extends AbstractDAO<CourseSection> implements CourseSectionDAO {
+    public CourseSectionDAOImpl() {
+        super(CourseSection.class);
+    }
 
+    // lưu lớp học phần mới
     @Override
     public CourseSection save(CourseSection courseSection) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            if (courseSection.getId() == null) {
-                // Thêm mới lớp học phần
-                em.persist(courseSection);
-            } else {
-                // Cập nhật thông tin lớp học phần
-                courseSection = em.merge(courseSection);
-            }
-            em.getTransaction().commit();
-            return courseSection;
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            throw e;
-        } finally {
-            em.close();
-        }
+        return saveEntity(courseSection);
     }
 
+    // cập nhật lớp học phần đã có
     @Override
     public CourseSection update(CourseSection courseSection) {
-        return save(courseSection);
+        return saveEntity(courseSection);
     }
 
+    // xóa lớp học phần
     @Override
     public void delete(CourseSection courseSection) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            courseSection = em.merge(courseSection);
-            em.remove(courseSection);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            throw e;
-        } finally {
-            em.close();
+        if (courseSection == null) {
+            return;
         }
+        deleteEntityById(courseSection.getId());
     }
 
+    // tìm lớp theo id, fetch luôn môn học và giảng viên cho nhanh
     @Override
     public Optional<CourseSection> findById(Long id) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Tìm lớp học phần kèm theo thông tin môn học, giảng viên và đợt đăng ký
+        return executeRead(em -> {
             List<CourseSection> result = em.createQuery(
                             "SELECT cs FROM CourseSection cs " +
                                     "JOIN FETCH cs.course " +
@@ -70,76 +48,59 @@ public class CourseSectionDAOImpl implements CourseSectionDAO {
                     .setParameter("id", id)
                     .getResultList();
             return result.stream().findFirst();
-        } finally {
-            em.close();
-        }
+        });
     }
 
+    // tìm các lớp của học kỳ nào đó
     @Override
     public List<CourseSection> findByTermId(Long termId) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Tìm các lớp học phần theo học kỳ
-            return em.createQuery("SELECT cs FROM CourseSection cs WHERE cs.term.id = :termId", CourseSection.class)
-                    .setParameter("termId", termId)
-                    .getResultList();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery(
+                        "SELECT cs FROM CourseSection cs WHERE cs.term.id = :termId",
+                        CourseSection.class
+                )
+                .setParameter("termId", termId)
+                .getResultList());
     }
 
+    // tìm các lớp thuộc đợt đăng ký môn cụ thể
     @Override
     public List<CourseSection> findByRegistrationBatchId(Long registrationBatchId) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Danh sách các lớp học phần thuộc một đợt đăng ký cụ thể
-            return em.createQuery(
-                            "SELECT cs FROM CourseSection cs " +
-                                    "JOIN FETCH cs.course " +
-                                    "LEFT JOIN FETCH cs.lecturer " +
-                                    "WHERE cs.registrationBatch.id = :registrationBatchId",
-                            CourseSection.class
-                    )
-                    .setParameter("registrationBatchId", registrationBatchId)
-                    .getResultList();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery(
+                        "SELECT cs FROM CourseSection cs " +
+                                "JOIN FETCH cs.course " +
+                                "LEFT JOIN FETCH cs.lecturer " +
+                                "WHERE cs.registrationBatch.id = :registrationBatchId",
+                        CourseSection.class
+                )
+                .setParameter("registrationBatchId", registrationBatchId)
+                .getResultList());
     }
 
+    // tìm các lớp bị trùng giờ học trong cùng học kỳ (để check conflict)
     @Override
     public List<CourseSection> findConflictingSections(Long termId, Integer dayOfWeek, Integer startSlot, Integer endSlot) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Tìm các lớp học phần bị trùng lịch học (cùng học kỳ, cùng thứ, và thời gian tiết học giao nhau)
-            return em.createQuery(
-                            "SELECT cs FROM CourseSection cs " +
-                                    "JOIN FETCH cs.course " +
-                                    "LEFT JOIN FETCH cs.lecturer " +
-                                    "WHERE cs.term.id = :termId " +
-                                    "AND cs.dayOfWeek = :dayOfWeek " +
-                                    "AND cs.startSlot <= :endSlot " +
-                                    "AND cs.endSlot >= :startSlot",
-                            CourseSection.class
-                    )
-                    .setParameter("termId", termId)
-                    .setParameter("dayOfWeek", dayOfWeek)
-                    .setParameter("startSlot", startSlot)
-                    .setParameter("endSlot", endSlot)
-                    .getResultList();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery(
+                        "SELECT cs FROM CourseSection cs " +
+                                "JOIN FETCH cs.course " +
+                                "LEFT JOIN FETCH cs.lecturer " +
+                                "WHERE cs.term.id = :termId " +
+                                "AND cs.dayOfWeek = :dayOfWeek " +
+                                "AND cs.startSlot <= :endSlot " +
+                                "AND cs.endSlot >= :startSlot",
+                        CourseSection.class
+                )
+                .setParameter("termId", termId)
+                .setParameter("dayOfWeek", dayOfWeek)
+                .setParameter("startSlot", startSlot)
+                .setParameter("endSlot", endSlot)
+                .getResultList());
     }
 
     @Override
     public List<CourseSection> findAll() {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Lấy toàn bộ danh sách lớp học phần kèm thông tin môn học và giảng viên
-            return em.createQuery("SELECT cs FROM CourseSection cs JOIN FETCH cs.course LEFT JOIN FETCH cs.lecturer", CourseSection.class).getResultList();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery(
+                        "SELECT cs FROM CourseSection cs JOIN FETCH cs.course LEFT JOIN FETCH cs.lecturer",
+                        CourseSection.class
+                ).getResultList());
     }
 }

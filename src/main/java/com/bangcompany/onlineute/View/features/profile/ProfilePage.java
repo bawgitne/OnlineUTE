@@ -1,10 +1,10 @@
 /**
- * Xem thông tin cá nhân
+ * xem thông tin cá nhân
  */
 package com.bangcompany.onlineute.View.features.profile;
 
+import com.bangcompany.onlineute.View.shared.ViewContext;
 import com.bangcompany.onlineute.View.Components.ui.Card;
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.UserProfile;
 import com.bangcompany.onlineute.View.Components.theme.AppTheme;
 import com.bangcompany.onlineute.View.Components.theme.RoundedBorders;
@@ -18,11 +18,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class ProfilePage extends JPanel implements Refreshable {
+    private final ViewContext viewContext;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final JPanel bodyPanel = new JPanel(new BorderLayout());
 
-    public ProfilePage() {
+    // khởi tạo khung+tiêu đề trang
+    public ProfilePage(ViewContext viewContext) {
+        this.viewContext = viewContext;
         setLayout(new BorderLayout(0, 16));
         setBackground(new Color(245, 245, 245));
         setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
@@ -33,17 +36,17 @@ public class ProfilePage extends JPanel implements Refreshable {
         add(bodyPanel, BorderLayout.CENTER);
     }
 
-    // lấy data
+    // load lại data mới nhất khi vào trang
     @Override
     public void onEnter() {
-        UserProfile profile = AppContext.getUserProfileController().getCurrentUserProfile();
+        UserProfile profile = viewContext.getUserProfileController().getCurrentUserProfile();
         bodyPanel.removeAll();
         bodyPanel.add(createProfileContent(profile), BorderLayout.CENTER);
         revalidate();
         repaint();
     }
 
-    // chia thành các section nhỏ: cá nhân, học thuật, liên hệ
+    // gom các mục vào bảng dọc có scroll
     private JComponent createProfileContent(UserProfile profile) {
         JPanel content = new JPanel();
         content.setOpaque(false);
@@ -60,7 +63,7 @@ public class ProfilePage extends JPanel implements Refreshable {
         return SwingUtils.hiddenScrollPane(content);
     }
 
-    // cái card to đầu tiên chứa avatar và tên
+    // tạo header tóm tắt tên/mã/mail/sdt
     private JPanel createSummaryCard(UserProfile profile) {
         JPanel card = new JPanel(new BorderLayout(20, 0));
         card.setBackground(AppTheme.BACKGROUND_CARD);
@@ -68,13 +71,11 @@ public class ProfilePage extends JPanel implements Refreshable {
         card.setAlignmentX(Component.LEFT_ALIGNMENT);
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
 
-
         card.add(createSummaryInfo(profile), BorderLayout.CENTER);
         return card;
     }
 
-
-    // thông tin tóm tắt bên cạnh avatar
+    // nạp label thông tin vào header
     private JComponent createSummaryInfo(UserProfile profile) {
         JPanel info = new JPanel();
         info.setOpaque(false);
@@ -102,7 +103,7 @@ public class ProfilePage extends JPanel implements Refreshable {
         return info;
     }
 
-    // các field chi tiết của cá nhân
+    // hiện tên/nS/quê quán/cccd...
     private ProfileSectionCard createPersonalSection(UserProfile profile) {
         ProfileSectionCard card = new ProfileSectionCard("Thông tin cá nhân");
         card.addField("Họ và tên", valueOf(profile.getDisplayName()));
@@ -116,59 +117,39 @@ public class ProfilePage extends JPanel implements Refreshable {
         card.addField("CCCD / CMND", valueOf(profile.getCitizenIdNumber()));
         card.addField("Nơi cấp", valueOf(profile.getCitizenIdIssuePlace()));
         card.addField("Ngày cấp", formatDate(profile.getCitizenIdIssueDate()));
-        card.addField("Địa chỉ thường trú", valueOf(profile.getPermanentAddress()));
-        card.addField("Địa chỉ liên lạc", valueOf(profile.getCurrentAddress()));
-        card.addField("Email", valueOf(profile.getEmail()));
         return card;
     }
 
-    // các field chi tiết về học tập
+    // hiện khoa/ngành/lớp...
     private ProfileSectionCard createAcademicSection(UserProfile profile) {
         ProfileSectionCard card = new ProfileSectionCard("Thông tin học tập");
-        card.addField("Vai trò", valueOf(profile.getRoleTitle()));
-        card.addField("Khoa / Đơn vị", valueOf(profile.getFacultyName()));
-        card.addField("Lớp", valueOf(profile.getClassName()));
+        card.addField("Khoa", valueOf(profile.getFacultyName()));
         card.addField("Ngành", valueOf(profile.getMajorName()));
-        card.addField("Niên khóa", valueOf(profile.getAcademicYear()));
+        card.addField("Lớp", valueOf(profile.getClassName()));
+        card.addField("Năm nhập học", valueOf(profile.getAcademicYear()));
         card.addField("Năm tốt nghiệp dự kiến", valueOf(profile.getExpectedGraduationYear()));
         return card;
     }
 
-    // các field chi tiết về gia đình/liên hệ
+    // hiện địa chỉ+sdt liên hệ
     private ProfileSectionCard createContactSection(UserProfile profile) {
-        ProfileSectionCard card = new ProfileSectionCard("Thông tin liên hệ");
-        card.addField("Người liên hệ", valueOf(profile.getContactName()));
-        card.addField("Điện thoại liên hệ", valueOf(profile.getContactPhone()));
-        card.addField("Địa chỉ liên hệ", valueOf(profile.getContactAddress()));
-        card.addField("Họ tên cha", valueOf(profile.getFatherName()));
-        card.addField("Điện thoại cha", valueOf(profile.getFatherPhone()));
-        card.addField("Họ tên mẹ", valueOf(profile.getMotherName()));
-        card.addField("Điện thoại mẹ", valueOf(profile.getMotherPhone()));
+        ProfileSectionCard card = new ProfileSectionCard("Liên hệ");
+        card.addField("Địa chỉ thường trú", valueOf(profile.getPermanentAddress()));
+        card.addField("Địa chỉ tạm trú", valueOf(profile.getCurrentAddress()));
+        card.addField("Số điện thoại", valueOf(profile.getPhoneNumber()));
+        card.addField("Email", valueOf(profile.getEmail()));
+        card.addField("Liên hệ khẩn cấp", valueOf(profile.getContactName()));
+        card.addField("SDT khẩn cấp", valueOf(profile.getContactPhone()));
         return card;
     }
 
-    // kiểm tra null để hiện "Chưa cập nhật"
-    private String valueOf(String value) {
-        return value == null || value.isBlank() ? "Chưa cập nhật" : value;
+    // check null để ko hiện chữ null
+    private String valueOf(Object value) {
+        return value == null ? "" : String.valueOf(value);
     }
 
-    private String formatDate(LocalDate date) {
-        return date == null ? "Chưa cập nhật" : date.format(DATE_FORMATTER);
-    }
-
-    // lấy kí tự đầu tên để làm avatar
-    private String initialsOf(String value) {
-        if (value == null || value.isBlank()) {
-            return "?";
-        }
-
-        String[] parts = value.trim().split("\\s+");
-        if (parts.length == 1) {
-            return parts[0].substring(0, 1).toUpperCase();
-        }
-
-        String first = parts[0].substring(0, 1);
-        String last = parts[parts.length - 1].substring(0, 1);
-        return (first + last).toUpperCase();
+    // format ngày tháng vn
+    private String formatDate(LocalDate value) {
+        return value == null ? "" : DATE_FORMATTER.format(value);
     }
 }

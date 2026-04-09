@@ -1,5 +1,5 @@
 /**
- * quản lí tab
+ * quản lý cửa sổ chính của app
  */
 package com.bangcompany.onlineute.View;
 
@@ -10,6 +10,7 @@ public final class WindowManager extends JFrame {
     private static WindowManager instance;
     private static JPanel container;
 
+    // setup kích thước, tên app
     private WindowManager() {
         setTitle("OnlineUTE");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -20,13 +21,14 @@ public final class WindowManager extends JFrame {
         add(container);
     }
 
-    private static void init() {
+    // tạo instance duy nhất
+    public static void init() {
         if (instance == null) {
             instance = new WindowManager();
         }
     }
 
-    // xóa tab khác dduaw tab kia vào 1 lần 1 tab
+    // xóa nội dung cũ, nạp panel mới vào màn hình
     public static void show(JPanel panel) {
         init();
         container.removeAll();
@@ -39,7 +41,8 @@ public final class WindowManager extends JFrame {
         }
     }
 
-    public static void exit() {
+    // đóng app
+    public static void close() {
         if (instance != null) {
             instance.dispose();
         }

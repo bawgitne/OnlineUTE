@@ -1,13 +1,12 @@
 /**
- * DateUtils.java
- * Công dụng: Tiện ích xử lý và định dạng các thông tin liên quan đến ngày tháng.
+ * chuển số thành string tiếng việt
  */
 package com.bangcompany.onlineute.View.Components.theme;
 
 public final class DateUtils {
     private DateUtils() {}
 
-    // Chuyển đổi số thứ tự ngày trong tuần (1-7) sang chuỗi hiển thị tiếng Việt có dấu
+    // Chuyển đổi số thứtự ngày trong tuần(1-7) sang chuỗi hiển thị tiếng Việt có dấu
     public static String formatDay(Integer dayOfWeek) {
         if (dayOfWeek == null) {
             return "";

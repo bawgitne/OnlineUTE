@@ -1,6 +1,10 @@
 package com.bangcompany.onlineute.Service.Impl;
 
+
 import com.bangcompany.onlineute.DAO.MajorDAO;
+import com.bangcompany.onlineute.Model.DTO.PageRequest;
+import com.bangcompany.onlineute.Model.DTO.PagedResult;
+import com.bangcompany.onlineute.Model.DTO.PaginationSupport;
 import com.bangcompany.onlineute.Model.Entity.Major;
 import com.bangcompany.onlineute.Service.MajorService;
 
@@ -13,13 +17,13 @@ public class MajorServiceImpl implements MajorService {
         this.majorDAO = majorDAO;
     }
 
-    // lấy toàn bộ danh sách các ngành học
+    // lấy toàn bộ danh sách các ngành học
     @Override
     public List<Major> getAllMajors() {
         return majorDAO.findAll();
     }
 
-    // lấy danh sách các ngành học thuộc về một khoa cụ thể
+    // lấy danh sách các ngành học thuộc vọ một khoa cụ thể
     @Override
     public List<Major> getMajorsByFaculty(Long facultyId) {
         if (facultyId == null) {
@@ -28,25 +32,45 @@ public class MajorServiceImpl implements MajorService {
         return majorDAO.findByFacultyId(facultyId);
     }
 
-    // tạo một ngành học mới
+    @Override
+    public PagedResult<Major> searchMajors(String keyword, PageRequest pageRequest) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return PaginationSupport.empty(pageRequest);
+        }
+        String trimmedKeyword = keyword.trim();
+        String effectiveKeyword = "all".equalsIgnoreCase(trimmedKeyword) ? "" : trimmedKeyword;
+        return majorDAO.search(effectiveKeyword, pageRequest);
+    }
+
+    @Override
+    public PagedResult<Major> searchMajors(String keyword, int page, int pageSize) {
+        return searchMajors(keyword, PaginationSupport.normalize(page, pageSize));
+    }
+
+    @Override
+    public long countAllMajors() {
+        return majorDAO.countAll();
+    }
+
+    // tạo một ngành học mớii
     @Override
     public Major createMajor(Major major) {
         if (major == null) {
-            throw new IllegalArgumentException("Dữ liệu ngành học không được để trống.");
+            throw new IllegalArgumentException("Dữ liệu ngành học không đÃ†Â°ợc đáÂ»Æ’ trệ˜ng.");
         }
         return majorDAO.save(major);
     }
 
-    // cập nhật thông tin ngành học đã có
+    // cập nhật thông tin ngành học đã có
     @Override
     public Major updateMajor(Major major) {
         if (major == null) {
-            throw new IllegalArgumentException("Dữ liệu ngành học không được để trống.");
+            throw new IllegalArgumentException("Dữ liệu ngành học không đÃ†Â°ợc đáÂ»Æ’ trệ˜ng.");
         }
         return majorDAO.save(major);
     }
 
-    // xóa ngành học ra khỏi hệ thống dựa theo ID
+    // xóa ngành học ra khọi hệ thống dựa theo ID
     @Override
     public void deleteMajor(Long id) {
         majorDAO.deleteById(id);

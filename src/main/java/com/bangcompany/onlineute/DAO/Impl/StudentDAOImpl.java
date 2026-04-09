@@ -1,43 +1,30 @@
-
 package com.bangcompany.onlineute.DAO.Impl;
 
-import com.bangcompany.onlineute.Config.JpaUtil;
+import com.bangcompany.onlineute.DAO.AbstractDAO;
 import com.bangcompany.onlineute.DAO.StudentDAO;
 import com.bangcompany.onlineute.Model.DTO.PageRequest;
 import com.bangcompany.onlineute.Model.DTO.PagedResult;
 import com.bangcompany.onlineute.Model.DTO.PaginationSupport;
 import com.bangcompany.onlineute.Model.Entity.Student;
-import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
 
-public class StudentDAOImpl implements StudentDAO {
-
-    @Override
-    public Student save(Student student) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            if (student.getId() == null) {
-                // Thêm mới sinh viên
-                em.persist(student);
-            } else {
-                // Cập nhật sinh viên
-                student = em.merge(student);
-            }
-            em.getTransaction().commit();
-            return student;
-        } finally {
-            em.close();
-        }
+public class StudentDAOImpl extends AbstractDAO<Student> implements StudentDAO {
+    public StudentDAOImpl() {
+        super(Student.class);
     }
 
+    // lưu sv mới hoặc update cũ
+    @Override
+    public Student save(Student student) {
+        return saveEntity(student);
+    }
+
+    // tìm sv theo id, có fetch luôn lớp/khoa cho đỡ tốn query lẻ
     @Override
     public Optional<Student> findById(Long id) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Tìm sinh viên theo ID kèm thông tin lớp và khoa
+        return executeRead(em -> {
             Student student = em.createQuery(
                             "SELECT s FROM Student s " +
                                     "LEFT JOIN FETCH s.classEntity c " +
@@ -47,20 +34,18 @@ public class StudentDAOImpl implements StudentDAO {
                             Student.class
                     )
                     .setParameter("id", id)
-                    .getSingleResult();
+                    .getResultList()
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
             return Optional.ofNullable(student);
-        } catch (Exception e) {
-            return Optional.empty();
-        } finally {
-            em.close();
-        }
+        });
     }
 
+    // tìm sv dựa trên id của account login
     @Override
     public Optional<Student> findByAccountId(Long accountId) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Tìm sinh viên theo ID tài khoản kèm thông tin lớp và khoa
+        return executeRead(em -> {
             Student student = em.createQuery(
                             "SELECT s FROM Student s " +
                                     "LEFT JOIN FETCH s.classEntity c " +
@@ -70,40 +55,32 @@ public class StudentDAOImpl implements StudentDAO {
                             Student.class
                     )
                     .setParameter("accountId", accountId)
-                    .getSingleResult();
-            return Optional.of(student);
-        } catch (Exception e) {
-            return Optional.empty();
-        } finally {
-            em.close();
-        }
+                    .getResultList()
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+            return Optional.ofNullable(student);
+        });
     }
 
+    // lấy hết danh sách sv kèm thông tin lớp khoa
     @Override
     public List<Student> findAll() {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Lấy toàn bộ danh sách sinh viên kèm thông tin lớp và khoa
-            return em.createQuery(
-                            "SELECT s FROM Student s " +
-                                    "LEFT JOIN FETCH s.classEntity c " +
-                                    "LEFT JOIN FETCH c.major m " +
-                                    "LEFT JOIN FETCH m.faculty " +
-                                    "ORDER BY s.fullName, s.code",
-                            Student.class
-                    )
-                    .getResultList();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery(
+                        "SELECT s FROM Student s " +
+                                "LEFT JOIN FETCH s.classEntity c " +
+                                "LEFT JOIN FETCH c.major m " +
+                                "LEFT JOIN FETCH m.faculty " +
+                                "ORDER BY s.fullName, s.code",
+                        Student.class
+                ).getResultList());
     }
 
+    // search sv theo đủ thứ: tên, mã, mail, lớp... có phân trang
     @Override
     public PagedResult<Student> search(String keyword, PageRequest pageRequest) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
+        return executeRead(em -> {
             String normalizedKeyword = "%" + keyword.toLowerCase() + "%";
-            // Tìm kiếm sinh viên theo mã, họ tên, email, tên lớp hoặc tên khoa (kèm phân trang)
             List<Student> items = em.createQuery(
                             "SELECT DISTINCT s FROM Student s " +
                                     "LEFT JOIN FETCH s.classEntity c " +
@@ -124,7 +101,6 @@ public class StudentDAOImpl implements StudentDAO {
                     .setMaxResults(pageRequest.getPageSize())
                     .getResultList();
 
-            // Đếm tổng số lượng sinh viên tìm được
             Long totalItems = em.createQuery(
                             "SELECT COUNT(DISTINCT s.id) FROM Student s " +
                                     "LEFT JOIN s.classEntity c " +
@@ -143,55 +119,30 @@ public class StudentDAOImpl implements StudentDAO {
                     .getSingleResult();
 
             return PaginationSupport.of(items, pageRequest, totalItems);
-        } finally {
-            em.close();
-        }
+        });
     }
 
+    // tổng số sv trong db
     @Override
     public long countAll() {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Tổng số lượng sinh viên trong hệ thống
-            return em.createQuery("SELECT COUNT(s) FROM Student s", Long.class)
-                    .getSingleResult();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery("SELECT COUNT(s) FROM Student s", Long.class)
+                .getSingleResult());
     }
 
+    // xóa sv theo id
     @Override
     public void deleteById(Long id) {
-        if (id == null) {
-            return;
-        }
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            Student student = em.find(Student.class, id);
-            if (student != null) {
-                // Xóa sinh viên nếu tồn tại
-                em.remove(student);
-            }
-            em.getTransaction().commit();
-        } finally {
-            em.close();
-        }
+        deleteEntityById(id);
     }
 
+    // đếm sv theo đầu số mã sv (để sinh mã mới)
     @Override
     public long countByCodePrefix(String codePrefix) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Đếm số sinh viên có mã bắt đầu bằng chuỗi cụ thể (dùng để sinh mã tự động)
-            return em.createQuery(
-                            "SELECT COUNT(s) FROM Student s WHERE s.code LIKE :codePrefix",
-                            Long.class
-                    )
-                    .setParameter("codePrefix", codePrefix + "%")
-                    .getSingleResult();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery(
+                        "SELECT COUNT(s) FROM Student s WHERE s.code LIKE :codePrefix",
+                        Long.class
+                )
+                .setParameter("codePrefix", codePrefix + "%")
+                .getSingleResult());
     }
 }

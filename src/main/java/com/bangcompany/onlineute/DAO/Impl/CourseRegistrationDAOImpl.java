@@ -1,108 +1,97 @@
-
 package com.bangcompany.onlineute.DAO.Impl;
 
-import com.bangcompany.onlineute.Config.JpaUtil;
+import com.bangcompany.onlineute.DAO.AbstractDAO;
 import com.bangcompany.onlineute.DAO.CourseRegistrationDAO;
 import com.bangcompany.onlineute.Model.Entity.CourseRegistration;
-import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-public class CourseRegistrationDAOImpl implements CourseRegistrationDAO {
+public class CourseRegistrationDAOImpl extends AbstractDAO<CourseRegistration> implements CourseRegistrationDAO {
+    public CourseRegistrationDAOImpl() {
+        super(CourseRegistration.class);
+    }
 
+    // lưu đăng ký môn mới
     @Override
     public CourseRegistration save(CourseRegistration registration) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            if (registration.getId() == null) {
-                // Thêm mới đăng ký
-                em.persist(registration);
-            } else {
-                // Cập nhật thông tin đăng ký
-                registration = em.merge(registration);
-            }
-            em.getTransaction().commit();
-            return registration;
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            throw e;
-        } finally {
-            em.close();
-        }
+        return saveEntity(registration);
     }
 
     @Override
     public CourseRegistration update(CourseRegistration registration) {
-        return save(registration);
+        return saveEntity(registration);
     }
 
+    // hủy đăng ký môn (xóa khỏi db)
     @Override
     public void delete(CourseRegistration registration) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            // Cần merge vào persistence context trước khi xóa
-            registration = em.merge(registration);
-            em.remove(registration);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            throw e;
-        } finally {
-            em.close();
+        if (registration == null) {
+            return;
         }
+        deleteEntityById(registration.getId());
     }
 
     @Override
     public Optional<CourseRegistration> findById(Long id) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            return Optional.ofNullable(em.find(CourseRegistration.class, id));
-        } finally {
-            em.close();
-        }
+        return Optional.ofNullable(findEntityById(id));
     }
 
+    // lấy hết các môn sv này đã đăng ký, kèm theo điểm nếu có
     @Override
     public List<CourseRegistration> findByStudentId(Long studentId) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Danh sách các học phần mà sinh viên đăng ký, kèm kết quả điểm nếu có
-            return em.createQuery("SELECT cr FROM CourseRegistration cr JOIN FETCH cr.courseSection cs JOIN FETCH cs.course LEFT JOIN FETCH cr.mark WHERE cr.student.id = :studentId", CourseRegistration.class)
-                    .setParameter("studentId", studentId)
-                    .getResultList();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery(
+                        "SELECT cr FROM CourseRegistration cr JOIN FETCH cr.courseSection cs JOIN FETCH cs.course LEFT JOIN FETCH cs.lecturer LEFT JOIN FETCH cr.mark WHERE cr.student.id = :studentId",
+                        CourseRegistration.class
+                )
+                .setParameter("studentId", studentId)
+                .getResultList());
     }
 
+    // lấy danh sách sv đăng ký 1 lớp học phần nào đó
     @Override
     public List<CourseRegistration> findByCourseSectionId(Long sectionId) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Danh sách các sinh viên đăng ký vào một lớp học phần cụ thể
-            return em.createQuery("SELECT cr FROM CourseRegistration cr JOIN FETCH cr.student LEFT JOIN FETCH cr.mark WHERE cr.courseSection.id = :sectionId", CourseRegistration.class)
-                    .setParameter("sectionId", sectionId)
-                    .getResultList();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery(
+                        "SELECT cr FROM CourseRegistration cr JOIN FETCH cr.student LEFT JOIN FETCH cr.mark WHERE cr.courseSection.id = :sectionId",
+                        CourseRegistration.class
+                )
+                .setParameter("sectionId", sectionId)
+                .getResultList());
+    }
+
+    // tìm 1 dòng đăng ký cụ thể của sv trong 1 lớp
+    @Override
+    public Optional<CourseRegistration> findByStudentAndSection(Long studentId, Long sectionId) {
+        return executeRead(em -> em.createQuery(
+                        "SELECT cr FROM CourseRegistration cr LEFT JOIN FETCH cr.mark WHERE cr.student.id = :studentId AND cr.courseSection.id = :sectionId",
+                        CourseRegistration.class)
+                .setParameter("studentId", studentId)
+                .setParameter("sectionId", sectionId)
+                .getResultStream()
+                .findFirst());
     }
 
     @Override
+    public void deleteByStudentAndSection(Long studentId, Long sectionId) {
+        executeWrite(em -> {
+            em.createQuery("DELETE FROM CourseRegistration cr WHERE cr.student.id = :studentId AND cr.courseSection.id = :sectionId")
+                    .setParameter("studentId", studentId)
+                    .setParameter("sectionId", sectionId)
+                    .executeUpdate();
+            return null;
+        });
+    }
+
+    // check xem sv này đã đk lớp này chưa
+    @Override
     public boolean isRegistered(Long studentId, Long sectionId) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Kiểm tra xem sinh viên đã đăng ký học phần này chưa
+        return executeRead(em -> {
             Long count = em.createQuery(
-                "SELECT COUNT(cr) FROM CourseRegistration cr WHERE cr.student.id = :studentId AND cr.courseSection.id = :sectionId", Long.class)
-                .setParameter("studentId", studentId)
-                .setParameter("sectionId", sectionId)
-                .getSingleResult();
+                            "SELECT COUNT(cr) FROM CourseRegistration cr WHERE cr.student.id = :studentId AND cr.courseSection.id = :sectionId",
+                            Long.class)
+                    .setParameter("studentId", studentId)
+                    .setParameter("sectionId", sectionId)
+                    .getSingleResult();
             return count > 0;
-        } finally {
-            em.close();
-        }
+        });
     }
 }

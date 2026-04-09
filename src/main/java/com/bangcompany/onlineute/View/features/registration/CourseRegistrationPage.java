@@ -1,24 +1,25 @@
 /**
- * Đăng ký môn học
+ * đăng ký môn học
  */
 package com.bangcompany.onlineute.View.features.registration;
 
-import com.bangcompany.onlineute.View.Components.ui.Card;
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.CourseRegistration;
 import com.bangcompany.onlineute.Model.Entity.CourseSection;
 import com.bangcompany.onlineute.Model.Entity.RegistrationBatch;
 import com.bangcompany.onlineute.Model.Entity.Student;
-import com.bangcompany.onlineute.View.Components.ui.Button;
-import com.bangcompany.onlineute.View.Components.ui.Table;
 import com.bangcompany.onlineute.View.Components.theme.AppTheme;
 import com.bangcompany.onlineute.View.Components.theme.DateUtils;
+import com.bangcompany.onlineute.View.Components.ui.Button;
+import com.bangcompany.onlineute.View.Components.ui.Card;
+import com.bangcompany.onlineute.View.Components.ui.Table;
+import com.bangcompany.onlineute.View.Components.ui.Tabs;
+import com.bangcompany.onlineute.View.shared.ExceptionHandler;
 import com.bangcompany.onlineute.View.shared.Refreshable;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,167 +29,149 @@ import java.util.List;
 import java.util.Set;
 
 public class CourseRegistrationPage extends JPanel implements Refreshable {
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private final ViewContext viewContext;
 
-    private final DefaultListModel<RegistrationBatch> batchListModel = new DefaultListModel<>();
-    private final JList<RegistrationBatch> batchList = new JList<>(batchListModel);
-    private final Table sectionTable;
-    private final JLabel batchInfoLabel = new JLabel("Chọn một đợt đăng ký để xem các môn học.", SwingConstants.LEFT);
-    private final List<CourseSection> currentSections = new ArrayList<>();
+    private Tabs batchTabs = new Tabs();
+    private final JPanel tabsContainer = new JPanel(new BorderLayout());
+    private final List<BatchTab> tabItems = new ArrayList<>();
 
-    // hàm tạo giao diện chính
-    public CourseRegistrationPage() {
+    // class gom data cho mỗi tab (mỗi đợt)
+    private static final class BatchTab {
+        private final RegistrationBatch batch;
+        private final Table table;
+        private final JLabel infoLabel;
+        private final List<CourseSection> sections = new ArrayList<>();
+        private final JPanel panel;
+
+        private BatchTab(RegistrationBatch batch, Table table, JLabel infoLabel, JPanel panel) {
+            this.batch = batch;
+            this.table = table;
+            this.infoLabel = infoLabel;
+            this.panel = panel;
+        }
+    }
+
+    // khởi tạo trang đăng ký môn
+    public CourseRegistrationPage(ViewContext viewContext) {
+        this.viewContext = viewContext;
         setLayout(new BorderLayout(0, 16));
         setBackground(new Color(245, 245, 245));
-        setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
-
-        sectionTable = new Table(new String[]{"ID", "Mã lớp", "Môn học", "Giảng viên", "Phòng", "Thứ", "Tiết", "Còn chỗ", "Trạng thái"}, 12, 44);
-        sectionTable.setOnRowSelected(index -> {});
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
         add(Card.titleCard("ĐĂNG KÝ MÔN HỌC"), BorderLayout.NORTH);
         add(createBody(), BorderLayout.CENTER);
 
-        configureBatchList();
         loadOpenBatches();
     }
 
-    private Component createBody() {
+    private JComponent createBody() {
         JPanel container = new JPanel(new BorderLayout(0, 20));
         container.setOpaque(false);
-        container.add(createHintPanel(), BorderLayout.NORTH);
-        container.add(createContentPanel(), BorderLayout.CENTER);
+        container.add(createTabsContainer(), BorderLayout.CENTER);
         return container;
     }
 
-    private JPanel createHintPanel() {
+    // vùng chứa các tab đợt đăng ký môn
+    private JComponent createTabsContainer() {
+        tabsContainer.setOpaque(false);
+        return tabsContainer;
+    }
+
+    // hiện lúc ko có đợt nào đang mở
+    private JPanel createEmptyPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(AppTheme.BACKGROUND_CARD);
-        panel.setBorder(new EmptyBorder(18, 18, 18, 18));
+        panel.setOpaque(false);
 
-        JLabel hintLabel = new JLabel("<html>Hệ thống chỉ hiển thị các đợt đăng ký đang mở theo thời gian thực.<br>Chọn một đợt ở bên trái để xem các lớp học phần và đăng ký.</html>");
-        hintLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        hintLabel.setForeground(AppTheme.TEXT_MUTED);
-        panel.add(hintLabel, BorderLayout.CENTER);
+        Card card = new Card(AppTheme.RADIUS_CARD, new Insets(18, 18, 18, 18));
+        card.setLayout(new BorderLayout());
+        JLabel label = new JLabel("Không có đợt khả thi để đăng ký.", SwingConstants.CENTER);
+        label.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        label.setForeground(AppTheme.TEXT_MUTED);
+        card.add(label, BorderLayout.CENTER);
+
+        panel.add(card, BorderLayout.CENTER);
         return panel;
     }
 
-    // chia 2 cột: trái là ds đợt, phải là ds lớp môn học
-    private Component createContentPanel() {
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createBatchPanel(), createSectionPanel());
-        splitPane.setBorder(BorderFactory.createEmptyBorder());
-        splitPane.setDividerLocation(280);
-        splitPane.setResizeWeight(0.3);
-        return splitPane;
-    }
+    // build nội dung cho 1 tab (bảng lớp học phần)
+    private BatchTab buildBatchTab(RegistrationBatch batch) {
+        Table table = new Table(new String[]{"ID", "Mã lớp", "Môn học", "Giảng viên", "Phòng", "Thứ", "Tiết", "Còn chỗ", "Trạng thái"}, 12, 44);
+        table.setOnRowSelected(index -> {});
 
-    private Component createBatchPanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 12));
-        panel.setBackground(AppTheme.BACKGROUND_CARD);
-        panel.setBorder(new EmptyBorder(18, 18, 18, 18));
+        JLabel infoLabel = new JLabel("", SwingConstants.LEFT);
+        infoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        infoLabel.setForeground(new Color(80, 90, 100));
 
-        Card title = Card.titleCard("Đợt đăng ký đang mở");
-        panel.add(title, BorderLayout.NORTH);
-
-        JScrollPane scrollPane = new JScrollPane(batchList);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        panel.add(scrollPane, BorderLayout.CENTER);
-        return panel;
-    }
-
-    private Component createSectionPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 12));
         panel.setBackground(Color.WHITE);
         panel.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        batchInfoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        batchInfoLabel.setForeground(new Color(80, 90, 100));
-        panel.add(batchInfoLabel, BorderLayout.NORTH);
+        panel.add(infoLabel, BorderLayout.NORTH);
+        panel.add(table, BorderLayout.CENTER);
+        panel.add(buildActionsPanel(table, batch), BorderLayout.SOUTH);
 
-        panel.add(sectionTable, BorderLayout.CENTER);
+        BatchTab tab = new BatchTab(batch, table, infoLabel, panel);
+        loadSectionsForTab(tab);
+        return tab;
+    }
 
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+    // cụm nút bấm đăng ký dưới bảng
+    private JPanel buildActionsPanel(Table table, RegistrationBatch batch) {
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         actions.setOpaque(false);
+
         Button registerButton = new Button("Đăng ký lớp đã chọn");
         registerButton.setPreferredSize(new Dimension(190, 42));
-        registerButton.addActionListener(e -> registerSelectedSection());
+        registerButton.addActionListener(e -> registerSelectedSection(batch, table));
         actions.add(registerButton);
-        panel.add(actions, BorderLayout.SOUTH);
 
-        return panel;
+        return actions;
     }
 
-    // vẽ giao diện cho từng đợt đăng ký trong list bên trái
-    private void configureBatchList() {
-        batchList.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        batchList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        batchList.setFixedCellHeight(56);
-        batchList.setCellRenderer((list, value, index, isSelected, cellHasFocus) -> {
-            JPanel item = new JPanel(new BorderLayout(0, 6));
-            item.setBorder(new EmptyBorder(10, 12, 10, 12));
-            item.setBackground(isSelected ? new Color(223, 236, 255) : AppTheme.BACKGROUND_CARD);
-
-            JLabel nameLabel = new JLabel(value.getName());
-            nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-            nameLabel.setForeground(new Color(25, 35, 45));
-
-            String termText = value.getTerm() == null ? "" : value.getTerm().toString();
-            JLabel metaLabel = new JLabel(termText + " | " + DATE_TIME_FORMATTER.format(value.getOpenAt()) + " - " + DATE_TIME_FORMATTER.format(value.getCloseAt()));
-            metaLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-            metaLabel.setForeground(AppTheme.TEXT_MUTED);
-
-            item.add(nameLabel, BorderLayout.NORTH);
-            item.add(metaLabel, BorderLayout.CENTER);
-            return item;
-        });
-        batchList.addListSelectionListener(this::onBatchSelected);
-    }
-
-    private void onBatchSelected(ListSelectionEvent event) {
-        if (!event.getValueIsAdjusting()) {
-            loadSectionsForSelectedBatch();
-        }
-    }
-
-    // chỉ load những đợt đang trong thời gian mở
+    // load mấy đợt đang mở từ db
     private void loadOpenBatches() {
-        batchListModel.clear();
-        List<RegistrationBatch> openBatches = AppContext.getRegistrationBatchController().getOpenBatches(LocalDateTime.now());
-        for (RegistrationBatch batch : openBatches) {
-            batchListModel.addElement(batch);
-        }
+        tabItems.clear();
+        batchTabs = new Tabs();
+        tabsContainer.removeAll();
 
-        if (!batchListModel.isEmpty()) {
-            batchList.setSelectedIndex(0);
-        } else {
-            batchInfoLabel.setText("Hiện tại chưa có đợt đăng ký nào đang mở.");
-            sectionTable.clearRows();
-            sectionTable.setEmptyRow("");
-        }
-    }
-
-    // load các lớp học phần thuộc đợt được chọn
-    private void loadSectionsForSelectedBatch() {
-        sectionTable.clearRows();
-        currentSections.clear();
-        RegistrationBatch batch = batchList.getSelectedValue();
-        if (batch == null) {
-            batchInfoLabel.setText("Chọn một đợt đăng ký để xem các môn học.");
+        List<RegistrationBatch> openBatches = viewContext.getRegistrationBatchController().getOpenBatches(LocalDateTime.now());
+        if (openBatches == null || openBatches.isEmpty()) {
+            tabsContainer.add(createEmptyPanel(), BorderLayout.CENTER);
+            revalidate();
+            repaint();
             return;
         }
 
-        Set<Long> registeredSectionIds = getRegisteredSectionIds();
-        batchInfoLabel.setText("Đợt " + batch.getName() + " | Học kỳ " + batch.getTerm() + " | Bắt đầu học " + DATE_FORMATTER.format(batch.getCommonStartDate()));
+        for (RegistrationBatch batch : openBatches) {
+            BatchTab tab = buildBatchTab(batch);
+            tabItems.add(tab);
+            batchTabs.addTab(batch.getName(), tab.panel);
+        }
 
-        List<CourseSection> sections = AppContext.getCourseSectionController().getSectionsByBatch(batch.getId());
+        tabsContainer.add(batchTabs, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+    }
+
+    // nạp danh sách lớp vào bảng tương ứng
+    private void loadSectionsForTab(BatchTab tab) {
+        tab.table.clearRows();
+        tab.sections.clear();
+
+        RegistrationBatch batch = tab.batch;
+        tab.infoLabel.setText("Đợt " + batch.getName() + " | Học kỳ " + batch.getTerm() + " | Bắt đầu học " + DATE_FORMATTER.format(batch.getCommonStartDate()));
+
+        Set<Long> registeredSectionIds = getRegisteredSectionIds();
+        List<CourseSection> sections = viewContext.getCourseSectionController().getSectionsByBatch(batch.getId());
         for (CourseSection section : sections) {
             int current = section.getCurrentCapacity() == null ? 0 : section.getCurrentCapacity();
             int max = section.getMaxCapacity() == null ? 0 : section.getMaxCapacity();
             String availability = current + "/" + max;
             String state = registeredSectionIds.contains(section.getId()) ? "Đã đăng ký" : (current >= max ? "Đã đầy" : "Có thể đăng ký");
 
-            currentSections.add(section);
-            sectionTable.addRow(
+            tab.sections.add(section);
+            tab.table.addRow(
                     section.getId(),
                     section.getSectionCode(),
                     section.getCourse() == null ? "" : section.getCourse().getFullName(),
@@ -202,14 +185,14 @@ public class CourseRegistrationPage extends JPanel implements Refreshable {
         }
     }
 
-    // lấy ds ID các lớp mà sinh viên này đã đăng ký trước đó
+    // lấy danh sách môn đã đăng ký để check trùng
     private Set<Long> getRegisteredSectionIds() {
         Set<Long> ids = new HashSet<>();
         Student student = SessionManager.getCurrentStudent();
         if (student == null) {
             return ids;
         }
-        for (CourseRegistration registration : AppContext.getCourseRegistrationController().getStudentRegistrations(student.getId())) {
+        for (CourseRegistration registration : viewContext.getCourseRegistrationController().getStudentRegistrations(student.getId())) {
             if (registration.getCourseSection() != null) {
                 ids.add(registration.getCourseSection().getId());
             }
@@ -217,30 +200,42 @@ public class CourseRegistrationPage extends JPanel implements Refreshable {
         return ids;
     }
 
-    // gọi controller để thực hiện đăng ký 1 lớp học phần
-    private void registerSelectedSection() {
+    // gửi lệnh đăng ký môn lên database
+    private void registerSelectedSection(RegistrationBatch batch, Table table) {
         Student student = SessionManager.getCurrentStudent();
         if (student == null) {
-            JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin sinh viên đang đăng nhập.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            ExceptionHandler.showError(this, new IllegalArgumentException("Không tìm thấy thông tin sinh viên đang đăng nhập."), "Lỗi");
             return;
         }
 
-        int selectedIndex = sectionTable.getSelectedIndex();
-        if (selectedIndex < 0 || selectedIndex >= currentSections.size()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một lớp học phần trước.", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        int selectedIndex = table.getSelectedIndex();
+        BatchTab tab = findTabByBatch(batch);
+        if (tab == null || selectedIndex < 0 || selectedIndex >= tab.sections.size()) {
+            ExceptionHandler.showError(this, new IllegalArgumentException("Vui lòng chọn một lớp học phần trước."), "Thông báo");
             return;
         }
 
-        Long sectionId = currentSections.get(selectedIndex).getId();
+        Long sectionId = tab.sections.get(selectedIndex).getId();
         try {
-            AppContext.getCourseRegistrationController().registerStudentToSection(student.getId(), sectionId);
-            JOptionPane.showMessageDialog(this, "Đăng ký môn học thành công.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-            loadSectionsForSelectedBatch();
+            viewContext.getCourseRegistrationController().registerStudentToSection(student.getId(), sectionId);
+            ExceptionHandler.showInfo(this, "Đăng ký môn học thành công.", "Thành công");
+            loadSectionsForTab(tab); // Tải lại bảng để cập nhật trạng thái "Đã đăng ký"
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Không thể đăng ký: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            ExceptionHandler.showError(this, ex, "Không thể đăng ký.");
         }
     }
 
+    // tìm tab theo mã đợt đăng ký
+    private BatchTab findTabByBatch(RegistrationBatch batch) {
+        for (BatchTab tab : tabItems) {
+            if (tab.batch != null && tab.batch.getId() != null && tab.batch.getId().equals(batch.getId())) {
+                return tab;
+            }
+        }
+        return null;
+    }
+
+    // hiện tiết học kiểu 1-3
     private String formatSlots(Integer startSlot, Integer endSlot) {
         if (startSlot == null || endSlot == null) {
             return "";

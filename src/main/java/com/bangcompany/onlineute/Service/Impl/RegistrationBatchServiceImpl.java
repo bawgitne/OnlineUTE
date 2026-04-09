@@ -1,5 +1,6 @@
 package com.bangcompany.onlineute.Service.Impl;
 
+
 import com.bangcompany.onlineute.DAO.RegistrationBatchDAO;
 import com.bangcompany.onlineute.Model.Entity.RegistrationBatch;
 import com.bangcompany.onlineute.Service.RegistrationBatchService;
@@ -15,64 +16,63 @@ public class RegistrationBatchServiceImpl implements RegistrationBatchService {
         this.registrationBatchDAO = registrationBatchDAO;
     }
 
-    // tạo mới đợt đăng ký môn học
+    // tạo đợt đăng ký môn mới
     @Override
     public RegistrationBatch createBatch(RegistrationBatch registrationBatch) {
         validateBatch(registrationBatch);
         return registrationBatchDAO.save(registrationBatch);
     }
 
-    // cập nhật thông tin đợt đăng ký đã tồn tại
+    // lưu thay đổi cho đợt đăng ký
     @Override
     public RegistrationBatch updateBatch(RegistrationBatch registrationBatch) {
         validateBatch(registrationBatch);
         return registrationBatchDAO.save(registrationBatch);
     }
 
-    // lấy thông tin đợt đăng ký theo ID
+    // tìm đợt đk theo id
     @Override
     public Optional<RegistrationBatch> getBatchById(Long id) {
         return registrationBatchDAO.findById(id);
     }
 
-    // lấy danh sách đợt đăng ký thuộc học kỳ cụ thể
+    // lấy đợt đk của học kỳ nào đó
     @Override
     public List<RegistrationBatch> getBatchesByTerm(Long termId) {
         return registrationBatchDAO.findByTermId(termId);
     }
 
-    // lấy toàn bộ danh sách các đợt đăng ký
+    // lấy hết danh sách đợt đk
     @Override
     public List<RegistrationBatch> getAllBatches() {
         return registrationBatchDAO.findAll();
     }
 
-    // lấy các đợt đăng ký đang trong thời gian mở
+    // tìm mấy đợt đang trong giờ mở cửa cho sv đk
     @Override
     public List<RegistrationBatch> getOpenBatches(LocalDateTime currentTime) {
         return registrationBatchDAO.findOpenBatches(currentTime);
     }
 
-    // kiểm tra tính hợp lệ của dữ liệu đợt đăng ký trước khi lưu
     private void validateBatch(RegistrationBatch registrationBatch) {
         if (registrationBatch == null) {
-            throw new IllegalArgumentException("Đợt đăng ký không được để trống.");
+            throw new IllegalArgumentException("Ã„Â ợt đÃ„Æ’ng ký không đÃ†Â°ợc đáÂ»Æ’ trệ˜ng.");
         }
         if (registrationBatch.getName() == null || registrationBatch.getName().isBlank()) {
             throw new IllegalArgumentException("Tên đợt đăng ký không được để trống.");
         }
         if (registrationBatch.getTerm() == null) {
-            throw new IllegalArgumentException("Học kỳ áp dụng không được để trống.");
+            throw new IllegalArgumentException("Họ c kọ³ áp dọ¥ng không đÃ†Â°ợc đáÂ»Æ’ trệ˜ng.");
         }
         if (registrationBatch.getCommonStartDate() == null) {
-            throw new IllegalArgumentException("Ngày bắt đầu học chung không được để trống.");
+            throw new IllegalArgumentException("NgÃƒÂ y bắt đầu họ c chung không đÃ†Â°ợc đáÂ»Æ’ trệ˜ng.");
         }
         if (registrationBatch.getOpenAt() == null || registrationBatch.getCloseAt() == null) {
-            throw new IllegalArgumentException("Thời gian mở và đóng đăng ký không được để trống.");
+            throw new IllegalArgumentException("Thọ i gian máÂ»Å¸ và đóng đÃ„Æ’ng ký không đÃ†Â°ợc đáÂ»Æ’ trệ˜ng.");
         }
-        // Đảm bảo logic thời gian mở phải luôn trước thời gian đóng
+        // check giờ mở phải trước giờ đóng
         if (!registrationBatch.getOpenAt().isBefore(registrationBatch.getCloseAt())) {
-            throw new IllegalArgumentException("Thời gian mở đăng ký phải trước thời gian đóng đăng ký.");
+            throw new IllegalArgumentException("Thọ i gian máÂ»Å¸ đÃ„Æ’ng ký phải trÃ†Â°ớic thọ i gian đóng đÃ„Æ’ng ký.");
         }
     }
 }

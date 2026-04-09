@@ -26,4 +26,5 @@ public interface CourseService {
     
     // tìm kiếm môn học (số trang và kích thước trang)
     PagedResult<Course> searchCourses(String keyword, int page, int pageSize);
+    long countAllCourses();
 }

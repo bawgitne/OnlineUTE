@@ -42,4 +42,8 @@ public class StudentController {
     public long countAllStudents() {
         return studentService.countAllStudents();
     }
+
+    public long countStudentsByCodePrefix(String prefix) {
+        return studentService.countStudentsByCodePrefix(prefix);
+    }
 }

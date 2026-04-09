@@ -18,7 +18,7 @@ public final class RoundedBorders {
         return new OutlineBorder(color, arc, insets == null ? new Insets(0, 0, 0, 0) : insets);
     }
 
-    // Tạo đường viền bo góc kết hợp khảng cách đệm (padding) bên trong
+    // Tạo đường viền bo góc kết hợp khảng cách đệm bên trong
     public static Border paddedOutline(Color color, int arc, Insets padding) {
         return BorderFactory.createCompoundBorder(
                 outline(color, arc, new Insets(0, 0, 0, 0)),
@@ -31,7 +31,7 @@ public final class RoundedBorders {
         return paddedOutline(AppTheme.BORDER_LIGHT, arc, padding);
     }
 
-    // Tạo đường viền có nhãn tiêu đề (title) đè lên nét vẽ bo góc
+    // Tạo đường viền có nhãn tiêu đề  đè lên nét vẽ bo góc
     public static Border titleBorder(String title, Color borderColor, Color titleColor, Color backgroundColor, Font titleFont, int arc) {
         return new TitleBorder(title, borderColor, titleColor, backgroundColor, titleFont, arc);
     }

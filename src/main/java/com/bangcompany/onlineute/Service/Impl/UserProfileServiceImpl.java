@@ -19,19 +19,19 @@ public class UserProfileServiceImpl implements UserProfileService {
         this.userProfileDAO = userProfileDAO;
     }
 
-    // lưu thông tin hồ sơ người dùng
+    // lưu profile vào db
     @Override
     public UserProfile save(UserProfile userProfile) {
         return userProfileDAO.save(userProfile);
     }
 
-    // tìm hồ sơ theo ID tài khoản
+    // tìm profile theo id của account link với nó
     @Override
     public Optional<UserProfile> findByAccountId(Long accountId) {
         return userProfileDAO.findByAccountId(accountId);
     }
 
-    // lấy thông tin hồ sơ của người dùng hiện đang đăng nhập
+    // lấy profile của người đang login, ưu tiên lấy từ db ko có thì chế tạm từ session
     @Override
     public UserProfile getCurrentUserProfile() {
         Account currentAccount = SessionManager.getCurrentAccount();
@@ -44,7 +44,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .orElseGet(() -> buildFallbackProfile(currentAccount));
     }
 
-    // xây dựng hồ sơ dự phòng từ dữ liệu trong Session nêú DB chưa có Profile record
+    // tự chế profile từ data trong session (dùng khi db chưa có record cho account này)
     private UserProfile buildFallbackProfile(Account account) {
         UserProfile profile = new UserProfile();
         profile.setAccount(account);
@@ -52,7 +52,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         profile.setProfileCode(SessionManager.getProfileCode());
         profile.setRoleTitle(resolveRoleTitle(account));
 
-        // Nếu là sinh viên, bổ sung thêm các thông tin về lớp và khoa
+        // lấy thêm lớp, khoa... nếu là sv
         Student student = SessionManager.getCurrentStudent();
         if (student != null) {
             profile.setEmail(student.getEmail());
@@ -85,7 +85,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         return profile;
     }
 
-    // xác định tên hiển thị của vai trò người dùng
+    // đọc xem role là gì để hiện chữ sv/gv/admin cho đẹp
     private String resolveRoleTitle(Account account) {
         if (account == null || account.getRole() == null) {
             return "Người dùng";

@@ -4,13 +4,13 @@
 package com.bangcompany.onlineute.View.features.attendance;
 
 import com.bangcompany.onlineute.View.Components.ui.Card;
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.CourseRegistration;
 import com.bangcompany.onlineute.Model.Entity.Mark;
 import com.bangcompany.onlineute.Model.Entity.Student;
 import com.bangcompany.onlineute.View.Components.ui.Table;
 import com.bangcompany.onlineute.View.shared.Refreshable;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,8 +18,10 @@ import java.util.List;
 
 public class AttendancePage extends JPanel implements Refreshable {
     private final Table table;
+    private final ViewContext viewContext;
 
-    public AttendancePage() {
+    public AttendancePage(ViewContext viewContext) {
+        this.viewContext = viewContext;
         setLayout(new BorderLayout(0, 16));
         setBackground(new Color(245, 245, 245));
         setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
@@ -37,7 +39,7 @@ public class AttendancePage extends JPanel implements Refreshable {
         add(table, BorderLayout.CENTER);
     }
 
-    // hhiện data lên
+    // hiển thị dữ liệu lên
     @Override
     public void onEnter() {
         Student student = SessionManager.getCurrentStudent();
@@ -46,7 +48,7 @@ public class AttendancePage extends JPanel implements Refreshable {
         }
 
         table.clearRows();
-        List<CourseRegistration> registrations = AppContext.getCourseRegistrationService().getRegistrationsByStudent(student.getId());
+        List<CourseRegistration> registrations = viewContext.getCourseRegistrationController().getStudentRegistrations(student.getId());
 
         for (CourseRegistration registration : registrations) {
             Object[] row = new Object[16];
@@ -54,7 +56,7 @@ public class AttendancePage extends JPanel implements Refreshable {
                     ? registration.getCourseSection().getCourse().getFullName() : "";
 
             Mark mark = registration.getMark();
-            // lưu 15 buổi luuuw bằng 0 1 cho gọn
+            // lưu 15 buổi, lưu bằng 0/1 cho gọn
             String attendance = (mark != null && mark.getAttendance() != null) ? mark.getAttendance() : "000000000000000";
             while (attendance.length() < 15) {
                 attendance += "0";

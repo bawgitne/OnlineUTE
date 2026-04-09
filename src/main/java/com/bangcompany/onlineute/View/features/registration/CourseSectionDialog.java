@@ -1,210 +1,223 @@
-/**
- * Tạo lớp học phần
- */
 package com.bangcompany.onlineute.View.features.registration;
 
+import com.bangcompany.onlineute.View.shared.ViewContext;
+import com.bangcompany.onlineute.View.shared.ExceptionHandler;
 import com.bangcompany.onlineute.View.Components.ui.Card;
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Model.Entity.Course;
 import com.bangcompany.onlineute.Model.Entity.CourseSection;
 import com.bangcompany.onlineute.Model.Entity.Lecturer;
 import com.bangcompany.onlineute.Model.Entity.RegistrationBatch;
 import com.bangcompany.onlineute.View.Components.ui.Button;
-import com.bangcompany.onlineute.View.Components.ui.Table;
 import com.bangcompany.onlineute.View.Components.ui.TextInput;
 import com.bangcompany.onlineute.View.Components.ui.SelectInput;
 import com.bangcompany.onlineute.View.Components.ui.FormRow;
-import com.bangcompany.onlineute.View.Components.theme.DateUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CourseSectionDialog extends JDialog {
     private final RegistrationBatch selectedBatch;
+    private final ViewContext viewContext;
+    private final CourseSection editingSection;
 
     private final TextInput sectionCodeInput = new TextInput("Mã lớp học phần", false);
-    private final SelectInput<Course> courseSelect = new SelectInput<>("Môn học", AppContext.getCourseService().getAllCourses());
-    private final SelectInput<Lecturer> lecturerSelect = new SelectInput<>("Giảng viên", AppContext.getLecturerDAO().findAll());
-    private final TextInput roomInput = new TextInput("Phòng học", false);
-    private final TextInput maxCapacityInput = new TextInput("Số lượng tối đa", false);
-    private final SelectInput<DayOption> daySelect = new SelectInput<>("Thứ học", List.of(
-            new DayOption(1, DateUtils.formatDay(1)),
-            new DayOption(2, DateUtils.formatDay(2)),
-            new DayOption(3, DateUtils.formatDay(3)),
-            new DayOption(4, DateUtils.formatDay(4)),
-            new DayOption(5, DateUtils.formatDay(5)),
-            new DayOption(6, DateUtils.formatDay(6)),
-            new DayOption(7, DateUtils.formatDay(7))
-    ));
+    private final SelectInput<Course> courseSelect = new SelectInput<>("Môn học", List.of());
+    private final SelectInput<Lecturer> lecturerSelect = new SelectInput<>("Giảng viên", List.of());
+    private final TextInput roomInput = new TextInput("Phòng", false);
+    private final TextInput maxCapacityInput = new TextInput("Sĩ số tối đa", false);
+    private final SelectInput<DayOption> daySelect = new SelectInput<>("Thứ học", List.of());
     private final TextInput startSlotInput = new TextInput("Tiết bắt đầu", false);
     private final TextInput endSlotInput = new TextInput("Tiết kết thúc", false);
     private final TextInput totalWeeksInput = new TextInput("Số tuần học", false);
 
-    private final Table sectionTable = new Table(
-            new String[]{"ID", "Mã lớp", "Môn học", "Giảng viên", "Phòng", "Thứ", "Tiết", "Số tuần", "Sĩ số"},
-            12,
-            44
-    );
+    private final Button saveButton = new Button("Lưu lớp học phần");
+    private Button deleteButton;
+    private List<DayOption> dayOptions = new ArrayList<>();
 
-    // hàm tạo dialog quản lí lớp học phần
-    public CourseSectionDialog(Window owner, RegistrationBatch selectedBatch) {
-        super(owner, "Quản lý lớp học phần", ModalityType.APPLICATION_MODAL);
+    public CourseSectionDialog(Window owner, RegistrationBatch selectedBatch, ViewContext viewContext) {
+        this(owner, selectedBatch, null, viewContext);
+    }
+
+    public CourseSectionDialog(Window owner, RegistrationBatch selectedBatch, CourseSection editingSection, ViewContext viewContext) {
+        super(owner, editingSection == null ? "Tạo lớp học phần" : "Chỉnh sửa lớp học phần", ModalityType.APPLICATION_MODAL);
         this.selectedBatch = selectedBatch;
+        this.viewContext = viewContext;
+        this.editingSection = editingSection;
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setSize(980, 620);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(720, 560);
         setLocationRelativeTo(owner);
-        setContentPane(createContent());
 
-        fillDefaultValues();
-        loadSectionsIntoTable();
+        setLayout(new BorderLayout(0, 12));
+        add(Card.titleCard(editingSection == null ? "TẠO LỚP HỌC PHẦN" : "CHỈNH SỬA LỚP HỌC PHẦN"), BorderLayout.NORTH);
+        add(createFormPanel(), BorderLayout.CENTER);
+        add(createActionPanel(), BorderLayout.SOUTH);
+
+        loadOptions();
+        if (editingSection != null) {
+            fillForm(editingSection);
+        }
     }
 
-    private Container createContent() {
-        JPanel container = new JPanel(new BorderLayout(0, 16));
-        container.setBackground(new Color(245, 245, 245));
-        container.setBorder(new EmptyBorder(18, 18, 18, 18));
-
-        Card title = Card.titleCard("Tạo lớp học phần cho đợt: " + selectedBatch.getName() + " | " + selectedBatch.getTerm());
-        container.add(title, BorderLayout.NORTH);
-
-        // chia 2 nửa: bên trái nhập form, bên phải xem list
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createFormPanel(), createTablePanel());
-        splitPane.setBorder(BorderFactory.createEmptyBorder());
-        splitPane.setResizeWeight(0.42);
-        splitPane.setDividerLocation(360);
-        splitPane.setDividerSize(0);
-        splitPane.setEnabled(false);
-        splitPane.setOneTouchExpandable(false);
-        container.add(splitPane, BorderLayout.CENTER);
-
-        return container;
-    }
-
-    // cái form dài loằng ngoằng để nhập thông tin lớp
     private JPanel createFormPanel() {
         JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(12, 12, 12, 12));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        JLabel hint = new JLabel("<html>Khai báo môn học, giảng viên, phòng, thứ học, tiết học và số tuần.<br>Hệ thống sẽ tự động tính ngày học đầu tiên và sinh lịch theo tuần.</html>");
-        hint.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        hint.setForeground(new Color(100, 110, 120));
-        panel.add(hint);
-        panel.add(Box.createVerticalStrut(14));
-
-        panel.add(sectionCodeInput);
-        panel.add(Box.createVerticalStrut(12));
-        panel.add(courseSelect);
-        panel.add(Box.createVerticalStrut(12));
-        panel.add(lecturerSelect);
-        panel.add(Box.createVerticalStrut(12));
-        panel.add(FormRow.two(roomInput, maxCapacityInput));
-        panel.add(Box.createVerticalStrut(12));
-        panel.add(FormRow.two(daySelect, totalWeeksInput));
-        panel.add(Box.createVerticalStrut(12));
-        panel.add(FormRow.two(startSlotInput, endSlotInput));
-        panel.add(Box.createVerticalStrut(18));
-
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        actions.setOpaque(false);
-
-        Button createSectionButton = new Button("Tạo lớp học phần");
-        createSectionButton.setPreferredSize(new Dimension(180, 40));
-        createSectionButton.addActionListener(e -> createCourseSection());
-
-        actions.add(createSectionButton);
-        panel.add(actions);
+        panel.add(FormRow.two(sectionCodeInput, courseSelect));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(FormRow.two(lecturerSelect, roomInput));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(FormRow.three(maxCapacityInput, daySelect, startSlotInput));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(FormRow.two(endSlotInput, totalWeeksInput));
 
         return panel;
     }
 
-    private JPanel createTablePanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 12));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(new EmptyBorder(18, 18, 18, 18));
+    private JPanel createActionPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(0, 12, 12, 12));
 
-        Card title = Card.titleCard("Danh sách lớp học phần của đợt");
-        panel.add(title, BorderLayout.NORTH);
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        left.setOpaque(false);
 
-        panel.add(sectionTable, BorderLayout.CENTER);
+        if (editingSection != null) {
+            deleteButton = new Button("Xóa", new Color(230, 234, 240), new Color(30, 35, 40));
+            deleteButton.addActionListener(e -> deleteSection());
+            left.add(deleteButton);
+        }
+
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        right.setOpaque(false);
+
+        Button cancelButton = new Button("Đóng", new Color(230, 234, 240), new Color(30, 35, 40));
+        cancelButton.addActionListener(e -> dispose());
+
+        saveButton.setText(editingSection == null ? "Lưu lớp học phần" : "Cập nhật");
+        saveButton.addActionListener(e -> saveSection());
+
+        right.add(cancelButton);
+        right.add(saveButton);
+
+        panel.add(left, BorderLayout.WEST);
+        panel.add(right, BorderLayout.EAST);
         return panel;
     }
 
-    // lưu lớp học phần và tự động sinh lịch học kèm theo
-    private void createCourseSection() {
+    private void loadOptions() {
+        courseSelect.setItems(viewContext.getCourseController().getAllCourses());
+        lecturerSelect.setItems(viewContext.getLecturerController().getAllLecturers());
+        dayOptions = defaultDays();
+        daySelect.setItems(dayOptions);
+    }
+
+    private void fillForm(CourseSection section) {
+        sectionCodeInput.setValue(section.getSectionCode());
+        courseSelect.setSelectedItem(section.getCourse());
+        lecturerSelect.setSelectedItem(section.getLecturer());
+        roomInput.setValue(section.getRoom());
+        maxCapacityInput.setValue(section.getMaxCapacity() == null ? "" : String.valueOf(section.getMaxCapacity()));
+        startSlotInput.setValue(section.getStartSlot() == null ? "" : String.valueOf(section.getStartSlot()));
+        endSlotInput.setValue(section.getEndSlot() == null ? "" : String.valueOf(section.getEndSlot()));
+        totalWeeksInput.setValue(section.getTotalWeeks() == null ? "" : String.valueOf(section.getTotalWeeks()));
+        DayOption option = findDayOption(section.getDayOfWeek());
+        if (option != null) {
+            daySelect.setSelectedItem(option);
+        }
+    }
+
+    private DayOption findDayOption(Integer day) {
+        if (day == null) return null;
+        for (DayOption option : dayOptions) {
+            if (option.day == day) {
+                return option;
+            }
+        }
+        return null;
+    }
+
+    private List<DayOption> defaultDays() {
+        List<DayOption> options = new ArrayList<>();
+        options.add(new DayOption(1, "Thứ 2"));
+        options.add(new DayOption(2, "Thứ 3"));
+        options.add(new DayOption(3, "Thứ 4"));
+        options.add(new DayOption(4, "Thứ 5"));
+        options.add(new DayOption(5, "Thứ 6"));
+        options.add(new DayOption(6, "Thứ 7"));
+        options.add(new DayOption(7, "Chủ nhật"));
+        return options;
+    }
+
+    private void saveSection() {
         try {
-            CourseSection section = new CourseSection();
+            CourseSection section = editingSection == null ? new CourseSection() : editingSection;
             section.setSectionCode(sectionCodeInput.getValue().trim());
             section.setCourse(courseSelect.getSelectedValue());
             section.setLecturer(lecturerSelect.getSelectedValue());
             section.setRoom(roomInput.getValue().trim());
-            section.setMaxCapacity(Integer.parseInt(maxCapacityInput.getValue().trim()));
-            section.setCurrentCapacity(0);
-            section.setDayOfWeek(daySelect.getSelectedValue().value());
-            section.setStartSlot(Integer.parseInt(startSlotInput.getValue().trim()));
-            section.setEndSlot(Integer.parseInt(endSlotInput.getValue().trim()));
-            section.setTotalWeeks(Integer.parseInt(totalWeeksInput.getValue().trim()));
+            section.setMaxCapacity(parseInteger(maxCapacityInput.getValue(), "Sĩ số tối đa"));
+            section.setDayOfWeek(daySelect.getSelectedValue() == null ? null : daySelect.getSelectedValue().day);
+            section.setStartSlot(parseInteger(startSlotInput.getValue(), "Tiết bắt đầu"));
+            section.setEndSlot(parseInteger(endSlotInput.getValue(), "Tiết kết thúc"));
+            section.setTotalWeeks(parseInteger(totalWeeksInput.getValue(), "Số tuần học"));
+            section.setRegistrationBatch(selectedBatch);
+            if (selectedBatch != null) {
+                section.setTerm(selectedBatch.getTerm());
+            }
 
-            AppContext.getCourseSectionController().createSectionForBatch(selectedBatch, section);
-
-            JOptionPane.showMessageDialog(this, "Tạo lớp học phần thành công.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-            clearSectionForm();
-            loadSectionsIntoTable();
+            if (editingSection == null) {
+                viewContext.getCourseSectionController().createSectionForBatch(selectedBatch, section);
+                ExceptionHandler.showInfo(this, "Đã tạo lớp học phần.", "Thông báo");
+            } else {
+                viewContext.getCourseSectionController().updateSection(section);
+                ExceptionHandler.showInfo(this, "Đã cập nhật lớp học phần.", "Thông báo");
+            }
+            dispose();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Không tạo được lớp học phần: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            ExceptionHandler.showError(this, ex, "Không thể lưu lớp học phần.");
         }
     }
 
-    // load list lớp con của đợt vào table
-    private void loadSectionsIntoTable() {
-        sectionTable.clearRows();
-        List<CourseSection> sections = AppContext.getCourseSectionController().getSectionsByBatch(selectedBatch.getId());
-        for (CourseSection section : sections) {
-            sectionTable.addRow(
-                    section.getId(),
-                    section.getSectionCode(),
-                    section.getCourse() == null ? "" : section.getCourse().getFullName(),
-                    section.getLecturer() == null ? "" : section.getLecturer().getFullName(),
-                    section.getRoom(),
-                    DateUtils.formatDay(section.getDayOfWeek()),
-                    formatSlots(section.getStartSlot(), section.getEndSlot()),
-                    section.getTotalWeeks(),
-                    (section.getCurrentCapacity() == null ? 0 : section.getCurrentCapacity()) + "/" + (section.getMaxCapacity() == null ? 0 : section.getMaxCapacity())
-            );
+    private void deleteSection() {
+        int confirm = JOptionPane.showConfirmDialog(this, "Xóa lớp học phần này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+        try {
+            viewContext.getCourseSectionController().deleteSection(editingSection);
+            ExceptionHandler.showInfo(this, "Đã xóa lớp học phần.", "Thông báo");
+            dispose();
+        } catch (Exception ex) {
+            ExceptionHandler.showError(this, ex, "Không thể xóa lớp học phần.");
         }
     }
 
-    private void clearSectionForm() {
-        sectionCodeInput.setValue("");
-        roomInput.setValue("");
-        maxCapacityInput.setValue("70");
-        startSlotInput.setValue("");
-        endSlotInput.setValue("");
-        totalWeeksInput.setValue("15");
-    }
-
-    private void fillDefaultValues() {
-        if (maxCapacityInput.getValue().isBlank()) {
-            maxCapacityInput.setValue("70");
+    private Integer parseInteger(String value, String field) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(field + " không được để trống.");
         }
-        if (totalWeeksInput.getValue().isBlank()) {
-            totalWeeksInput.setValue("15");
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException(field + " không hợp lệ.");
         }
     }
 
-    private String formatSlots(Integer startSlot, Integer endSlot) {
-        if (startSlot == null || endSlot == null) {
-            return "";
-        }
-        return startSlot + " - " + endSlot;
-    }
+    private static final class DayOption {
+        private final int day;
+        private final String label;
 
-    // model bọc thứ học để hiện text trong comboBox
-    private record DayOption(int value, String label) {
+        private DayOption(int day, String label) {
+            this.day = day;
+            this.label = label;
+        }
+
         @Override
         public String toString() {
             return label;

@@ -14,4 +14,5 @@ public interface ClassDAO {
     PagedResult<Class> search(String keyword, PageRequest pageRequest);
     Class save(Class classEntity);
     void deleteById(Long id);
+    long countAll();
 }

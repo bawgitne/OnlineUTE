@@ -17,14 +17,14 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         this.announcementDAO = announcementDAO;
     }
 
-    // tạo mới thông báo
+    // tạo tin mới
     @Override
     public void createAnnouncement(String title, String content, String targetType, Long courseSectionId, String senderName) {
         Announcement announcement = new Announcement(title, content, targetType, courseSectionId, senderName);
         announcementDAO.create(announcement);
     }
 
-    // tìm kiếm thông báo có phân trang
+    // tìm tin có phân trang
     @Override
     public PagedResult<Announcement> searchAnnouncements(String keyword, PageRequest pageRequest) {
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -33,30 +33,29 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         return announcementDAO.search(keyword.trim(), pageRequest);
     }
 
-    // tìm kiếm thông báo (hỗ trợ số trang và kích thước trang)
+    // tìm tin nâng cao
     @Override
     public PagedResult<Announcement> searchAnnouncements(String keyword, int page, int pageSize) {
         return searchAnnouncements(keyword, PaginationSupport.normalize(page, pageSize));
     }
 
-    // lấy danh sách thông báo phù hợp với người dùng hiện tại
+    // lấy tin đúng role của user đang login
     @Override
     public List<Announcement> getAnnouncementsForCurrentUser() {
         String role = SessionManager.getRole();
         if (role == null) return new ArrayList<>();
 
-        // Admin có thể thấy toàn bộ thông báo trong hệ thống
+        // admin xem đc hết
         if (role.equals("ADMIN")) {
             return announcementDAO.findAll();
         } 
-        // Giảng viên thấy thông báo chung và thông báo dành riêng cho giảng viên
+        // gv thấy tin chung với tin cho gv
         else if (role.equals("LECTURER")) {
-            List<Announcement> res = new ArrayList<>();
-            res.addAll(announcementDAO.findByTargetType("ALL_LECTURERS"));
-            res.addAll(announcementDAO.findByTargetType("ALL"));
-            return res;
+            var lecturer = SessionManager.getCurrentLecturer();
+            if (lecturer == null) return new ArrayList<>();
+            return announcementDAO.findAnnouncementsForLecturer(lecturer.getId());
         } 
-        // Sinh viên thấy thông báo chung và thông báo từ các lớp học phần đang tham gia
+        // sv thấy tin chung và tin của lớp mình học
         else if (role.equals("STUDENT")) {
             var student = SessionManager.getCurrentStudent();
             if (student == null) return new ArrayList<>();

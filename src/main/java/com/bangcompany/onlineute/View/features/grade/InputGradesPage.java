@@ -4,7 +4,6 @@
 package com.bangcompany.onlineute.View.features.grade;
 
 import com.bangcompany.onlineute.View.Components.ui.Card;
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.Config.SessionManager;
 import com.bangcompany.onlineute.Model.Entity.CourseRegistration;
 import com.bangcompany.onlineute.Model.Entity.CourseSection;
@@ -13,6 +12,8 @@ import com.bangcompany.onlineute.Model.Entity.Mark;
 import com.bangcompany.onlineute.View.Components.ui.Button;
 import com.bangcompany.onlineute.View.Components.theme.TableStyles;
 import com.bangcompany.onlineute.View.shared.Refreshable;
+import com.bangcompany.onlineute.View.shared.ViewContext;
+import com.bangcompany.onlineute.View.shared.ExceptionHandler;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -26,8 +27,10 @@ import java.util.stream.Collectors;
 public class InputGradesPage extends JPanel implements Refreshable {
     private final JTabbedPane tabbedPane;
     private final JPanel noDataPanel = new JPanel(new BorderLayout());
+    private final ViewContext viewContext;
 
-    public InputGradesPage() {
+    public InputGradesPage(ViewContext viewContext) {
+        this.viewContext = viewContext;
         setLayout(new BorderLayout(0, 16));
         setBackground(new Color(245, 245, 245));
         setBorder(new javax.swing.border.EmptyBorder(20, 20, 20, 20));
@@ -61,7 +64,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         loadTabs();
     }
 
-    // ô các lớp để quản lí
+    // hiển thị các lớp để quản lý
     private void loadTabs() {
         tabbedPane.removeAll();
         Lecturer currentLecturer = SessionManager.getCurrentLecturer();
@@ -69,7 +72,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
             return;
         }
 
-        List<CourseSection> mySections = AppContext.getCourseSectionService().getAllSections().stream()
+        List<CourseSection> mySections = viewContext.getCourseSectionController().getAllSections().stream()
                 .filter(sec -> sec.getLecturer() != null && sec.getLecturer().getId().equals(currentLecturer.getId()))
                 .collect(Collectors.toList());
 
@@ -115,11 +118,11 @@ public class InputGradesPage extends JPanel implements Refreshable {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column >= 3 && column <= 19; // chỉ cho sửa điểm/điểm danh
+                return column >= 3 && column <= 19; // cho phép sửa điểm danh và điểm
             }
         };
 
-        List<CourseRegistration> registrations = AppContext.getCourseRegistrationService().getRegistrationsBySection(section.getId());
+        List<CourseRegistration> registrations = viewContext.getCourseRegistrationController().getRegistrationsBySection(section.getId());
 
         for (CourseRegistration reg : registrations) {
             Object[] rowData = new Object[21];
@@ -180,7 +183,7 @@ public class InputGradesPage extends JPanel implements Refreshable {
         return panel;
     }
 
-    // duyệt table để lưu điểm/điểm danh vào mảng dữ liệu sv
+    // duyệt table để lưu điểm/điểm danh vào mảng dữ liệu sinh viên
     private void saveGrades(JTable table, DefaultTableModel model, List<CourseRegistration> registrations) {
         if (table.isEditing()) {
             table.getCellEditor().stopCellEditing();
@@ -209,14 +212,14 @@ public class InputGradesPage extends JPanel implements Refreshable {
                 mark.setProcessScore(parseScore(model.getValueAt(r, 18)));
                 mark.setTestScore(parseScore(model.getValueAt(r, 19)));
 
-                AppContext.getMarkService().saveMark(mark);
+                viewContext.getMarkController().updateMark(mark);
             }
-            JOptionPane.showMessageDialog(this, "Lưu thành công bảng điểm và điểm danh.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            ExceptionHandler.showInfo(this, "Lưu thành công bảng điểm và điểm danh.", "Thông báo");
             loadTabs();
         } catch (NumberFormatException nfe) {
-            JOptionPane.showMessageDialog(this, "Có ô điểm nhập sai định dạng hoặc vượt khoảng 0-10.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            ExceptionHandler.showError(this, new IllegalArgumentException("Điểm nhập sai, chỉ nhận 0-10."), "Lỗi");
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Lỗi khi lưu bảng điểm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            ExceptionHandler.showError(this, ex, "Lỗi khi lưu bảng điểm.");
         }
     }
 

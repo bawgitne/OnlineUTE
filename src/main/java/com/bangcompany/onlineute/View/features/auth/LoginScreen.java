@@ -1,25 +1,30 @@
+/**
+ * màn hình đăng nhập
+ */
 package com.bangcompany.onlineute.View.features.auth;
 
-import com.bangcompany.onlineute.Config.AppContext;
 import com.bangcompany.onlineute.View.navigation.MainNavigator;
 import com.bangcompany.onlineute.View.Components.theme.ImageUtil;
+import com.bangcompany.onlineute.View.shared.ViewContext;
 
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Màn hình đăng nhập chính của ứng dụng.
- */
 public class LoginScreen extends JPanel {
-    public LoginScreen() {
-        setLayout(new GridBagLayout());     // tự động nằm giữa màn hình
+    private final ViewContext viewContext;
+
+    // khởi tạo giao diện logo và form login
+    public LoginScreen(ViewContext viewContext) {
+        this.viewContext = viewContext;
+        setLayout(new GridBagLayout());     // căn giữa nội dung
         setBackground(new Color(230, 235, 240));
 
-        JPanel cardHolder = new JPanel();   // container chứa nội dung đăng nhập
-        cardHolder.setLayout(new BoxLayout(cardHolder, BoxLayout.Y_AXIS));// xếp theo chiều dọc
-        cardHolder.setOpaque(false); // trong suốt background
+        JPanel cardHolder = new JPanel();   
+        cardHolder.setLayout(new BoxLayout(cardHolder, BoxLayout.Y_AXIS));
+        cardHolder.setOpaque(false); 
         add(cardHolder);
 
+        // logo và tên trường
         JPanel logoPanel = new JPanel();
         logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.Y_AXIS));
         logoPanel.setOpaque(false);
@@ -38,7 +43,6 @@ public class LoginScreen extends JPanel {
         uniName2.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         logoPanel.add(logoLabel);
-        logoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         logoPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         logoPanel.add(uniName1);
         logoPanel.add(uniName2);
@@ -46,11 +50,13 @@ public class LoginScreen extends JPanel {
         cardHolder.add(logoPanel);
         cardHolder.add(Box.createRigidArea(new Dimension(0, 30)));
 
+        // form nhập liệu user/pass
         LoginForm loginForm = new LoginForm(this::attemptLogin);
         loginForm.setAlignmentX(Component.CENTER_ALIGNMENT);
         cardHolder.add(loginForm);
     }
 
+    // xử lý check pass khi bấm nút đăng nhập
     private void attemptLogin(String user, String pass) {
         
         if (user.isEmpty() || pass.isEmpty()) {
@@ -58,7 +64,7 @@ public class LoginScreen extends JPanel {
             return;
         }
 
-        AppContext.authController.Login(user, pass).ifPresentOrElse(
+        viewContext.getAuthController().Login(user, pass).ifPresentOrElse(
                 account -> MainNavigator.showDashboard(),
                 () -> JOptionPane.showMessageDialog(this, "Tài khoản hoặc mật khẩu không chính xác.", "Lỗi đăng nhập", JOptionPane.ERROR_MESSAGE)
         );

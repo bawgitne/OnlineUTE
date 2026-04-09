@@ -1,65 +1,71 @@
-
 package com.bangcompany.onlineute.DAO.Impl;
 
-import com.bangcompany.onlineute.Config.JpaUtil;
+import com.bangcompany.onlineute.DAO.AbstractDAO;
 import com.bangcompany.onlineute.DAO.FacultyDAO;
+import com.bangcompany.onlineute.Model.DTO.PageRequest;
+import com.bangcompany.onlineute.Model.DTO.PagedResult;
+import com.bangcompany.onlineute.Model.DTO.PaginationSupport;
 import com.bangcompany.onlineute.Model.Entity.Faculty;
-import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
-public class FacultyDAOImpl implements FacultyDAO {
+public class FacultyDAOImpl extends AbstractDAO<Faculty> implements FacultyDAO {
+    public FacultyDAOImpl() {
+        super(Faculty.class);
+    }
+
+    // lấy hết danh sách khoa
     @Override
     public List<Faculty> findAll() {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // Lấy toàn bộ danh sách khoa sắp xếp theo tên
-            return em.createQuery("SELECT f FROM Faculty f ORDER BY f.fullName", Faculty.class).getResultList();
-        } finally {
-            em.close();
-        }
+        return executeRead(em -> em.createQuery("SELECT f FROM Faculty f ORDER BY f.fullName", Faculty.class)
+                .getResultList());
     }
 
+    // tìm khoa theo tên hoặc mã khoa có phân trang
+    @Override
+    public PagedResult<Faculty> search(String keyword, PageRequest pageRequest) {
+        return executeRead(em -> {
+            String normalizedKeyword = "%" + keyword.toLowerCase() + "%";
+            List<Faculty> items = em.createQuery(
+                            "SELECT f FROM Faculty f " +
+                                    "WHERE LOWER(f.facultyCode) LIKE :keyword " +
+                                    "OR LOWER(f.fullName) LIKE :keyword " +
+                                    "ORDER BY f.fullName",
+                            Faculty.class
+                    )
+                    .setParameter("keyword", normalizedKeyword)
+                    .setFirstResult(PaginationSupport.offset(pageRequest))
+                    .setMaxResults(pageRequest.getPageSize())
+                    .getResultList();
+
+            Long totalItems = em.createQuery(
+                            "SELECT COUNT(f) FROM Faculty f " +
+                                    "WHERE LOWER(f.facultyCode) LIKE :keyword " +
+                                    "OR LOWER(f.fullName) LIKE :keyword",
+                            Long.class
+                    )
+                    .setParameter("keyword", normalizedKeyword)
+                    .getSingleResult();
+
+            return PaginationSupport.of(items, pageRequest, totalItems);
+        });
+    }
+
+    // lưu khoa mới hoặc cập nhật khoa cũ
     @Override
     public Faculty save(Faculty faculty) {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            if (faculty.getId() == null) {
-                // Thêm mới khoa
-                em.persist(faculty);
-            } else {
-                // Cập nhật thông tin khoa
-                faculty = em.merge(faculty);
-            }
-            em.getTransaction().commit();
-            return faculty;
-        } catch (Exception ex) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw ex;
-        } finally {
-            em.close();
-        }
+        return saveEntity(faculty);
+    }
+
+    // xóa khoa theo id
+    @Override
+    public void deleteById(Long id) {
+        deleteEntityById(id);
     }
 
     @Override
-    public void deleteById(Long id) {
-        if (id == null) {
-            return;
-        }
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            em.getTransaction().begin();
-            Faculty faculty = em.find(Faculty.class, id);
-            if (faculty != null) {
-                // Xóa khoa nếu tồn tại
-                em.remove(faculty);
-            }
-            em.getTransaction().commit();
-        } finally {
-            em.close();
-        }
+    public long countAll() {
+        return executeRead(em -> em.createQuery("SELECT COUNT(f) FROM Faculty f", Long.class)
+                .getSingleResult());
     }
 }
