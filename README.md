@@ -60,7 +60,7 @@ Chạy lần lượt các file SQL trong thư mục `database/`:
 - Password: admin123
 #### 2. Role GIANGVIEN:
 - Username: GV001 - GV011
-- Password: 
+- Password: 123456
 #### 3. Role SINHVIEC:
-- Username: SV001
-- Password: 
+- Username: 24110001 - 24110200
+- Password: 123456
