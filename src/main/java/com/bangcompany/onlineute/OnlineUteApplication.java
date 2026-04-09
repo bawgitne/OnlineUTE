@@ -57,7 +57,17 @@ public class OnlineUteApplication {
                 ExceptionHandler.showError(null, ex, "Da xay ra loi.");
             }
         });
-
+        System.out.println("Xem file readme: https://github.com/bawgitne/OnlineUTE/blob/master/README.md");
+        System.out.println("Thông tin tài khoản tạo sẵn\n" +
+                "#### 1. Role ADMIN:\n" +
+                "- Username: AD001\n" +
+                "- Password: admin123\n" +
+                "#### 2. Role GIANGVIEN:\n" +
+                "- Username: GV001 - GV011\n" +
+                "- Password: 123456\n" +
+                "#### 3. Role SINHVIEC:\n" +
+                "- Username: 24110001 - 24110200\n" +
+                "- Password: 123456");
         // 4. Cleanup
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             JpaUtil.shutdown();
